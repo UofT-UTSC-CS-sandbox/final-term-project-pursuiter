@@ -1,1 +1,38 @@
-[![Open in Visual Studio Code](https://classroom.github.com/assets/open-in-vscode-718a45dd9cf7e7f842a935f5ebbe5719a5e09af4491e668f4dbf3b35d5cca122.svg)](https://classroom.github.com/online_ide?assignment_repo_id=15087118&assignment_repo_type=AssignmentRepo)
+# CSCC01 Final Term Project - Pursuiter
+## Prereqs
+- Node.js (v22.2.0): https://nodejs.org/en/download/package-manager
+- MongoDB (v7.0.8): https://www.mongodb.com/docs/manual/administration/install-community/
+- MongoDB Compass Download (GUI): https://www.mongodb.com/try/download/atlascli
+
+## Run backend
+Run `cd backend` to navigate to the backend directory. 
+1. Install dependencies
+```
+npm install
+```
+2. Setup database cirectory
+```
+mkdir data
+cd data
+mkdir db
+cd ..
+```
+3. Start MongoDB server
+```
+mongod --dbpath=./data/db
+```
+4. Run the application
+```
+npm run dev
+```
+
+## Run frontend
+Run `cd frontend` to navigate to the frontend directory.
+1. Install dependencies
+```
+npm install
+```
+2. Run the application
+```
+npm start
+```
