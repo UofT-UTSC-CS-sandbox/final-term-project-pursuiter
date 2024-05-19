@@ -1,5 +1,5 @@
 # CSCC01 Final Term Project - Pursuiter
-## Prereqs
+## Prerequisites
 - Node.js (v22.2.0): https://nodejs.org/en/download/package-manager
 - MongoDB (v7.0.8): https://www.mongodb.com/docs/manual/administration/install-community/
 - MongoDB Compass Download (GUI): https://www.mongodb.com/try/download/atlascli
