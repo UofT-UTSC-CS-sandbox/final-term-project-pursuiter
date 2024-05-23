@@ -70,56 +70,50 @@ Acceptance criteria: Given that the job seeker uploaded a resume, when they appl
 then the AI will recommend edits to their resume.
 
 
-13. User story: As a job seeker, I want get notifications of job postings that match my skills, so that I can be one of the first that apply to the posting.
-
-Acceptance criteria: Given that the job seeker has registered, when a job posting matching their skills is made, 
-then they will be notified.
-
-
-14. User story: As an employer, I want to post jobs, so that I can get applications and hire someone.
+13. User story: As an employer, I want to post jobs, so that I can get applications and hire someone.
 
 Acceptance criteria: Given that the job data is filled out, when post button is pressed, 
 then the job will be available to job seekers.
 
 
-15. User story: As an employer, I want to see all my jobs postings, so that I can track the hiring process.
+14. User story: As an employer, I want to see all my jobs postings, so that I can track the hiring process.
 
 Acceptance criteria: Given that the jobs have already been posted, when viewing the posted jobs section, 
 then the employer will be able to see all the jobs they are hiring for.
 
 
-16. User story: As an employer, I want to select one of my postings, so that I can see the list of applicants.
+15. User story: As an employer, I want to select one of my postings, so that I can see the list of applicants.
 
 Acceptance criteria: Given that the job posting has been clicked on, when the “applications” section opens, 
 then the employer will be able view all the applicants to that particular job.
 
 
-17. User story: As an employer, I want to search for specific things via the search bar in my applications, so that I can see applicants with matching qualifications.
+16. User story: As an employer, I want to search for specific things via the search bar in my applications, so that I can see applicants with matching qualifications.
 
 Acceptance criteria: Given that the search bar has been filled with something, when the search button is pressed, 
 then the employer will be able view all the applicants that have the matching qualifications.
 
 
-18. User story: As an employer, I want to use filters for my applicants such as experience, education etc., so that I can efficiently sort by matching qualifications.
+17. User story: As an employer, I want to use filters for my applicants such as experience, education etc., so that I can efficiently sort by matching qualifications.
 
 Acceptance criteria: Given that the applicant filters are selected, when looking at the applicants list, 
 then the employer will be able view all the applicants that have the matching qualifications.
 
 
-19. User story: As an employer, I want to get compatibility summary by AI for all my applicants, so that I can save time in viewing and choosing aspect of hiring.
+18. User story: As an employer, I want to get compatibility summary by AI for all my applicants, so that I can save time in viewing and choosing aspect of hiring.
 
 Acceptance criteria: Given that the applicant has sufficient personal information submitted, when looking at the applicants list, 
 then the employer will be able view short AI compatibility summaries.
 
 
-20. User story: As an employer, I want to view detailed AI descriptions of my applicants when viewing submissions for a job posting, so that 
+19. User story: As an employer, I want to view detailed AI descriptions of my applicants when viewing submissions for a job posting, so that 
 I view all the needed information about an applicant when making hiring decisions.
 
 Acceptance criteria: Given that the applicant has sufficient personal information submitted, when clicking on an applicant in the applicant list, 
 then the employer will be able view detailed AI descriptions of applicants for the job.
 
 
-21. User story: As an employer, I want to edit applicant status for my applicants, so that potential employees can see their progress within the application.
+20. User story: As an employer, I want to edit applicant status for my applicants, so that potential employees can see their progress within the application.
 
 Acceptance criteria: Given that the application status is specified by the employer, when application is viewed by either the applicant or the employer, 
 then the application status is displayed.
