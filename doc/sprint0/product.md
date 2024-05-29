@@ -10,7 +10,7 @@ We are planning to build a job application platform called Pursuiter that provid
 
 * **High-level description:** Pursuiter is a job application platform that tailors job recommendations for applicants and filters applicants for employers.
 * **Problem:** Job seekers often get rejected due to not meeting job requirements, and employers receive many unqualified applications.
-* **Solution:** Pursuiter aims to reduce rejections for applicants by providing tailored job recommendations and help employers filter out unqualified applicants effectively.
+* **Solution:** Pursuiter aims to reduce rejections for applicants by providing tailored job recommendations and help employers filter out unqualified applicants effectively. In addition, it empowers AI to rank applicants based on their qualifications and provide quick, short, and relevant summaries of the applicant to increase the effciency of the screening phase.
 * **Product Type:** Website
 * **Common Use Cases:**
   - **Applicants:** Receive job recommendations based on their profiles and qualifications, apply for jobs they are eligible for, and get feedback on their applications.
@@ -64,8 +64,8 @@ We are planning to build a job application platform called Pursuiter that provid
 3. **Employer Stats and Summaries:** We discussed providing basic application lists versus detailed AI-generated summaries. Detailed summaries were chosen to give employers better insights and make more informed decisions.
 4. **Team Organization:** All members are full-stack developers to gain experience in all fields.
 5. **Meeting Schedule:**
-   - **Standups:** Everyday, in-person.
-   - **Tuesday Meeting:** 3:00 - 4:00 pm, online asynchronous.
+   - **Standups:** Everyday, online asynchronous.
+   - **Tuesday Meeting:** 3:00 - 4:00 pm, in-person.
    - **Sprint Planning:** Thursday (before new sprint), 3:00 - 4:00 pm, online synchronous.
    - **Sprint Retro:** Thursday (after sprint ends), 3:00 - 4:00 pm, online synchronous.
    - All members get a ‘free pass’ to miss one meeting.
