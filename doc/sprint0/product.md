@@ -8,9 +8,14 @@
 
 We are planning to build a job application platform called Pursuiter that provides tailored job recommendations to applicants and efficient applicant filtering for employers.
 
-* **High-level description:** Pursuiter is a job application platform that tailors job recommendations for applicants and filters applicants for employers.
-* **Problem:** Job seekers often get rejected due to not meeting job requirements, and employers receive many unqualified applications.
-* **Solution:** Pursuiter aims to reduce rejections for applicants by providing tailored job recommendations and help employers filter out unqualified applicants effectively. In addition, it empowers AI to rank applicants based on their qualifications and provide quick, short, and relevant summaries of the applicant to increase the effciency of the screening phase.
+* **High-level description:** Pursuiter is a job application platform that leverages AI to help with a smooth job seeking and recruitment process. It assists job seekers in tailoring their applications for their desired positions. It also helps recruiters limit application to qualified candidates, as well as assists in evaluating and sorting candidates with minimal effort.
+  
+* **Problem:**
+* Job seekers: Often get rejected due to not meeting minimum requirements. They also spend too much time tailoring applications with no feedback.
+* Recruiters: Receive too many applications with few numbers of candidates who qualify. They also spend too much time reviewing the applications.
+  
+* **Solution:** Pursuiter aims to assist applicants by providing tailored job recommendations and help employers filter out unqualified applicants effectively. In addition, it empowers AI to rank applicants based on their qualifications and provide quick, short, and relevant summaries of the applicant to increase the effciency of the screening phase.
+  
 * **Product Type:** Website
 * **Common Use Cases:**
   - **Applicants:** Receive job recommendations based on their profiles and qualifications, apply for jobs they are eligible for, and get feedback on their applications.
@@ -36,15 +41,15 @@ We are planning to build a job application platform called Pursuiter that provid
 #### Q3: Why would your users choose your product? What are they using today to solve their problem/need?
 
 **Why applicants would choose Pursuiter:**
-- **Tailored Recommendations:** Our platform offers job recommendations based on their personal profiles and resumes, reducing the chances of rejections.
-- **Efficient Application Process:** Applicants can only apply for jobs they are eligible for, saving time and effort.
-
+- **Tailored Recommendations:** Before submitting an application, our platform offers AI generated feedback that is based on their profiles, resumes and the specific job they are applying for. This allows users to better showcase their qualifications for the role being applied to.
+- **Efficient Application Process:** By getting AI generated feedback, this reduces the time and effort needed to personalize an application for the posting.
+  
 **Why employers would choose Pursuiter:**
-- **Qualified Applicants:** Employers receive applications from candidates who meet the job requirements, reducing the number of unqualified applicants.
-- **Advanced Filtering:** Employers can filter and sort applications using AI-generated summaries and statistics, making the shortlisting process more efficient.
+- **Qualified Applicants:** Employers are able to set minimum requirements that are hidden to job seekers (possibly different than preferred qualifications which are shown on the posting). By doing so, applicants who do not meet the minimum requirements will not be able to apply, ensuring that employers receive less but more qualified applications.
+- **Advanced Filtering:** Employers can sort applications using AI-generated summaries and statistics, making the shortlisting process more efficient.
 
 **Current Solutions:**
-- **Applicants:** Use generic job boards, face high rejection rates due to mismatched applications.
+- **Applicants:** Use generic job boards, face high rejection rates due to mismatched applications. More time and effort required to personalize applications.
 - **Employers:** Use traditional job boards or recruiting agencies, spend a lot of time filtering through unqualified candidates.
 
 #### Q4: What does "DONE" mean to your Team?
