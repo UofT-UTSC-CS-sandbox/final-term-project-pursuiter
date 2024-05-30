@@ -9,4 +9,4 @@ Fixes: #
 Explain the changes made at a higher level
 
 ### Testing
--   [ ] Does the code introduced have sufficient test coverage (specify wether unit testing or automated testing and attach results if applicable)? If not, include a reasoning and steps required to manually QA.
+-   [ ] Does the code introduced have sufficient test coverage (Please Specify) ?
