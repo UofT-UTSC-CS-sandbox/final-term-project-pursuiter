@@ -5,7 +5,7 @@ User stories
 Acceptance criteria: Given that all the required fields in the create account screen are completed, when the register button is pressed, then
 a job seeker account is created and registered in the database.
 
-Priority: 1
+Priority: 1 - High
 
 Estimated time: 4 hours
 
@@ -15,7 +15,7 @@ Estimated time: 4 hours
 Acceptance criteria: Given that all the required fields match an account that was previously created, when log in button is pressed, then
 a user would be taken to the logged-in version of Pursuiter where they can access their data.
 
-Priority: 3
+Priority: 1 - High
 
 Estimated time: 4 hours
 
@@ -25,7 +25,7 @@ Estimated time: 4 hours
 Acceptance criteria: Given that personal information regarding the job seeker is filled out, when recommendations are made, then
 the recommendations match what the job seeker represents as an applicant.
 
-Priority: 5
+Priority: 1 - High
 
 Estimated time: 7 hours
 
@@ -35,7 +35,7 @@ Estimated time: 7 hours
 Acceptance criteria: Given that words are entered into the search bar, when the search button is pressed, then jobs that fit the search 
 descriptions are displayed.
 
-Priority: 4
+Priority: 3 - Low
 
 Estimated time: 10 hours
 
@@ -45,7 +45,7 @@ Estimated time: 10 hours
 Acceptance criteria: Given that the job seeker's personal information-based keywords don’t match the job posting requirements, when the grey deactivated apply button 
 is pressed, then nothing happens and the "unqualified for this job" warning shows.
 
-Priority: 7
+Priority: 2 - Medium
 
 Estimated time: 3 hours
 
@@ -54,7 +54,7 @@ Estimated time: 3 hours
 
 Acceptance criteria: Given that filters are set, when looking at the list of jobs, then only the jobs that match the filters are displayed.
 
-Priority: 6
+Priority: 3 - Low
 
 Estimated time: 4 hours
 
@@ -63,7 +63,7 @@ Estimated time: 4 hours
 
 Acceptance criteria: Given that the job is displayed in the jobs list, when the job is clicked on, then a detailed description of the job is opened.
 
-Priority: 8
+Priority: 1 - High
 
 Estimated time: 2 hours
 
@@ -73,7 +73,7 @@ Estimated time: 2 hours
 Acceptance criteria: Given that the job seeker qualifications allow you to do so, when the apply button underneath the job application is pressed, 
 then an application is sent to the employer.
 
-Priority: 9
+Priority: 1 - High
 
 Estimated time: 3 hours
 
@@ -83,7 +83,7 @@ Estimated time: 3 hours
 Acceptance criteria: Given that the job seeker found a job they want to save, when the save button is pressed, 
 then the job is moved into the saved folder for later viewing.
 
-Priority: 10
+Priority: 3 - Low
 
 Estimated time: 1 hour
 
@@ -93,7 +93,7 @@ Estimated time: 1 hour
 Acceptance criteria: Given that the job seeker applied to a job, when updates by the employer occur, 
 then the job seeker is shown them under their "applications" section.
 
-Priority: 12
+Priority: 2 - Medium
 
 Estimated time: 2 hours
 
@@ -103,7 +103,7 @@ Estimated time: 2 hours
 Acceptance criteria: Given that the job seeker uploaded a file, when they do something that involves file upload to be there, 
 then the application uses the uploaded files to complete the action.
 
-Priority: 11
+Priority: 1 - High
 
 Estimated time: 4 hours
 
@@ -113,7 +113,7 @@ Estimated time: 4 hours
 Acceptance criteria: Given that the job seeker uploaded a resume, when they apply to jobs and request recommendations, 
 then the AI will recommend edits to their resume.
 
-Priority: 14
+Priority: 2 - Medium
 
 Estimated time: 12 hours
 
@@ -123,7 +123,7 @@ Estimated time: 12 hours
 Acceptance criteria: Given that the job data is filled out, when the post button is pressed, 
 then the job will be available to job seekers.
 
-Priority: 13
+Priority: 1 - High
 
 Estimated time: 5 hours
 
@@ -133,7 +133,7 @@ Estimated time: 5 hours
 Acceptance criteria: Given that the jobs have already been posted, when viewing the posted jobs section, 
 then the employer will be able to see all the jobs they are hiring for.
 
-Priority: 16
+Priority: 1 - High
 
 Estimated time: 6 hours
 
@@ -143,7 +143,7 @@ Estimated time: 6 hours
 Acceptance criteria: Given that the job posting has been clicked on, when the “applications” section opens, 
 then the employer will be able to view all the applicants for that particular job.
 
-Priority: 15
+Priority: 2 - Medium
 
 Estimated time: 4 hours
 
@@ -153,7 +153,7 @@ Estimated time: 4 hours
 Acceptance criteria: Given that the search bar has been filled with something, when the search button is pressed, 
 then the employer will be able to view all the applicants that have the matching qualifications.
 
-Priority: 17
+Priority: 3 - Low
 
 Estimated time: 6 hours
 
@@ -163,7 +163,7 @@ Estimated time: 6 hours
 Acceptance criteria: Given that the applicant filters are selected, when looking at the "Applicants" list, 
 then the employer will be able to view all the applicants that have the matching qualifications.
 
-Priority: 18
+Priority: 3 - Low
 
 Estimated time: 6 hours
 
@@ -174,7 +174,7 @@ I can save time in viewing and choosing aspects of hiring.
 Acceptance criteria: Given that the applicant has sufficient personal information submitted, when looking at the "Applicants" list, 
 then the employer will be able to view short AI compatibility summaries.
 
-Priority: 20
+Priority: 2 - Medium
 
 Estimated time: 11 hours
 
@@ -185,7 +185,7 @@ I view all the needed information about an applicant when making hiring decision
 Acceptance criteria: Given that the applicant has sufficient personal information submitted, when clicking on an applicant in the applicant list, 
 then the employer will be able to view detailed AI descriptions of applicants for the job.
 
-Priority: 21
+Priority: 2 - Medium
 
 Estimated time: 7 hours
 
@@ -195,7 +195,7 @@ Estimated time: 7 hours
 Acceptance criteria: Given that the application status is specified by the employer, when the application is viewed by either the applicant or the employer, 
 then the application status is displayed.
 
-Priority: 19
+Priority: 3 - Low
 
 Estimated time: 2 hours
 
@@ -205,8 +205,16 @@ Estimated time: 2 hours
 Acceptance criteria: Given that all the required fields in the create account screen are completed, when the register button is pressed, then
 an employer account is created and registered in the database.
 
-Priority: 2
+Priority: 1 - High
 
 Estimated time: 2 hours
 
+
+22. User story: As a user, I want to see a landing page when I open the website so that I can quickly understand what the website is about and navigate to relevant information or actions efficiently.
+
+Acceptance criteria: Given that the user has entered the website, when the first screen is displayed, then the user can see the landing page where they can navigate to all other pages needed.
+
+Priority: 2 - Medium
+
+Estimated time: 4 hours
 
