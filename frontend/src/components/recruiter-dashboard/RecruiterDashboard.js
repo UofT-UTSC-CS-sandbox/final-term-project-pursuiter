@@ -95,23 +95,23 @@ function RecruiterDashboard() {
                                 </div>
                                 <div className="job-detail-body">
                                     <div className="job-detail-section">
-                                        <strong>Company</strong> {selectedJob.company}
+                                        <strong>Company:</strong> {selectedJob.company}
                                     </div>
                                     <div className="job-detail-section">
-                                        <strong>Location</strong> {selectedJob.location}
+                                        <strong>Location:</strong> {selectedJob.location}
                                     </div>
                                     <div className="job-detail-section">
-                                        <strong>Type</strong> {selectedJob.type}
+                                        <strong>Type:</strong> {selectedJob.type}
                                     </div>
                                     <div className="job-detail-section">
-                                        <strong>Hidden Keywords</strong> {selectedJob.hiddenKeywords}
+                                        <strong>Hidden Keywords:</strong> {selectedJob.hiddenKeywords}
                                     </div>
                                     <div className="job-detail-section">
-                                        <strong>Description</strong>
+                                        <strong>Description:</strong>
                                         <p>{selectedJob.description}</p>
                                     </div>
                                     <div className="job-detail-section">
-                                        <strong>Qualifications</strong>
+                                        <strong>Qualifications:</strong>
                                         <p>{selectedJob.qualifications}</p>
                                     </div>
                                 </div>
