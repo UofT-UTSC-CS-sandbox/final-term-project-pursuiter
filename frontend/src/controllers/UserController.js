@@ -19,14 +19,14 @@ async function loginUser(username, password) {
     }
 }
 
-async function signupUser(username, password, userType) {
+async function signupUser(userType, email, password, fullName, companyName) {
     try {
         const response = await fetch(`${API_URL}/signup`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ username, password, userType }),
+            body: JSON.stringify({ userType, email, password, fullName, companyName }),
         });
         if (!response.ok) {
             const errorData = await response.json();
