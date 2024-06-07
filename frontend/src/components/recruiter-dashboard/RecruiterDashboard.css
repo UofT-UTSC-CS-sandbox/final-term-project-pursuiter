@@ -1,7 +1,8 @@
-/* General styles */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap');
+
 body {
     margin: 0;
-    font-family: Arial, sans-serif;
+    font-family: 'Inter', Arial, sans-serif;
 }
 
 .dashboard-container {
@@ -88,8 +89,11 @@ body {
 }
 
 .job-count {
-    margin: 20px;
+    padding: 10px;
     font-weight: bold;
+    background-color: #fff;
+    width: 100%;
+    box-sizing: border-box;
 }
 
 .job-item:nth-child(even) {
@@ -136,6 +140,7 @@ body {
     font-size: 28px;
     font-weight: bold;
     color: #800020;
+    margin-left: 20px;
 }
 
 .job-detail-actions {
@@ -162,16 +167,55 @@ body {
 }
 
 .job-detail-section {
-    margin-bottom: 20px;
+    margin-bottom: 30px;
     font-size: 18px;
+    font-family: 'Inter', Arial, sans-serif;
 }
 
 .job-detail-section strong {
     display: block;
-    font-size: 20px;
+    font-size: 16px;
+    font-weight: 600;
     margin-bottom: 5px;
+}
+
+.job-detail-section div {
+    font-size: 16px;
+    font-weight: 400; 
 }
 
 .job-description p {
     margin: 0;
+}
+
+.favorite-icon {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    color: #ddd;
+    cursor: pointer;
+}
+
+.favorite-icon.favorited {
+    color: gold;
+}
+
+/* Modify the job-item to have relative positioning for the absolute star positioning */
+.job-item {
+    display: flex;
+    flex-direction: column;
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+    cursor: pointer;
+    width: 100%;
+    box-sizing: border-box;
+    position: relative;
+}
+
+.job-apply-by {
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    font-weight: bold;
+    font-size: 14px;
 }

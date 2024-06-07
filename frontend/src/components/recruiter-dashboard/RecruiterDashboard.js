@@ -1,16 +1,13 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { FaStar } from 'react-icons/fa';
 import './RecruiterDashboard.css';
 
 function RecruiterDashboard() {
     const navigate = useNavigate();
     const [selectedJob, setSelectedJob] = useState(null);
-
-    const handleLogout = () => {
-        navigate('/');
-    };
-
-    const jobs = [
+    const [favoritedJobs, setFavoritedJobs] = useState([]);
+    const [originalJobs] = useState([
         {
             title: "Software Engineer",
             company: "Tech Corp",
@@ -51,7 +48,26 @@ function RecruiterDashboard() {
             description: "Analyze data to extract insights...",
             qualifications: "Master's degree in Data Science...",
         }
-    ];
+    ]);
+
+    const handleLogout = () => {
+        navigate('/');
+    };
+
+    const handleFavorite = (job) => {
+        setFavoritedJobs((prevFavorites) => {
+            if (prevFavorites.includes(job)) {
+                return prevFavorites.filter((fav) => fav !== job);
+            } else {
+                return [job, ...prevFavorites];
+            }
+        });
+    };
+
+    const isFavorited = (job) => favoritedJobs.includes(job);
+
+    const allJobs = originalJobs.filter(job => !favoritedJobs.includes(job));
+    const displayedJobs = [...favoritedJobs, ...allJobs];
 
     return (
         <div className="dashboard-container">
@@ -68,8 +84,8 @@ function RecruiterDashboard() {
                 <div className="aesthetic-bar"></div>
                 <div className="job-listings">
                     <div className="job-list">
-                        <div className="job-count">Showing {jobs.length} Jobs</div>
-                        {jobs.map((job, index) => (
+                        <div className="job-count">Showing {displayedJobs.length} Jobs</div>
+                        {displayedJobs.map((job, index) => (
                             <div
                                 key={index}
                                 className="job-item"
@@ -79,7 +95,18 @@ function RecruiterDashboard() {
                                 <div className="job-company">{job.company}</div>
                                 <div className="job-location">{job.location}</div>
                                 <div className="job-type">{job.type}</div>
-                                <div className="job-apply-by">Apply by: {job.applyBy}</div>
+                                <div className="job-apply-by">
+                                    <strong>Closing Date:</strong> {job.applyBy}
+                                </div>
+                                <div
+                                    className={`favorite-icon ${isFavorited(job) ? 'favorited' : ''}`}
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        handleFavorite(job);
+                                    }}
+                                >
+                                    <FaStar />
+                                </div>
                             </div>
                         ))}
                     </div>
