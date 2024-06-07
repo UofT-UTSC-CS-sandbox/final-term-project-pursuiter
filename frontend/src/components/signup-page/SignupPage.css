@@ -1,6 +1,6 @@
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
 
-body {
+.signup-page-container body {
     background-color: #f3f3f3;
     color: #000;
     margin: 0;
@@ -11,7 +11,7 @@ body {
     align-items: flex-start;
 }
 
-h1 {
+.signup-page-container h1 {
     font-family: Poppins;
     font-size: 64px;
     font-weight: 800;
