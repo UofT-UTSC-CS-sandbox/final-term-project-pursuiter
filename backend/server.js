@@ -3,19 +3,15 @@ import { MongoClient } from 'mongodb';
 import bcrypt from 'bcrypt';
 import cors from 'cors';
 import jwt from 'jsonwebtoken';
-import multer from 'multer';
-import fs from 'fs';
-import path from 'path';
 
 const app = express();
 const PORT = 4000;
-const mongoURL = "mongodb://localhost:27017";
+const mongoURL = "mongodb+srv://mohammadqassim000:xVTcVQ2a7IA3HL0C@cluster0.1teyexn.mongodb.net/pursuiter?retryWrites=true&w=majority";
 const dbName = "pursuiter";
 
 app.use(express.json());
 app.use(cors());
 
-// Connect to MongoDB
 let db;
 
 async function connectToMongo() {
@@ -25,14 +21,26 @@ async function connectToMongo() {
     await client.connect();
     console.log("Connected to MongoDB");
     db = client.db(dbName);
+    return db;
   } catch (error) {
     console.error("Error connecting to MongoDB:", error);
+    throw error; // re-throw the error after logging it
   }
 }
 
-connectToMongo();
+// Middleware to ensure DB connection is initialized
+const ensureDbConnection = (req, res, next) => {
+  if (!db) {
+    connectToMongo()
+      .then(() => next())
+      .catch(err => res.status(500).json({ message: "Error connecting to the database" }));
+  } else {
+    next();
+  }
+};
 
-// Routes for jobs
+app.use(ensureDbConnection);
+
 app.get('/jobs', async (req, res) => {
   try {
     const jobs = await db.collection('jobs').find().toArray();
@@ -57,7 +65,6 @@ app.post('/jobs/add', async (req, res) => {
   }
 });
 
-// Signup
 app.post('/signup', async (req, res) => {
   const { userType, email, password, fullName, companyName } = req.body;
   try {
@@ -83,7 +90,6 @@ app.post('/signup', async (req, res) => {
   }
 });
 
-// Login
 app.post('/login', async (req, res) => {
   const { email, password } = req.body;
   try {
@@ -98,7 +104,8 @@ app.post('/login', async (req, res) => {
   }
 });
 
-// Open Port
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);
 });
+
+export default app; // Ensure the app is exported as the default export
