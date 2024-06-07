@@ -12,7 +12,7 @@ const UserProvider = ({ children }) => {
 
   useEffect(() => {
     if (user) {
-      Cookies.set("user", JSON.stringify(user), { expires: 7 }); // Store user data in a cookie for 7 days
+      Cookies.set("user", JSON.stringify(user), { expires: 1 });
     } else {
       Cookies.remove("user");
     }
