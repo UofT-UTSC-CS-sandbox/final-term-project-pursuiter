@@ -1,18 +1,19 @@
 import "./LoginPage.css";
 
-import UserController from "../../controllers/UserController";
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
+import { UserContext } from "../../contexts/UserContext";
 
 function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
+  const { loginUser } = useContext(UserContext);
 
   const handleSubmit = async (event) => {
     event.preventDefault();
     try {
-      const user = await UserController.loginUser(email, password);
+      const user = await loginUser(email, password);
       console.log("Login successful");
       if (user.userType === "applicant") {
         navigate("/applicant-dashboard");
