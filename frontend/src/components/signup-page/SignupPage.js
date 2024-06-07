@@ -2,21 +2,19 @@ import './SignupPage.css';
 
 import UserController from '../../controllers/UserController'; 
 import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
-function SignupPage({ userType }) {
+function SignupPage() {
 
-    const [email, setEmail] = useState('');
+    const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
-    const [fullName, setFullName] = useState('');
-    const [companyName, setCompanyName] = useState('');
+    const [userType, setUserType] = useState('applicant');
     const navigate = useNavigate();
-    const heading = userType === 'applicant' ? 'Create Job-Seeker Account' : 'Create Recruiter Account';
 
     const handleSubmit = async (event) => {
         event.preventDefault();
         try {
-            const user = await UserController.signupUser(userType, email, password, fullName, companyName);
+            const user = await UserController.signupUser(username, password, userType);
             console.log('Signup successful', user);
             alert('Signup successful!');
 
@@ -33,31 +31,23 @@ function SignupPage({ userType }) {
 
     return (
         <div className="signup-container">
-            <h1>{heading}</h1>
+            <h1>Signup Page</h1>
             <form onSubmit={handleSubmit}>
                 <div>
-                    <label>Full Name: </label>
-                    <input type="text" value={fullName} onChange={e => setFullName(e.target.value)} required />
-                </div>
-                <div>
-                    <label>Email: </label>
-                    <input type="text" value={email} onChange={e => setEmail(e.target.value)} required />
+                    <label>Username: </label>
+                    <input type="text" value={username} onChange={e => setUsername(e.target.value)} required />
                 </div>
                 <div>
                     <label>Password: </label>
                     <input type="password" value={password} onChange={e => setPassword(e.target.value)} required />
                 </div>
-                {userType === 'recruiter' && (
-                    <div>
-                        <label>Company Name: </label>
-                        <input type="text" value={companyName} onChange={e => setCompanyName(e.target.value)} required />
-                    </div>
-                )}
+                <div>
+                    <label>User Type:</label>
+                    <input type="radio" value="applicant" checked={userType === 'applicant'} onChange={e => setUserType(e.target.value)} /> Applicant
+                    <input type="radio" value="recruiter" checked={userType === 'recruiter'} onChange={e => setUserType(e.target.value)} /> Recruiter
+                </div>
                 <button type="submit">Sign Up</button>
             </form>
-            <div className="login-link">
-                <p>Already have an account? <Link to="/login">Login</Link></p>
-            </div>
         </div>
     );
 }

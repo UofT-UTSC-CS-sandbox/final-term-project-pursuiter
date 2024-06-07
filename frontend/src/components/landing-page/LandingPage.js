@@ -8,7 +8,7 @@ function LandingPage() {
     <div className="landing-container">
         <h1>Landing Page</h1>
         <div><Link to="/login">Login</Link></div>
-        <div><Link to="/applicant-signup">Job Seeker Signup</Link></div>
+        <div><Link to="/signup">Signup</Link></div>
     </div>
   );
 }

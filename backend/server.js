@@ -38,20 +38,19 @@ connectToMongo();
 
 // Signup
 app.post('/signup', async (req, res) => {
-  const { userType, email, password, fullName, companyName } = req.body;
+  const { username, password, userType } = req.body;
   try {
-    const existingUser = await db.collection(dbCollections.users).findOne({ email });
+
+    const existingUser = await db.collection(dbCollections.users).findOne({ username });
     if (existingUser) {
       return res.status(409).json({ message: "Username already exists" });
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
     const newUser = {
-      userType,
-      email,
+      username: username,
       password: hashedPassword,
-      fullName,
-      companyName
+      userType: userType,
     };
 
     const result = await db.collection(dbCollections.users).insertOne(newUser);
@@ -64,9 +63,9 @@ app.post('/signup', async (req, res) => {
 
 // Login
 app.post('/login', async (req, res) => {
-  const { email, password } = req.body;
+  const { username, password } = req.body;
   try {
-      const user = await db.collection(dbCollections.users).findOne({ email });
+      const user = await db.collection(dbCollections.users).findOne({ username });
       if (user && await bcrypt.compare(password, user.password)) {
           res.json({ message: "Login successful", userType: user.userType });
       } else {
