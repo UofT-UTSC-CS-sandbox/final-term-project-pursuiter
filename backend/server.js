@@ -1,6 +1,11 @@
 import express from 'express';
 import { MongoClient } from 'mongodb';
+import bcrypt from 'bcrypt';
 import cors from 'cors';
+import jwt from 'jsonwebtoken';
+import multer from 'multer';
+import fs from 'fs';
+import path from 'path';
 
 const app = express();
 const PORT = 4000;
@@ -38,24 +43,58 @@ app.get('/jobs', async (req, res) => {
 });
 
 app.post('/jobs/add', async (req, res) => {
-  const { title, company, location, type, applyBy, hiddenKeywords, description, qualifications } = req.body;
+  const jobs = req.body;
 
-  const newJob = {
-    title,
-    company,
-    location,
-    type,
-    applyBy,
-    hiddenKeywords,
-    description,
-    qualifications
-  };
+  if (!Array.isArray(jobs)) {
+    return res.status(400).json({ message: "Expected an array of jobs" });
+  }
 
   try {
-    await db.collection('jobs').insertOne(newJob);
-    res.status(201).json({ message: "Job added!" });
+    await db.collection('jobs').insertMany(jobs);
+    res.status(201).json({ message: "Jobs added!" });
   } catch (error) {
-    res.status(500).json({ message: "Error adding job" });
+    res.status(500).json({ message: "Error adding jobs" });
+  }
+});
+
+// Signup
+app.post('/signup', async (req, res) => {
+  const { userType, email, password, fullName, companyName } = req.body;
+  try {
+    const existingUser = await db.collection('users').findOne({ email });
+    if (existingUser) {
+      return res.status(409).json({ message: "User already exists" });
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const newUser = {
+      userType,
+      email,
+      password: hashedPassword,
+      fullName,
+      companyName
+    };
+
+    const result = await db.collection('users').insertOne(newUser);
+    res.status(201).json({ message: "User created", userId: result.insertedId });
+  } catch (error) {
+    console.error("Error in signup:", error);
+    res.status(500).json({ message: "Error creating user" });
+  }
+});
+
+// Login
+app.post('/login', async (req, res) => {
+  const { email, password } = req.body;
+  try {
+    const user = await db.collection('users').findOne({ email });
+    if (user && await bcrypt.compare(password, user.password)) {
+      res.json({ message: "Login successful", userType: user.userType });
+    } else {
+      res.status(401).json({ message: "Invalid credentials" });
+    }
+  } catch (error) {
+    res.status(500).json({ message: "Error logging in" });
   }
 });
 
