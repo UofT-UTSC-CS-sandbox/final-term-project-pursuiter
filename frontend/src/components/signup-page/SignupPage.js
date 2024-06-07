@@ -38,7 +38,6 @@ function SignupPage({ userType }) {
       } else if (userType === "recruiter") {
         navigate("/recruiter-dashboard");
       }
-      
     } catch (error) {
       console.error("Signup failed:", error);
       alert(error.message);
