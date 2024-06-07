@@ -42,7 +42,7 @@ app.post('/signup', async (req, res) => {
   try {
     const existingUser = await db.collection(dbCollections.users).findOne({ email });
     if (existingUser) {
-      return res.status(409).json({ message: "Username already exists" });
+      return res.status(409).json({ message: "User already exists" });
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);

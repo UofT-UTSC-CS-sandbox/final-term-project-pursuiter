@@ -9,6 +9,7 @@ function LandingPage() {
         <h1>Landing Page</h1>
         <div><Link to="/login">Login</Link></div>
         <div><Link to="/applicant-signup">Job Seeker Signup</Link></div>
+        <div><Link to="/recruiter-signup">Recruiter Signup</Link></div>
     </div>
   );
 }

@@ -1,13 +1,13 @@
 const API_URL = 'http://localhost:4000';
 
-async function loginUser(username, password) {
+async function loginUser(email, password) {
     try {
         const response = await fetch(`${API_URL}/login`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ username, password }),
+            body: JSON.stringify({ email, password }),
         });
         if (!response.ok) {
             const errorData = await response.json();

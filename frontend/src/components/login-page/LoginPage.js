@@ -5,14 +5,14 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 function LoginPage() {
-    const [username, setUsername] = useState('');
+    const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const navigate = useNavigate();
 
     const handleSubmit = async (event) => {
         event.preventDefault();
         try {
-            const user = await UserController.loginUser(username, password);
+            const user = await UserController.loginUser(email, password);
             console.log('Login successful');
             if (user.userType === 'applicant') {
                 navigate('/applicant-dashboard');
@@ -30,8 +30,8 @@ function LoginPage() {
             <h1>Login</h1>
             <form onSubmit={handleSubmit}>
                 <div>
-                    <label>Username:</label>
-                    <input type="text" value={username} onChange={e => setUsername(e.target.value)} required />
+                    <label>Email:</label>
+                    <input type="text" value={email} onChange={e => setEmail(e.target.value)} required />
                 </div>
                 <div>
                     <label>Password:</label>

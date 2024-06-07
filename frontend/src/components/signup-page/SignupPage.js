@@ -32,31 +32,45 @@ function SignupPage({ userType }) {
     };
 
     return (
-        <div className="signup-container">
-            <h1>{heading}</h1>
-            <form onSubmit={handleSubmit}>
-                <div>
-                    <label>Full Name: </label>
-                    <input type="text" value={fullName} onChange={e => setFullName(e.target.value)} required />
-                </div>
-                <div>
-                    <label>Email: </label>
-                    <input type="text" value={email} onChange={e => setEmail(e.target.value)} required />
-                </div>
-                <div>
-                    <label>Password: </label>
-                    <input type="password" value={password} onChange={e => setPassword(e.target.value)} required />
-                </div>
-                {userType === 'recruiter' && (
+        <div className="signup-page-container">
+            <div className="signup-header">
+                <h1 className="pursuiter-heading">PURSUITER</h1>
+            </div>
+            <div className="signup-container">
+                <h1>{heading}</h1>
+                <form onSubmit={handleSubmit}>
                     <div>
-                        <label>Company Name: </label>
-                        <input type="text" value={companyName} onChange={e => setCompanyName(e.target.value)} required />
+                        <label>Full Name</label>
+                        <input type="text" value={fullName} onChange={e => setFullName(e.target.value)} required />
                     </div>
-                )}
-                <button type="submit">Sign Up</button>
-            </form>
-            <div className="login-link">
-                <p>Already have an account? <Link to="/login">Login</Link></p>
+                    <div>
+                        <label>Email</label>
+                        <input type="text" value={email} onChange={e => setEmail(e.target.value)} required />
+                    </div>
+                    <div>
+                        <label>Password</label>
+                        <input type="password" value={password} onChange={e => setPassword(e.target.value)} required />
+                    </div>
+                    {userType === 'recruiter' && (
+                        <div>
+                            <label>Company Name</label>
+                            <input type="text" value={companyName} onChange={e => setCompanyName(e.target.value)} required />
+                        </div>
+                    )}
+                    <button type="submit">Sign Up</button>
+                </form>
+                <div className="inline-link">
+                    <p>Already have an account? <Link to="/login">Login</Link></p>
+                    {userType === 'recruiter' ? (
+                        <div className="inline-link">
+                            <p>Are you a job-seeker? <Link to="/applicant-signup">Create an Job-Seeker Account</Link></p> 
+                        </div>
+                    ) : (
+                        <div className="inline-link">
+                            <p>Are you a recruiter? <Link to="/recruiter-signup">Create a Recruiter Account</Link></p> 
+                        </div>
+                    )}
+                </div>
             </div>
         </div>
     );
