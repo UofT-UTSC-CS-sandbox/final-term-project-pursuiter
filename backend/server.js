@@ -1,19 +1,11 @@
-import express from "express";             // express framework - Express.js framework
-import { MongoClient, ObjectId } from "mongodb"; // mongodb - database interaction client
-import bcrypt from "bcrypt";               // bcrypt - hashing and salting passwords
-import cors from "cors";                   // CORS middleware - enabling cross-origin requests
-import jwt from "jsonwebtoken";            // jsonwebtoken - creating and verifying JWTs
-import multer from 'multer';               // multer - uploading files
-import fs from "fs";                       // fs - interact with the local ile system
-import path from "path";                   // path - work with file and directory paths
+import express from 'express';
+import { MongoClient } from 'mongodb';
+import cors from 'cors';
 
 const app = express();
 const PORT = 4000;
-const mongoURL = "mongodb://localhost:27017";
+const mongoURL = "mongodb+srv://mohammadqassim000:xVTcVQ2a7IA3HL0C@cluster0.1teyexn.mongodb.net/pursuiter?retryWrites=true&w=majority";
 const dbName = "pursuiter";
-const dbCollections = {
-	users: "users",
-}
 
 app.use(express.json());
 app.use(cors());
@@ -27,7 +19,6 @@ async function connectToMongo() {
   try {
     await client.connect();
     console.log("Connected to MongoDB");
-
     db = client.db(dbName);
   } catch (error) {
     console.error("Error connecting to MongoDB:", error);
@@ -36,48 +27,39 @@ async function connectToMongo() {
 
 connectToMongo();
 
-// Signup
-app.post('/signup', async (req, res) => {
-  const { userType, email, password, fullName, companyName } = req.body;
+// Routes for jobs
+app.get('/jobs', async (req, res) => {
   try {
-    const existingUser = await db.collection(dbCollections.users).findOne({ email });
-    if (existingUser) {
-      return res.status(409).json({ message: "User already exists" });
-    }
-
-    const hashedPassword = await bcrypt.hash(password, 10);
-    const newUser = {
-      userType,
-      email,
-      password: hashedPassword,
-      fullName,
-      companyName
-    };
-
-    const result = await db.collection(dbCollections.users).insertOne(newUser);
-    res.status(201).json({ message: "User created", userId: result.insertedId });
+    const jobs = await db.collection('jobs').find().toArray();
+    res.json(jobs);
   } catch (error) {
-    console.error("Error in signup:", error);
-    res.status(500).json({ message: "Error creating user" });
+    res.status(500).json({ message: "Error fetching jobs" });
   }
 });
 
-// Login
-app.post('/login', async (req, res) => {
-  const { email, password } = req.body;
+app.post('/jobs/add', async (req, res) => {
+  const { title, company, location, type, applyBy, hiddenKeywords, description, qualifications } = req.body;
+
+  const newJob = {
+    title,
+    company,
+    location,
+    type,
+    applyBy,
+    hiddenKeywords,
+    description,
+    qualifications
+  };
+
   try {
-      const user = await db.collection(dbCollections.users).findOne({ email });
-      if (user && await bcrypt.compare(password, user.password)) {
-          res.json({ message: "Login successful", userType: user.userType });
-      } else {
-          res.status(401).json({ message: "Invalid credentials" });
-      }
+    await db.collection('jobs').insertOne(newJob);
+    res.status(201).json({ message: "Job added!" });
   } catch (error) {
-      res.status(500).json({ message: "Error logging in" });
+    res.status(500).json({ message: "Error adding job" });
   }
 });
 
 // Open Port
 app.listen(PORT, () => {
-    console.log(`Server is running on http://localhost:${PORT}`);
-  });
+  console.log(`Server is running on http://localhost:${PORT}`);
+});

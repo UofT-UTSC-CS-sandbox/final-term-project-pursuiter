@@ -1,54 +1,24 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FaStar } from 'react-icons/fa';
 import './RecruiterDashboard.css';
+import axios from 'axios';
 
 function RecruiterDashboard() {
     const navigate = useNavigate();
     const [selectedJob, setSelectedJob] = useState(null);
     const [favoritedJobs, setFavoritedJobs] = useState([]);
-    const [originalJobs] = useState([
-        {
-            title: "Software Engineer",
-            company: "Tech Corp",
-            location: "New York",
-            type: "Full-Time",
-            applyBy: "May 16",
-            hiddenKeywords: "JavaScript, React",
-            description: "Develop and maintain web applications...",
-            qualifications: "Bachelor's degree in Computer Science...",
-        },
-        {
-            title: "Product Manager",
-            company: "Innovate LLC",
-            location: "San Francisco",
-            type: "Full-Time",
-            applyBy: "May 20",
-            hiddenKeywords: "Agile, Scrum",
-            description: "Oversee product development lifecycle...",
-            qualifications: "Experience with product management...",
-        },
-        {
-            title: "Graphic Designer",
-            company: "Design Studio",
-            location: "Los Angeles",
-            type: "Part-Time",
-            applyBy: "May 16",
-            hiddenKeywords: "Photoshop, Illustrator",
-            description: "Create visual concepts and designs...",
-            qualifications: "Degree in Graphic Design or related field...",
-        },
-        {
-            title: "Data Scientist",
-            company: "Data Insights",
-            location: "Chicago",
-            type: "Full-Time",
-            applyBy: "May 20",
-            hiddenKeywords: "Python, Machine Learning",
-            description: "Analyze data to extract insights...",
-            qualifications: "Master's degree in Data Science...",
-        }
-    ]);
+    const [jobs, setJobs] = useState([]);
+
+    useEffect(() => {
+        axios.get('http://localhost:4000/jobs/')
+            .then(response => {
+                setJobs(response.data);
+            })
+            .catch(error => {
+                console.log(error);
+            });
+    }, []);
 
     const handleLogout = () => {
         navigate('/');
@@ -66,7 +36,7 @@ function RecruiterDashboard() {
 
     const isFavorited = (job) => favoritedJobs.includes(job);
 
-    const allJobs = originalJobs.filter(job => !favoritedJobs.includes(job));
+    const allJobs = jobs.filter(job => !favoritedJobs.includes(job));
     const displayedJobs = [...favoritedJobs, ...allJobs];
 
     return (
