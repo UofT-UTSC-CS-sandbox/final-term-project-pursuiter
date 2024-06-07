@@ -1,6 +1,6 @@
 @import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap");
 
-.signup-page-container body {
+.users-page-container body {
   background-color: #f3f3f3;
   color: #000;
   margin: 0;
@@ -19,7 +19,7 @@
   text-align: left;
 }
 
-.signup-container h1 {
+.users-container h1 {
   font-family: Poppins;
   font-size: 48px;
   font-weight: 400;
@@ -27,11 +27,11 @@
   text-align: left;
 }
 
-.signup-header {
+.users-header {
   margin: 20px;
 }
 
-.signup-header .pursuiter-heading::before {
+.users-header .pursuiter-heading::before {
   content: "";
   display: inline-block;
   background-color: #000000;
@@ -43,19 +43,19 @@
   opacity: 0px;
 }
 
-.signup-container {
+.users-container {
   margin: 20px;
   display: flex;
   flex-direction: column;
 }
 
-.signup-container form {
+.users-container form {
   max-width: 631px;
   display: flex;
   flex-direction: column;
 }
 
-.signup-container label {
+.users-container label {
   font-family: Poppins;
   font-size: 20px;
   font-weight: 500;
@@ -63,7 +63,7 @@
   text-align: left;
 }
 
-.signup-container input {
+.users-container input {
   width: 631px;
   height: 36px;
   top: 454px;
@@ -75,7 +75,7 @@
   margin-bottom: 20px;
 }
 
-.signup-container button {
+.users-container button {
   background-color: #8a0032;
   color: #ffffff;
   padding: 10px;
@@ -97,7 +97,7 @@
   text-align: center;
 }
 
-.signup-container button:hover {
+.users-container button:hover {
   background-color: #f3f3f3;
   color: #8a0032;
   border-color: #8a0032;

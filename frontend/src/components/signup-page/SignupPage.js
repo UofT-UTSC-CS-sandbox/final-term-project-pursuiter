@@ -41,11 +41,11 @@ function SignupPage({ userType }) {
   };
 
   return (
-    <div className="signup-page-container">
-      <div className="signup-header">
+    <div className="users-page-container">
+      <div className="users-header">
         <h1 className="pursuiter-heading">PURSUITER</h1>
       </div>
-      <div className="signup-container">
+      <div className="users-container">
         <h1>{heading}</h1>
         <form onSubmit={handleSubmit}>
           <div>
