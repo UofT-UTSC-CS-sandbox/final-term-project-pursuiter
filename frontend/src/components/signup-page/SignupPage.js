@@ -1,3 +1,4 @@
+import '../Users.css';
 import './SignupPage.css';
 
 import UserController from '../../controllers/UserController'; 
