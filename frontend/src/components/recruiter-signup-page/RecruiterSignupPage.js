@@ -1,9 +1,9 @@
-import './RecruiterSignupPage.css';
+import "./RecruiterSignupPage.css";
 
-import SignupPage from '../signup-page/SignupPage';
+import SignupPage from "../signup-page/SignupPage";
 
 function RecruiterSignupPage() {
-    return <SignupPage userType="recruiter" navigateTo="/applicant-dashboard" />;
+  return <SignupPage userType="recruiter" navigateTo="/applicant-dashboard" />;
 }
 
 export default RecruiterSignupPage;

@@ -126,3 +126,4 @@ function RecruiterDashboard() {
 }
 
 export default RecruiterDashboard;
+

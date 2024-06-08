@@ -1,22 +1,30 @@
-import './ApplicantDashboard.css';
+import "./ApplicantDashboard.css";
 
-import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useContext } from "react";
+import { useNavigate } from "react-router-dom";
+import { UserContext } from "../../contexts/UserContext";
 
 function ApplicantDashboard() {
+  const navigate = useNavigate();
+  const { user, logoutUser } = useContext(UserContext);
 
-    const navigate = useNavigate();
+  const handleLogout = () => {
+    logoutUser();
+    navigate("/");
+  };
 
-    const handleLogout = () => {
-        navigate('/');
-    };
-
-    return (
+  return (
+    <div>
+      <h1>Applicant Dashboard</h1>
+      {user && (
         <div>
-            <h1>Applicant Dashboard</h1>
-            <button onClick={handleLogout}>Logout</button>
+          <p>Welcome, {user.fullName}</p>
+          <p>Email: {user.email}</p>
         </div>
-    );
+      )}
+      <button onClick={handleLogout}>Logout</button>
+    </div>
+  );
 }
 
 export default ApplicantDashboard;

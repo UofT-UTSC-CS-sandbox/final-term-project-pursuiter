@@ -71,10 +71,13 @@ app.post('/signup', async (req, res) => {
     const existingUser = await db.collection('users').findOne({ email });
     if (existingUser) {
       return res.status(409).json({ message: "User already exists" });
+      return res.status(409).json({ message: "User already exists" });
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
     const newUser = {
+      userType,
+      email,
       userType,
       email,
       password: hashedPassword,
@@ -90,6 +93,9 @@ app.post('/signup', async (req, res) => {
   }
 });
 
+// Login
+app.post("/login", async (req, res) => {
+  const { email, password } = req.body;
 app.post('/login', async (req, res) => {
   const { email, password } = req.body;
   try {
@@ -100,6 +106,7 @@ app.post('/login', async (req, res) => {
       res.status(401).json({ message: "Invalid credentials" });
     }
   } catch (error) {
+    res.status(500).json({ message: "Error logging in" });
     res.status(500).json({ message: "Error logging in" });
   }
 });

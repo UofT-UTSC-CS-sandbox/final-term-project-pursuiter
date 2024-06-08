@@ -1,101 +1,25 @@
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
-
-.signup-page-container body {
-    background-color: #f3f3f3;
-    color: #000;
-    margin: 0;
-    padding: 0;
-    font-family: 'Poppins', sans-serif;
-    display: flex;
-    justify-content: left;
-    align-items: flex-start;
-}
-
-.signup-page-container h1 {
-    font-family: Poppins;
-    font-size: 64px;
-    font-weight: 800;
-    line-height: 96px;
-    text-align: left;    
-}
-
-.signup-header {
-    margin: 20px;
-}
-
-.signup-header .pursuiter-heading::before {
-    content: '';
-    display: inline-block;
-    width: 40px;
-    height: 40px;
-    background-color: #000000;
-    margin-right: 10px;
-}
-
-.signup-container {
-    margin: 20px;
-}
-
-.signup-container form {
-    max-width: 750px;
-    display: flex;
-    flex-direction: column;
-}
-
-.signup-container label {
-    font-family: Poppins;
-    font-size: 24px;
-    font-weight: 500;
-    line-height: 36px;
-    text-align: left;
-}
-
-.signup-container input {
-    width: 777px;
-    height: 56px;
-    top: 615px;
-    left: 89px;
-    border: 1px 0px 0px 0px;
-    background: #E7E7E7;
-    border: 1px solid #000000;
-    box-shadow: 0px 4px 4px 0px #00000040;
-    margin-bottom: 20px;
-}
-
-.signup-container button {
-    background-color: #8A0032;
-    color: #ffffff;
-    padding: 10px;
-    border-radius: 45.5px;
-    border: 2px solid transparent;
-    cursor: pointer;
-    width: 777px;
-    height: 78px;
-    font-family: Poppins;
-    font-size: 24px;
-    font-weight: 600;
-    line-height: 36px;
-    text-align: center;
-    margin-top: 10px;
-    margin-bottom: 20px;
-}
-
-.signup-container button:hover {
-    background-color: #f3f3f3;
-    color: #8A0032; 
-    border-color: #8A0032;
-    border-width: 2px;
+.inline-link p {
+  font-family: Poppins;
+  font-size: 20px;
+  font-weight: 500;
+  line-height: 30px;
+  text-align: left;
 }
 
 .inline-link {
-    text-align: left;
+  text-align: left;
 }
 
 .inline-link a {
-    color: #8b0000;
-    text-decoration: none;
+  color: #8b0000;
+  text-decoration: none;
+  font-family: Poppins;
+  font-size: 20px;
+  font-weight: 600;
+  line-height: 30px;
+  text-align: left;
 }
 
 .inline-link a:hover {
-    text-decoration: underline;
+  text-decoration: underline;
 }
