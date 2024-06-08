@@ -2,7 +2,6 @@ import express from 'express';
 import { MongoClient } from 'mongodb';
 import bcrypt from 'bcrypt';
 import cors from 'cors';
-import jwt from 'jsonwebtoken';
 
 const app = express();
 const PORT = 4000;
@@ -71,13 +70,10 @@ app.post('/signup', async (req, res) => {
     const existingUser = await db.collection('users').findOne({ email });
     if (existingUser) {
       return res.status(409).json({ message: "User already exists" });
-      return res.status(409).json({ message: "User already exists" });
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
     const newUser = {
-      userType,
-      email,
       userType,
       email,
       password: hashedPassword,
@@ -94,19 +90,22 @@ app.post('/signup', async (req, res) => {
 });
 
 // Login
-app.post("/login", async (req, res) => {
-  const { email, password } = req.body;
 app.post('/login', async (req, res) => {
   const { email, password } = req.body;
   try {
     const user = await db.collection('users').findOne({ email });
     if (user && await bcrypt.compare(password, user.password)) {
-      res.json({ message: "Login successful", userType: user.userType });
+      res.json({
+        message: "Login successful",
+        userType: user.userType,
+        email: user.email,
+        fullName: user.fullName,
+        companyName: user.companyName,
+      });
     } else {
       res.status(401).json({ message: "Invalid credentials" });
     }
   } catch (error) {
-    res.status(500).json({ message: "Error logging in" });
     res.status(500).json({ message: "Error logging in" });
   }
 });
@@ -115,4 +114,4 @@ app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);
 });
 
-export default app; // Ensure the app is exported as the default export
+export default app;

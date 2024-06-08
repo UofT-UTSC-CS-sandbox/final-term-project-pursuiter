@@ -28,21 +28,9 @@ const UserProvider = ({ children }) => {
     }
   };
 
-  const signupUser = async (
-    userType,
-    email,
-    password,
-    fullName,
-    companyName,
-  ) => {
+  const signupUser = async (userType, email, password, fullName, companyName) => {
     try {
-      const user = await UserController.signupUser(
-        userType,
-        email,
-        password,
-        fullName,
-        companyName,
-      );
+      const user = await UserController.signupUser(userType, email, password, fullName, companyName);
       setUser(user);
       return user;
     } catch (error) {

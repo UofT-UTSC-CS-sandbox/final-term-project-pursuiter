@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { UserContext } from "../../contexts/UserContext";
 import { FaStar } from 'react-icons/fa';
 import './RecruiterDashboard.css';
 import axios from 'axios';
@@ -9,8 +10,10 @@ function RecruiterDashboard() {
     const [selectedJob, setSelectedJob] = useState(null);
     const [favoritedJobs, setFavoritedJobs] = useState([]);
     const [jobs, setJobs] = useState([]);
+    const { user, logoutUser } = useContext(UserContext);
 
     useEffect(() => {
+        console.log('UserContext:', user); // Debugging line to check the user context
         axios.get('http://localhost:4000/jobs/')
             .then(response => {
                 setJobs(response.data);
@@ -18,9 +21,10 @@ function RecruiterDashboard() {
             .catch(error => {
                 console.log(error);
             });
-    }, []);
+    }, [user]);
 
     const handleLogout = () => {
+        logoutUser();
         navigate('/');
     };
 
@@ -50,6 +54,14 @@ function RecruiterDashboard() {
                 </div>
             </header>
             <div className="dashboard-content">
+                {user ? (
+                    <div>
+                        <p>Welcome, {user.fullName}</p>
+                        <p>Company: {user.companyName}</p>
+                    </div>
+                ) : (
+                    <p>Loading user information...</p>
+                )}
                 <button className="new-job-button">NEW JOB</button>
                 <div className="aesthetic-bar"></div>
                 <div className="job-listings">
@@ -126,4 +138,3 @@ function RecruiterDashboard() {
 }
 
 export default RecruiterDashboard;
-
