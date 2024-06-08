@@ -13,7 +13,8 @@ async function loginUser(email, password) {
       const errorData = await response.json();
       throw new Error(errorData.message || "Failed to login");
     }
-    return response.json();
+    const user = await response.json();
+    return user;
   } catch (error) {
     throw error;
   }
@@ -38,7 +39,8 @@ async function signupUser(userType, email, password, fullName, companyName) {
       const errorData = await response.json();
       throw new Error(errorData.message || "Failed to signup");
     }
-    return response.json();
+    const user = await response.json();
+    return user;
   } catch (error) {
     throw error;
   }

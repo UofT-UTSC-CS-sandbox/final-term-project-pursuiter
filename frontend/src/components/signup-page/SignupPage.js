@@ -2,8 +2,9 @@ import "../Users.css";
 import "./SignupPage.css";
 
 import UserController from "../../controllers/UserController";
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import { useNavigate, Link } from "react-router-dom";
+import { UserContext } from "../../contexts/UserContext";
 
 function SignupPage({ userType }) {
   const [email, setEmail] = useState("");
@@ -11,6 +12,7 @@ function SignupPage({ userType }) {
   const [fullName, setFullName] = useState("");
   const [companyName, setCompanyName] = useState("");
   const navigate = useNavigate();
+  const { loginUser } = useContext(UserContext);
   const heading =
     userType === "applicant"
       ? "Create Job-Seeker Account"
@@ -29,6 +31,8 @@ function SignupPage({ userType }) {
       console.log("Signup successful", user);
       alert("Signup successful!");
 
+      await loginUser(email, password);
+
       if (userType === "applicant") {
         navigate("/applicant-dashboard");
       } else if (userType === "recruiter") {
@@ -41,11 +45,11 @@ function SignupPage({ userType }) {
   };
 
   return (
-    <div className="signup-page-container">
-      <div className="signup-header">
+    <div className="users-page-container">
+      <div className="users-header">
         <h1 className="pursuiter-heading">PURSUITER</h1>
       </div>
-      <div className="signup-container">
+      <div className="users-container">
         <h1>{heading}</h1>
         <form onSubmit={handleSubmit}>
           <div>

@@ -72,7 +72,13 @@ app.post("/login", async (req, res) => {
   try {
     const user = await db.collection(dbCollections.users).findOne({ email });
     if (user && (await bcrypt.compare(password, user.password))) {
-      res.json({ message: "Login successful", userType: user.userType });
+      res.json({
+        message: "Login successful",
+        userType: user.userType,
+        email: user.email,
+        fullName: user.fullName,
+        companyName: user.companyName,
+      });
     } else {
       res.status(401).json({ message: "Invalid credentials" });
     }
