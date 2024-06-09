@@ -16,7 +16,8 @@ function RecruiterDashboard() {
         console.log('UserContext:', user); // Debugging line to check the user context
         axios.get('http://localhost:4000/jobs/')
             .then(response => {
-                setJobs(response.data);
+                const filteredJobs = response.data.filter(job => job.recruiterID.toString() === user.userId);
+                setJobs(filteredJobs);
             })
             .catch(error => {
                 console.log(error);
@@ -54,14 +55,6 @@ function RecruiterDashboard() {
                 </div>
             </header>
             <div className="dashboard-content">
-                {user ? (
-                    <div>
-                        <p>Welcome, {user.fullName}</p>
-                        <p>Company: {user.companyName}</p>
-                    </div>
-                ) : (
-                    <p>Loading user information...</p>
-                )}
                 <button className="new-job-button">NEW JOB</button>
                 <div className="aesthetic-bar"></div>
                 <div className="job-listings">

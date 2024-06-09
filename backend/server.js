@@ -101,6 +101,7 @@ app.post('/login', async (req, res) => {
         email: user.email,
         fullName: user.fullName,
         companyName: user.companyName,
+        userId: user._id
       });
     } else {
       res.status(401).json({ message: "Invalid credentials" });
