@@ -1,24 +1,16 @@
-import express from "express"; // express framework - Express.js framework
-import { MongoClient, ObjectId } from "mongodb"; // mongodb - database interaction client
-import bcrypt from "bcrypt"; // bcrypt - hashing and salting passwords
-import cors from "cors"; // CORS middleware - enabling cross-origin requests
-import jwt from "jsonwebtoken"; // jsonwebtoken - creating and verifying JWTs
-import multer from "multer"; // multer - uploading files
-import fs from "fs"; // fs - interact with the local ile system
-import path from "path"; // path - work with file and directory paths
+import express from 'express';
+import { MongoClient } from 'mongodb';
+import bcrypt from 'bcrypt';
+import cors from 'cors';
 
 const app = express();
 const PORT = 4000;
 const mongoURL = "mongodb://localhost:27017";
 const dbName = "pursuiter";
-const dbCollections = {
-  users: "users",
-};
 
 app.use(express.json());
 app.use(cors());
 
-// Connect to MongoDB
 let db;
 
 async function connectToMongo() {
@@ -27,22 +19,54 @@ async function connectToMongo() {
   try {
     await client.connect();
     console.log("Connected to MongoDB");
-
     db = client.db(dbName);
+    return db;
   } catch (error) {
     console.error("Error connecting to MongoDB:", error);
+    throw error; 
   }
 }
 
-connectToMongo();
+// Ensure MongoDB is connected before handling requests
+app.use(async (req, res, next) => {
+  if (!db) {
+    try {
+      db = await connectToMongo();
+    } catch (error) {
+      return res.status(500).json({ message: "Error connecting to the database" });
+    }
+  }
+  next();
+});
 
-// Signup
-app.post("/signup", async (req, res) => {
+app.get('/jobs', async (req, res) => {
+  try {
+    const jobs = await db.collection('jobs').find().toArray();
+    res.json(jobs);
+  } catch (error) {
+    res.status(500).json({ message: "Error fetching jobs" });
+  }
+});
+
+app.post('/jobs/add', async (req, res) => {
+  const jobs = req.body;
+
+  if (!Array.isArray(jobs)) {
+    return res.status(400).json({ message: "Expected an array of jobs" });
+  }
+
+  try {
+    await db.collection('jobs').insertMany(jobs);
+    res.status(201).json({ message: "Jobs added!" });
+  } catch (error) {
+    res.status(500).json({ message: "Error adding jobs" });
+  }
+});
+
+app.post('/signup', async (req, res) => {
   const { userType, email, password, fullName, companyName } = req.body;
   try {
-    const existingUser = await db
-      .collection(dbCollections.users)
-      .findOne({ email });
+    const existingUser = await db.collection('users').findOne({ email });
     if (existingUser) {
       return res.status(409).json({ message: "User already exists" });
     }
@@ -53,13 +77,11 @@ app.post("/signup", async (req, res) => {
       email,
       password: hashedPassword,
       fullName,
-      companyName,
+      companyName
     };
 
-    const result = await db.collection(dbCollections.users).insertOne(newUser);
-    res
-      .status(201)
-      .json({ message: "User created", userId: result.insertedId });
+    const result = await db.collection('users').insertOne(newUser);
+    res.status(201).json({ message: "User created", userId: result.insertedId });
   } catch (error) {
     console.error("Error in signup:", error);
     res.status(500).json({ message: "Error creating user" });
@@ -67,17 +89,18 @@ app.post("/signup", async (req, res) => {
 });
 
 // Login
-app.post("/login", async (req, res) => {
+app.post('/login', async (req, res) => {
   const { email, password } = req.body;
   try {
-    const user = await db.collection(dbCollections.users).findOne({ email });
-    if (user && (await bcrypt.compare(password, user.password))) {
+    const user = await db.collection('users').findOne({ email });
+    if (user && await bcrypt.compare(password, user.password)) {
       res.json({
         message: "Login successful",
         userType: user.userType,
         email: user.email,
         fullName: user.fullName,
         companyName: user.companyName,
+        userId: user._id
       });
     } else {
       res.status(401).json({ message: "Invalid credentials" });
@@ -87,7 +110,13 @@ app.post("/login", async (req, res) => {
   }
 });
 
-// Open Port
-app.listen(PORT, () => {
-  console.log(`Server is running on http://localhost:${PORT}`);
-});
+async function startServer() {
+  await connectToMongo();
+  app.listen(PORT, () => {
+    console.log(`Server is running on http://localhost:${PORT}`);
+  });
+}
+
+startServer();
+
+export default app;

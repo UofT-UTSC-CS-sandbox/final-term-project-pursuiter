@@ -118,3 +118,4 @@ function SignupPage({ userType }) {
 }
 
 export default SignupPage;
+
