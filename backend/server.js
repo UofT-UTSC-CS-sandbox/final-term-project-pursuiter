@@ -5,7 +5,7 @@ import cors from 'cors';
 
 const app = express();
 const PORT = 4000;
-const mongoURL = "mongodb+srv://mohammadqassim000:xVTcVQ2a7IA3HL0C@cluster0.1teyexn.mongodb.net/pursuiter?retryWrites=true&w=majority";
+const mongoURL = "mongodb://localhost:27017";
 const dbName = "pursuiter";
 
 app.use(express.json());
