@@ -77,7 +77,9 @@ app.post('/signup', async (req, res) => {
       email,
       password: hashedPassword,
       fullName,
-      companyName
+      companyName,
+      address,
+      positions,
     };
 
     const result = await db.collection('users').insertOne(newUser);
@@ -100,6 +102,8 @@ app.post('/login', async (req, res) => {
         email: user.email,
         fullName: user.fullName,
         companyName: user.companyName,
+        address: user.address,
+        positions: user.positions,
         userId: user._id
       });
     } else {
@@ -107,6 +111,88 @@ app.post('/login', async (req, res) => {
     }
   } catch (error) {
     res.status(500).json({ message: "Error logging in" });
+  }
+});
+
+// Update the user fullName, email, address, positions
+app.put("/updateUser", async (req, res) => {
+  const { email, newEmail, fullName, address, positions } = req.body;
+  try {
+    const user = await db.collection(dbCollections.users).findOne({ email });
+    if (user) {
+      const updatedUser = { ...user };
+      if (newEmail) {
+        const emailUsed = await db.collection(dbCollections.users).findOne({ email: newEmail });
+        if (emailUsed && newEmail !== email) {
+          return res.status(400).json({ message: "New email already used by another account" });
+        } else {
+          updatedUser.email = newEmail;
+        }
+      }
+
+      if (fullName) updatedUser.fullName = fullName;
+      if (address) updatedUser.address = address;
+      if (positions) updatedUser.positions = positions;
+
+      await db.collection(dbCollections.users).updateOne(
+        { email }, 
+        { $set: updatedUser } 
+      );
+
+      res.json({
+        message: "Update successful",
+        email: updatedUser.email,
+        fullName: updatedUser.fullName,
+        address: updatedUser.address,
+        positions: updatedUser.positions,
+      });      
+    } else {
+      res.status(404).json({ message: "User not found" });
+    }
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Error updating user" });
+  }
+});
+
+// Update the user fullName, email, address, positions
+app.put("/updateUser", async (req, res) => {
+  const { email, newEmail, fullName, address, positions } = req.body;
+  try {
+    const user = await db.collection(dbCollections.users).findOne({ email });
+    if (user) {
+      const updatedUser = { ...user };
+      if (newEmail) {
+        const emailUsed = await db.collection(dbCollections.users).findOne({ email: newEmail });
+        if (emailUsed && newEmail !== email) {
+          return res.status(400).json({ message: "New email already used by another account" });
+        } else {
+          updatedUser.email = newEmail;
+        }
+      }
+
+      if (fullName) updatedUser.fullName = fullName;
+      if (address) updatedUser.address = address;
+      if (positions) updatedUser.positions = positions;
+
+      await db.collection(dbCollections.users).updateOne(
+        { email }, 
+        { $set: updatedUser } 
+      );
+
+      res.json({
+        message: "Update successful",
+        email: updatedUser.email,
+        fullName: updatedUser.fullName,
+        address: updatedUser.address,
+        positions: updatedUser.positions,
+      });      
+    } else {
+      res.status(404).json({ message: "User not found" });
+    }
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Error updating user" });
   }
 });
 
@@ -119,4 +205,4 @@ async function startServer() {
 
 startServer();
 
-export default app;
+export default app

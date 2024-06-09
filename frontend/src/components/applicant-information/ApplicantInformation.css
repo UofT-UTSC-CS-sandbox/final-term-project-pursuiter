@@ -41,7 +41,7 @@
 }
 
 .profile-name {
-    font-size: 20px;
+    font-size: 18px;
     width: 282px;
     height: 83px;
     top: 419px;
@@ -52,9 +52,11 @@
 .profile-name h1 {
     color: #FFFFFF;
     font-family: Poppins;
-    font-size: 20px;
+    font-size: 18px;
     font-weight: 600;
-    line-height: 30px;    
+    line-height: 30px; 
+    overflow: hidden;
+    text-overflow: ellipsis;       
 }
 
 .menu-item {
