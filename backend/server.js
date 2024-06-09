@@ -23,22 +23,21 @@ async function connectToMongo() {
     return db;
   } catch (error) {
     console.error("Error connecting to MongoDB:", error);
-    throw error; // re-throw the error after logging it
+    throw error; 
   }
 }
 
-// Middleware to ensure DB connection is initialized
-const ensureDbConnection = (req, res, next) => {
+// Ensure MongoDB is connected before handling requests
+app.use(async (req, res, next) => {
   if (!db) {
-    connectToMongo()
-      .then(() => next())
-      .catch(err => res.status(500).json({ message: "Error connecting to the database" }));
-  } else {
-    next();
+    try {
+      db = await connectToMongo();
+    } catch (error) {
+      return res.status(500).json({ message: "Error connecting to the database" });
+    }
   }
-};
-
-app.use(ensureDbConnection);
+  next();
+});
 
 app.get('/jobs', async (req, res) => {
   try {
@@ -111,8 +110,13 @@ app.post('/login', async (req, res) => {
   }
 });
 
-app.listen(PORT, () => {
-  console.log(`Server is running on http://localhost:${PORT}`);
-});
+async function startServer() {
+  await connectToMongo();
+  app.listen(PORT, () => {
+    console.log(`Server is running on http://localhost:${PORT}`);
+  });
+}
+
+startServer();
 
 export default app;

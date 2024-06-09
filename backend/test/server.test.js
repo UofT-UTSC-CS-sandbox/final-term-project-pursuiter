@@ -1,6 +1,18 @@
 import request from 'supertest';
 import { expect } from 'chai';
-import app from '../server.js'; // Ensure this path correctly points to your server.js file
+import app from '../server.js';
+import { MongoClient } from 'mongodb';
+
+const mongoURL = "mongodb://localhost:27017";
+const dbName = "pursuiter_test"; // Use a separate test database
+let db;
+
+before(async () => {
+  const client = new MongoClient(mongoURL);
+  await client.connect();
+  db = client.db(dbName);
+  await db.collection('users').deleteMany({}); // Clear the users collection before tests
+});
 
 describe('User Authentication', () => {
   describe('POST /signup', () => {
@@ -70,4 +82,8 @@ describe('User Authentication', () => {
       expect(res.body).to.have.property('message', 'Invalid credentials');
     });
   });
+});
+
+after(async () => {
+  await db.collection('users').deleteMany({}); // Clean up the users collection after tests
 });
