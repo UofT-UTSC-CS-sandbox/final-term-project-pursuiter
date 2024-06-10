@@ -24,6 +24,12 @@ body {
     font-size: 24px;
 }
 
+.search-bar {
+    display: flex;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
 .header-links {
     display: flex;
     gap: 20px;
@@ -48,7 +54,7 @@ body {
     padding: 20px;
 }
 
-.new-job-button {
+.search-button {
     width: 200px;
     padding: 15px;
     background-color: #800020;
@@ -148,8 +154,7 @@ body {
     gap: 20px;
 }
 
-.see-applicants-button,
-.edit-button {
+.apply-button {
     padding: 15px 20px;
     background-color: #800020;
     color: #fff;

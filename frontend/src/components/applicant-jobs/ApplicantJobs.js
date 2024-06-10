@@ -61,7 +61,15 @@ function ApplicantJobs() {
               </div>
           </header>
           <div className="dashboard-content">
-              <button className="new-job-button">NEW JOB</button>
+                <div className="search-bar">
+                    <input
+                        type="text"
+                        placeholder="Search for jobs"
+                        className="search-input"
+                    />
+                </div>
+
+              <button className="search-button">SEARCH</button>
               <div className="aesthetic-bar"></div>
               <div className="job-listings">
                   <div className="job-list">
@@ -97,8 +105,7 @@ function ApplicantJobs() {
                               <div className="job-detail-header">
                                   <div className="job-detail-title">{selectedJob.title}</div>
                                   <div className="job-detail-actions">
-                                      <button className="see-applicants-button">SEE APPLICANTS</button>
-                                      <button className="edit-button">EDIT</button>
+                                  <button className="apply-button">APPLY</button>
                                   </div>
                               </div>
                               <div className="job-detail-body">
