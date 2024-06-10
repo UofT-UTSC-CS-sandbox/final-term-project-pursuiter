@@ -20,7 +20,15 @@ async function loginUser(email, password) {
   }
 }
 
-async function signupUser(userType, email, password, fullName, companyName, address, positions) {
+async function signupUser(
+  userType,
+  email,
+  password,
+  fullName,
+  companyName,
+  address,
+  positions
+) {
   try {
     const response = await fetch(`${API_URL}/signup`, {
       method: "POST",
@@ -34,7 +42,7 @@ async function signupUser(userType, email, password, fullName, companyName, addr
         fullName,
         companyName,
         address,
-        positions,        
+        positions,
       }),
     });
     if (!response.ok) {
@@ -60,7 +68,7 @@ async function updateUser(email, newEmail, fullName, address, positions) {
         newEmail,
         fullName,
         address,
-        positions,        
+        positions,
       }),
     });
     if (!response.ok) {

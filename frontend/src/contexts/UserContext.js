@@ -35,7 +35,7 @@ const UserProvider = ({ children }) => {
     fullName,
     companyName,
     address,
-    positions,    
+    positions
   ) => {
     try {
       const user = await UserController.signupUser(
@@ -45,7 +45,7 @@ const UserProvider = ({ children }) => {
         fullName,
         companyName,
         address,
-        positions,       
+        positions
       );
       setUser(user);
       return user;
@@ -54,34 +54,30 @@ const UserProvider = ({ children }) => {
     }
   };
 
-  const updateUser = async (
-    email, 
-    newEmail, 
-    fullName, 
-    address, 
-    positions,
-  ) => {
+  const updateUser = async (email, newEmail, fullName, address, positions) => {
     try {
       const updatedUser = await UserController.updateUser(
-        email, 
-        newEmail, 
-        fullName, 
-        address, 
-        positions,
+        email,
+        newEmail,
+        fullName,
+        address,
+        positions
       );
       setUser(updatedUser);
       return updatedUser;
     } catch (error) {
       throw error;
     }
-  }; 
+  };
 
   const logoutUser = () => {
     setUser(null);
   };
 
   return (
-    <UserContext.Provider value={{ user, loginUser, signupUser, logoutUser, updateUser }}>
+    <UserContext.Provider
+      value={{ user, loginUser, signupUser, logoutUser, updateUser }}
+    >
       {children}
     </UserContext.Provider>
   );
