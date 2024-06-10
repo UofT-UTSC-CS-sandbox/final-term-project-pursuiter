@@ -177,4 +177,4 @@ async function startServer() {
 
 startServer();
 
-export default app
+export default app;
