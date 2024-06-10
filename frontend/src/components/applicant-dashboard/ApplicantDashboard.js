@@ -27,6 +27,7 @@ function ApplicantDashboard() {
         <Link to="/applicant-information">Personal Information</Link>
       </div>      
       <button onClick={handleLogout}>Logout</button>
+      <button onClick={() => navigate("/applicant-jobs")}>View Jobs</button>
     </div>
   );
 }
