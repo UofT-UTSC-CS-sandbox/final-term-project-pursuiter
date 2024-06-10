@@ -1,6 +1,5 @@
 import "./ApplicantInformation.css";
 
-import UserController from "../../controllers/UserController";
 import React, { useState, useContext } from "react";
 import { UserContext } from "../../contexts/UserContext";
 import { useNavigate } from "react-router-dom";
@@ -11,7 +10,7 @@ function JobSeekerInformation() {
   const [activeMenu, setActiveMenu] = useState("Personal Details");
   const [fullName, setFullName] = useState(user.fullName);  
   const [address, setAddress] = useState(user.address);
-  const [email, setEmail] = useState(user.email);
+  const [email] = useState(user.email);
   const [newEmail, setNewEmail] = useState(user.email);
   const [positions, setPositions] = useState(user.positions);
 

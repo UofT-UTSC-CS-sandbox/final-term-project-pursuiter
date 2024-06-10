@@ -64,7 +64,7 @@ app.post('/jobs/add', async (req, res) => {
 });
 
 app.post('/signup', async (req, res) => {
-  const { userType, email, password, fullName, companyName } = req.body;
+  const { userType, email, password, fullName, companyName, address, positions } = req.body;
   try {
     const existingUser = await db.collection('users').findOne({ email });
     if (existingUser) {
@@ -118,11 +118,11 @@ app.post('/login', async (req, res) => {
 app.put("/updateUser", async (req, res) => {
   const { email, newEmail, fullName, address, positions } = req.body;
   try {
-    const user = await db.collection(dbCollections.users).findOne({ email });
+    const user = await db.collection('users').findOne({ email });
     if (user) {
       const updatedUser = { ...user };
       if (newEmail) {
-        const emailUsed = await db.collection(dbCollections.users).findOne({ email: newEmail });
+        const emailUsed = await db.collection('users').findOne({ email: newEmail });
         if (emailUsed && newEmail !== email) {
           return res.status(400).json({ message: "New email already used by another account" });
         } else {
@@ -134,48 +134,7 @@ app.put("/updateUser", async (req, res) => {
       if (address) updatedUser.address = address;
       if (positions) updatedUser.positions = positions;
 
-      await db.collection(dbCollections.users).updateOne(
-        { email }, 
-        { $set: updatedUser } 
-      );
-
-      res.json({
-        message: "Update successful",
-        email: updatedUser.email,
-        fullName: updatedUser.fullName,
-        address: updatedUser.address,
-        positions: updatedUser.positions,
-      });      
-    } else {
-      res.status(404).json({ message: "User not found" });
-    }
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: "Error updating user" });
-  }
-});
-
-// Update the user fullName, email, address, positions
-app.put("/updateUser", async (req, res) => {
-  const { email, newEmail, fullName, address, positions } = req.body;
-  try {
-    const user = await db.collection(dbCollections.users).findOne({ email });
-    if (user) {
-      const updatedUser = { ...user };
-      if (newEmail) {
-        const emailUsed = await db.collection(dbCollections.users).findOne({ email: newEmail });
-        if (emailUsed && newEmail !== email) {
-          return res.status(400).json({ message: "New email already used by another account" });
-        } else {
-          updatedUser.email = newEmail;
-        }
-      }
-
-      if (fullName) updatedUser.fullName = fullName;
-      if (address) updatedUser.address = address;
-      if (positions) updatedUser.positions = positions;
-
-      await db.collection(dbCollections.users).updateOne(
+      await db.collection('users').updateOne(
         { email }, 
         { $set: updatedUser } 
       );

@@ -84,6 +84,63 @@ describe('User Authentication', () => {
   });
 });
 
+describe('PUT /updateUser', () => {
+  let user1, user2;
+
+  before(async () => {
+    user1 = await request(app)
+      .post('/signup')
+      .send({
+        userType: 'applicant',
+        email: 'user1@example.com',
+        password: 'password123',
+        fullName: 'John Doe',
+        companyName: 'Tech Corp'
+      });
+
+    user2 = await request(app)
+      .post('/signup')
+      .send({
+        userType: 'applicant',
+        email: 'user2@example.com',
+        password: 'password123',
+        fullName: 'Doe John',
+        companyName: 'Tech Corp'
+      });
+  });
+
+  it('should not allow updating email to an email that already exists', async () => {
+    const res = await request(app)
+      .put('/updateUser')
+      .send({
+        email: 'user1@example.com',
+        newEmail: 'user2@example.com', 
+      });
+
+    expect(res.status).to.equal(400);
+    expect(res.body).to.have.property('message', 'New email already used by another account');
+  });
+
+  it('should update name, address and positions', async () => {
+    const res = await request(app)
+      .put('/updateUser')
+      .send({
+        email: 'user1@example.com',
+        newEmail: 'Newuser1@example.com',
+        fullName: 'New name',
+        address: 'New address',
+        positions: 'New position',
+      });
+
+    expect(res.status).to.equal(200);
+    expect(res.body).to.have.property('message', 'Update successful');
+    expect(res.body).to.have.property('email', 'Newuser1@example.com');
+    expect(res.body).to.have.property('fullName', 'New name');
+    expect(res.body).to.have.property('address', 'New address');
+    expect(res.body).to.have.property('positions', 'New position');
+  });
+});
+
 after(async () => {
   await db.collection('users').deleteMany({}); // Clean up the users collection after tests
 });
