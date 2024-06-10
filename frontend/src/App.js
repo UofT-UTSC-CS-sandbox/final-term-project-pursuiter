@@ -9,7 +9,11 @@ import JobSeekerSignupPage from "./components/applicant-signup-page/ApplicantSig
 import RecruiterSignupPage from "./components/recruiter-signup-page/RecruiterSignupPage";
 import ApplicantDashboard from "./components/applicant-dashboard/ApplicantDashboard";
 import RecruiterDashboard from "./components/recruiter-dashboard/RecruiterDashboard";
+<<<<<<< HEAD
 import JobSeekerInformation from "./components/applicant-information/ApplicantInformation";
+=======
+import ApplicantJobs from "./components/applicant-jobs/ApplicantJobs";
+>>>>>>> 42b6b3c (show jobs all jobs on jobs page)
 
 function App() {
   return (
@@ -25,7 +29,11 @@ function App() {
           {/* <Route path="/applicant-jobs" element={<ApplicantJobs />} /> */}
           <Route path="/applicant-dashboard" element={<ApplicantDashboard />} />
           <Route path="/recruiter-dashboard" element={<RecruiterDashboard />} />
+<<<<<<< HEAD
           <Route path="/applicant-information" element={<JobSeekerInformation />} />          
+=======
+          <Route path="/applicant-jobs" element={<ApplicantJobs />} />
+>>>>>>> 42b6b3c (show jobs all jobs on jobs page)
         </Routes>
       </BrowserRouter>
     </UserProvider>
