@@ -9,7 +9,7 @@ import JobSeekerSignupPage from "./components/applicant-signup-page/ApplicantSig
 import RecruiterSignupPage from "./components/recruiter-signup-page/RecruiterSignupPage";
 import ApplicantDashboard from "./components/applicant-dashboard/ApplicantDashboard";
 import RecruiterDashboard from "./components/recruiter-dashboard/RecruiterDashboard";
-import ApplicantJobs from "./components/applicant-jobs/ApplicantJobs";
+// import ApplicantJobs from "./components/applicant-jobs/ApplicantJobs";
 
 function App() {
   return (
@@ -20,9 +20,10 @@ function App() {
           <Route path="/login" element={<LoginPage />} />
           <Route path="/applicant-signup" element={<JobSeekerSignupPage />} />
           <Route path="/recruiter-signup" element={<RecruiterSignupPage />} />
-          <Route path="/applicant-dashboard" element={<ApplicantDashboard />} />
           <Route path="/recruiter-dashboard" element={<RecruiterDashboard />} />
-          <Route path="/applicant-jobs" element={<ApplicantJobs />} />
+
+          {/* <Route path="/applicant-jobs" element={<ApplicantJobs />} /> */}
+          <Route path="/applicant-dashboard" element={<ApplicantDashboard />} />
         </Routes>
       </BrowserRouter>
     </UserProvider>
