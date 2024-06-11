@@ -1,5 +1,5 @@
 import express from 'express';
-import { MongoClient } from 'mongodb';
+import { MongoClient, ObjectId } from 'mongodb'; // Ensure ObjectId is imported
 import bcrypt from 'bcrypt';
 import cors from 'cors';
 
@@ -107,6 +107,51 @@ app.post('/login', async (req, res) => {
     }
   } catch (error) {
     res.status(500).json({ message: "Error logging in" });
+  }
+});
+
+app.get('/jobs/:id/applicants', async (req, res) => {
+  const jobId = req.params.id;
+
+  try {
+    const applications = await db.collection('applications').find({ jobId: new ObjectId(jobId) }).toArray();
+    const userIds = applications.map(app => app.userId);
+    const applicants = await db.collection('users').find({ _id: { $in: userIds } }).toArray();
+    res.json(applicants);
+  } catch (error) {
+    console.error("Error fetching applicants:", error);
+    res.status(500).json({ message: "Error fetching applicants" });
+  }
+});
+
+app.get('/jobs/:id', async (req, res) => {
+  const jobId = req.params.id;
+
+  try {
+      const job = await db.collection('jobs').findOne({ _id: new ObjectId(jobId) });
+      if (job) {
+          res.json(job);
+      } else {
+          res.status(404).json({ message: "Job not found" });
+      }
+  } catch (error) {
+      res.status(500).json({ message: "Error fetching job details" });
+  }
+});
+
+app.get('/applications/:jobId', async (req, res) => {
+  const jobId = req.params.jobId;
+  try {
+      const applications = await db.collection('applications').find({ jobID: jobId }).toArray();
+      if (applications.length === 0) {
+          return res.status(404).json({ message: "No applications found for this job" });
+      }
+      const applicantIds = applications.map(app => app.applicantID);
+      const applicants = await db.collection('users').find({ _id: { $in: applicantIds.map(id => new ObjectId(id)) } }).toArray();
+      res.json(applicants);
+  } catch (error) {
+      console.error('Error fetching applicants:', error); // Log the error
+      res.status(500).json({ message: "Error fetching applicants", error: error.message });
   }
 });
 
