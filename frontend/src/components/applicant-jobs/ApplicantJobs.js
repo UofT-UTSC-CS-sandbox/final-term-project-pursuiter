@@ -66,6 +66,9 @@ function ApplicantJobs() {
 
   return (
       <div className="dashboard-container">
+        <head>
+          <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"></link>
+        </head>
           <header className="dashboard-header">
               <div className="logo-container">  
                     <img src="https://via.placeholder.com/20" alt="logo" className="logo-image" />
@@ -97,7 +100,63 @@ function ApplicantJobs() {
                     </div>
                 </div>
 
-              <button className="search-button">SEARCH</button>
+                <div className="filter-container">
+                    <div className="filter-bar">
+                        <div class="dropdown">
+                            <button class="dropbtn">Position 
+                                <i class="fa fa-caret-down"></i>
+                            </button>
+                            <div class="dropdown-content">
+                                <a href="#">Link 1</a>
+                                <a href="#">Link 2</a>
+                                <a href="#">Link 3</a>
+                            </div>
+                        </div> 
+                        <div class="dropdown">
+                            <button class="dropbtn">Company 
+                                <i class="fa fa-caret-down"></i>
+                            </button>
+                            <div class="dropdown-content">
+                                <a href="#">Link 1</a>
+                                <a href="#">Link 2</a>
+                                <a href="#">Link 3</a>
+                            </div>
+                        </div> 
+                        <div class="dropdown">
+                            <button class="dropbtn">Location 
+                                <i class="fa fa-caret-down"></i>
+                            </button>
+                            <div class="dropdown-content">
+                                <a href="#">Link 1</a>
+                                <a href="#">Link 2</a>
+                                <a href="#">Link 3</a>
+                            </div>
+                        </div> 
+                        <div class="dropdown">
+                            <button class="dropbtn">Type 
+                                <i class="fa fa-caret-down"></i>
+                            </button>
+                            <div class="dropdown-content">
+                                <a href="#">Link 1</a>
+                                <a href="#">Link 2</a>
+                                <a href="#">Link 3</a>
+                            </div>
+                        </div> 
+                        <div class="dropdown">
+                            <button class="dropbtn">Apply By 
+                                <i class="fa fa-caret-down"></i>
+                            </button>
+                            <div class="dropdown-content">
+                                <a href="#">Link 1</a>
+                                <a href="#">Link 2</a>
+                                <a href="#">Link 3</a>
+                            </div>
+                        </div> 
+                        <button className="search-button">SEARCH</button>
+                    </div>
+                    
+                </div>
+              
               <div className="aesthetic-bar"></div>
               <div className="job-listings">
                   <div className="job-list">
@@ -106,8 +165,7 @@ function ApplicantJobs() {
                           <div
                               key={index}
                               className="job-item"
-                              onClick={() => setSelectedJob(job)}
-                          >
+                              onClick={() => setSelectedJob(job)}>
                               <div className="job-title">{job.title}</div>
                               <div className="job-company">{job.company}</div>
                               <div className="job-location">{job.location}</div>
@@ -137,25 +195,20 @@ function ApplicantJobs() {
                                   </div>
                               </div>
                               <div className="job-detail-body">
-                                  <div className="job-detail-section">
-                                      <strong>Company:</strong> {selectedJob.company}
+                                  <div className="job-detail-section-top-company">
+                                      <strong>Company: &nbsp; </strong> {selectedJob.company}
+                                  </div>
+                                  <div className="job-detail-section-top">
+                                      <strong>Location: &nbsp; </strong> {selectedJob.location}
+                                  </div>
+                                  <div className="job-detail-section-top">
+                                      <strong>Type: &nbsp; </strong> {selectedJob.type}
                                   </div>
                                   <div className="job-detail-section">
-                                      <strong>Location:</strong> {selectedJob.location}
+                                      <strong>Description:  </strong> {selectedJob.description}
                                   </div>
                                   <div className="job-detail-section">
-                                      <strong>Type:</strong> {selectedJob.type}
-                                  </div>
-                                  <div className="job-detail-section">
-                                      <strong>Hidden Keywords:</strong> {selectedJob.hiddenKeywords}
-                                  </div>
-                                  <div className="job-detail-section">
-                                      <strong>Description:</strong>
-                                      <p>{selectedJob.description}</p>
-                                  </div>
-                                  <div className="job-detail-section">
-                                      <strong>Qualifications:</strong>
-                                      <p>{selectedJob.qualifications}</p>
+                                      <strong>Qualifications: </strong> {selectedJob.qualifications}
                                   </div>
                               </div>
                           </>
