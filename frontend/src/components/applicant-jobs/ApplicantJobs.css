@@ -283,11 +283,6 @@ body {
 }
 
 
-
-
-
-
-
 .logout-link {
     cursor: pointer;
 }
@@ -387,6 +382,17 @@ body {
 
 .job-item:hover {
     background-color: #e0e0e0;
+
+    /* // change the colour of the favorite-icon when the job-item is hovered: */
+    .favorite-icon {
+        color: #fff;
+    }
+
+    .favorite-icon.favorited {
+        color: gold;
+    }
+
+    
 }
 
 .job-title {
@@ -519,7 +525,10 @@ body {
     right: 10px;
     color: #ddd;
     cursor: pointer;
+    /* border: 1px solid #ddd; */
+    
 }
+
 
 .favorite-icon.favorited {
     color: gold;
