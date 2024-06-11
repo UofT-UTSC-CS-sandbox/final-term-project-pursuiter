@@ -5,6 +5,10 @@ import { useNavigate } from "react-router-dom";
 import { UserContext } from "../../contexts/UserContext";
 import { FaStar } from "react-icons/fa";
 import axios from "axios";
+<<<<<<< HEAD
+=======
+import { Link } from "react-router-dom";
+>>>>>>> eb78080 (changed the file location)
 
 function ApplicantDashboard() {
   const navigate = useNavigate();
@@ -75,9 +79,14 @@ function ApplicantDashboard() {
               </div>
               
               <div className="header-links">
+<<<<<<< HEAD
                   <div className="header-link">Jobs</div>
                   <div className="header-link">ACCOUNT</div>
                   <div className="header-link" onClick={handleLogout}>LOGOUT</div>
+=======
+                  <div className="header-link">Postings</div>
+                  <div className="header-link">ACCOUNT</div>
+>>>>>>> eb78080 (changed the file location)
               </div>
           </header>
           <div className="dashboard-content">
