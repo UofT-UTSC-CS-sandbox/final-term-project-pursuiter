@@ -9,7 +9,6 @@ import JobSeekerSignupPage from "./components/applicant-signup-page/ApplicantSig
 import RecruiterSignupPage from "./components/recruiter-signup-page/RecruiterSignupPage";
 import ApplicantDashboard from "./components/applicant-dashboard/ApplicantDashboard";
 import RecruiterDashboard from "./components/recruiter-dashboard/RecruiterDashboard";
-import JobSeekerInformation from "./components/applicant-information/ApplicantInformation";
 
 function App() {
   return (
@@ -22,7 +21,6 @@ function App() {
           <Route path="/recruiter-signup" element={<RecruiterSignupPage />} />
           <Route path="/applicant-dashboard" element={<ApplicantDashboard />} />
           <Route path="/recruiter-dashboard" element={<RecruiterDashboard />} />
-          <Route path="/applicant-information" element={<JobSeekerInformation />} />          
         </Routes>
       </BrowserRouter>
     </UserProvider>

@@ -11,8 +11,6 @@ function SignupPage({ userType }) {
   const [password, setPassword] = useState("");
   const [fullName, setFullName] = useState("");
   const [companyName, setCompanyName] = useState("");
-  const [address, setAddress] = useState("");
-  const [positions, setPositions] = useState("");
   const navigate = useNavigate();
   const { loginUser } = useContext(UserContext);
   const heading =
@@ -29,8 +27,6 @@ function SignupPage({ userType }) {
         password,
         fullName,
         companyName,
-        address,
-        positions        
       );
       console.log("Signup successful", user);
       alert("Signup successful!");

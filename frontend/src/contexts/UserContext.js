@@ -28,43 +28,11 @@ const UserProvider = ({ children }) => {
     }
   };
 
-  const signupUser = async (
-    userType,
-    email,
-    password,
-    fullName,
-    companyName,
-    address,
-    positions
-  ) => {
+  const signupUser = async (userType, email, password, fullName, companyName) => {
     try {
-      const user = await UserController.signupUser(
-        userType,
-        email,
-        password,
-        fullName,
-        companyName,
-        address,
-        positions
-      );
+      const user = await UserController.signupUser(userType, email, password, fullName, companyName);
       setUser(user);
       return user;
-    } catch (error) {
-      throw error;
-    }
-  };
-
-  const updateUser = async (email, newEmail, fullName, address, positions) => {
-    try {
-      const updatedUser = await UserController.updateUser(
-        email,
-        newEmail,
-        fullName,
-        address,
-        positions
-      );
-      setUser(updatedUser);
-      return updatedUser;
     } catch (error) {
       throw error;
     }
@@ -75,9 +43,7 @@ const UserProvider = ({ children }) => {
   };
 
   return (
-    <UserContext.Provider
-      value={{ user, loginUser, signupUser, logoutUser, updateUser }}
-    >
+    <UserContext.Provider value={{ user, loginUser, signupUser, logoutUser }}>
       {children}
     </UserContext.Provider>
   );

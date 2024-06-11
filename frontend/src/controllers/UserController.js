@@ -20,15 +20,7 @@ async function loginUser(email, password) {
   }
 }
 
-async function signupUser(
-  userType,
-  email,
-  password,
-  fullName,
-  companyName,
-  address,
-  positions
-) {
+async function signupUser(userType, email, password, fullName, companyName) {
   try {
     const response = await fetch(`${API_URL}/signup`, {
       method: "POST",
@@ -41,8 +33,6 @@ async function signupUser(
         password,
         fullName,
         companyName,
-        address,
-        positions,
       }),
     });
     if (!response.ok) {
@@ -56,34 +46,7 @@ async function signupUser(
   }
 }
 
-async function updateUser(email, newEmail, fullName, address, positions) {
-  try {
-    const response = await fetch(`${API_URL}/updateUser`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        email,
-        newEmail,
-        fullName,
-        address,
-        positions,
-      }),
-    });
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.message || "Failed to update");
-    }
-    const user = await response.json();
-    return user;
-  } catch (error) {
-    throw error;
-  }
-}
-
 export default {
   loginUser,
   signupUser,
-  updateUser,
 };

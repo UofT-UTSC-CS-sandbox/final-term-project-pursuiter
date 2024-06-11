@@ -3,7 +3,6 @@ import "./ApplicantDashboard.css";
 import React, { useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import { UserContext } from "../../contexts/UserContext";
-import { Link } from "react-router-dom";
 
 function ApplicantDashboard() {
   const navigate = useNavigate();
@@ -23,9 +22,6 @@ function ApplicantDashboard() {
           <p>Email: {user.email}</p>
         </div>
       )}
-      <div>
-        <Link to="/applicant-information">Personal Information</Link>
-      </div>      
       <button onClick={handleLogout}>Logout</button>
     </div>
   );
