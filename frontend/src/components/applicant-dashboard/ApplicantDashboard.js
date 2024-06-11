@@ -74,10 +74,8 @@ function ApplicantDashboard() {
               </div>
               
               <div className="header-links">
-                  <div className="header-link">Jobs</div>
-                  {/* <div className="header-link" navigateTo="/applicant-information" >ACCOUNT</div> */}
-                  <div className="header-link" onClick={() => navigate("/applicant-information")}>ACCOUNT</div>
-                  <div className="header-link" onClick={handleLogout}>LOGOUT</div>
+                  <div className="header-link">Postings</div>
+                  <div className="header-link">ACCOUNT</div>
               </div>
           </header>
           <div className="dashboard-content">
