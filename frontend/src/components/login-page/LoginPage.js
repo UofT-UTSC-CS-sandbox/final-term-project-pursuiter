@@ -2,7 +2,7 @@ import "./LoginPage.css";
 import "../Users.css";
 
 import React, { useState, useContext } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { UserContext } from "../../contexts/UserContext";
 
 function LoginPage() {
@@ -55,6 +55,11 @@ function LoginPage() {
           </div>
           <button type="submit">Login</button>
         </form>
+        <div className="inline-link">
+          <p>
+            Dont have an account? <Link to="/applicant-signup">Create Account</Link>
+          </p>
+        </div>        
       </div>
     </div>
   );
