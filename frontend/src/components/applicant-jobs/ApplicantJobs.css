@@ -1,4 +1,6 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Poppins&display=swap');
+
 
 body {
     margin: 0;
@@ -11,6 +13,13 @@ body {
     height: 100vh;
 }
 
+.page-title {
+    color: #000000;
+    font-family: Poppins;
+    font-size: 20px;
+    font-weight: 600;
+}
+
 .dashboard-header {
     display: flex;
     justify-content: space-between;
@@ -18,16 +27,67 @@ body {
     background-color: #000;
     color: #fff;
     padding: 10px 20px;
+    position: sticky;
+}
+
+.logo-container {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    cursor: pointer
 }
 
 .logo {
     font-size: 24px;
+    font-weight:bolder;
+    font-family: Poppins;
+}
+
+.logo-img {
+    width: 20px;
+    height: 20px; 
+    object-fit: cover;
+}
+
+.search-container {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 20px;
+    margin-bottom: 20px;
+
 }
 
 .search-bar {
-    display: flex;
-    align-items: center;
-    margin-bottom: 15px;
+    width: 65%;
+}
+
+.location-bar {
+    width: 30%;
+}
+
+.search-input {
+    padding: 10px; 
+    background-color: #E7E7E7;
+    font-family: Poppins;
+    color: #4B4B4B;
+    font-size: 14px;
+    width: 100%;
+    border: 1px solid #000000;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.4);
+    margin-right: 5px;
+}
+
+.location-input {
+    padding: 10px; 
+    font-family: Poppins;
+    box-sizing: border-box;
+    background-color: #E7E7E7;
+    color: #4B4B4B;
+    font-size: 14px;
+    width: 100%;
+    border: 1px solid #000000;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.4);
 }
 
 .header-links {
@@ -52,10 +112,12 @@ body {
     display: flex;
     flex-direction: column;
     padding: 20px;
+    width: 60vw;
+    margin: auto;
 }
 
 .search-button {
-    width: 200px;
+    width: 18vw;
     padding: 15px;
     background-color: #800020;
     color: #fff;
@@ -65,16 +127,23 @@ body {
     font-size: 16px;
     font-weight: bold;
     text-align: center;
-    align-self: flex-start;
+    font: Poppins;
     margin-bottom: 20px;
+    margin-left: auto;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.4);
+}
+
+.search-button:hover {
+    background-color: #620019;
 }
 
 .aesthetic-bar {
-    height: 40px;
+    height: 50px;
     background-color: #800020;
-    border-top-left-radius: 10px;
-    border-top-right-radius: 10px;
+    border-top-left-radius: 15px;
+    border-top-right-radius: 15px;
     margin-bottom: -10px;
+    border: 1px solid #000000;
 }
 
 .job-listings {
@@ -86,17 +155,23 @@ body {
     border-top-right-radius: 0;
     padding: 0;
     overflow: hidden;
+    border: 1px solid #000000;
 }
 
 .job-list {
     width: 30%;
     background-color: #f2f2f2;
     overflow-y: auto;
+    /* border: 1px solid #000000; */
+    /* put a border only on the right side */
+    border-right: 1px solid #000000;
+
 }
 
 .job-count {
     padding: 10px;
-    font-weight: bold;
+    font-weight:normal;
+    font-size: 14px;
     background-color: #fff;
     width: 100%;
     box-sizing: border-box;
@@ -117,6 +192,7 @@ body {
     border-bottom: 1px solid #ddd;
     cursor: pointer;
     width: 100%;
+    font-size: 14px;
     box-sizing: border-box;
 }
 
@@ -127,12 +203,27 @@ body {
 .job-title {
     color: #800020;
     font-weight: bold;
+    font-size: 14px;
+}
+
+.job-location {
+    font-size: 12px;
+    font-weight: 400;
+    color: #4B4B4B;
+}
+
+.job-type {
+    font-size: 12px;
+    font-weight: 400;
+    color: #4B4B4B;
 }
 
 .job-detail {
     width: 70%;
     padding: 20px;
+    margin-left: 10px;
     overflow-y: auto;
+    border-left: 1px solid #000000;
 }
 
 .job-detail-header {
@@ -143,7 +234,7 @@ body {
 }
 
 .job-detail-title {
-    font-size: 28px;
+    font-size: 20px;
     font-weight: bold;
     color: #800020;
     margin-left: 20px;
@@ -173,19 +264,19 @@ body {
 
 .job-detail-section {
     margin-bottom: 30px;
-    font-size: 18px;
+    font-size: 14px;
     font-family: 'Inter', Arial, sans-serif;
 }
 
 .job-detail-section strong {
     display: block;
-    font-size: 16px;
+    font-size: 15px;
     font-weight: 600;
-    margin-bottom: 5px;
+    margin-bottom: 2px;
 }
 
 .job-detail-section div {
-    font-size: 16px;
+    font-size: 10px;
     font-weight: 400; 
 }
 
@@ -214,13 +305,12 @@ body {
     cursor: pointer;
     width: 100%;
     box-sizing: border-box;
-    position: relative;
 }
 
 .job-apply-by {
-    position: absolute;
-    bottom: 10px;
-    right: 10px;
-    font-weight: bold;
-    font-size: 14px;
+    font-weight: 400;
+    font-size: 12px;
+    white-space: normal;
+    word-wrap:normal;
+    margin-left: 60px;
 }
