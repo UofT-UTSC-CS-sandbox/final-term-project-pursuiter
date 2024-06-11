@@ -57,9 +57,12 @@ function LoginPage() {
         </form>
         <div className="inline-link">
           <p>
-            Dont have an account? <Link to="/applicant-signup">Create Account</Link>
+            Want a job seeker account? <Link to="/applicant-signup">Create an Job-Seeker Account</Link>
           </p>
-        </div>        
+          <p>
+            Want a recruiter account? <Link to="/recruiter-signup">Create a Recruiter Account</Link>
+          </p>         
+        </div>                  
       </div>
     </div>
   );
