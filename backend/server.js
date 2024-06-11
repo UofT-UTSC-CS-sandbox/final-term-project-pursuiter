@@ -148,7 +148,14 @@ app.get('/applications/:jobId', async (req, res) => {
       }
       const applicantIds = applications.map(app => app.applicantID);
       const applicants = await db.collection('users').find({ _id: { $in: applicantIds.map(id => new ObjectId(id)) } }).toArray();
-      res.json(applicants);
+
+      // Merge applicants with their applyDate
+      const applicantsWithApplyDate = applicants.map(applicant => {
+        const application = applications.find(app => app.applicantID === applicant._id.toString());
+        return { ...applicant, applyDate: application ? application.applyDate : null };
+      });
+
+      res.json(applicantsWithApplyDate);
   } catch (error) {
       console.error('Error fetching applicants:', error); // Log the error
       res.status(500).json({ message: "Error fetching applicants", error: error.message });
