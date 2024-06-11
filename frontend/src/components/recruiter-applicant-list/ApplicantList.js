@@ -1,18 +1,18 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { UserContext } from "../../contexts/UserContext";
-import { FaStar } from 'react-icons/fa';
 import './ApplicantList.css';
 import axios from 'axios';
+import { FaStar } from 'react-icons/fa';
 
 function ApplicantList() {
     const { jobId } = useParams();
     const navigate = useNavigate();
     const [applicants, setApplicants] = useState([]);
     const [selectedApplicant, setSelectedApplicant] = useState(null);
-    const [favoritedApplicants, setFavoritedApplicants] = useState([]);
     const [searchTerm, setSearchTerm] = useState('');
     const [jobDetails, setJobDetails] = useState({});
+    const [favoritedApplicants, setFavoritedApplicants] = useState([]);
     const { user, logoutUser } = useContext(UserContext);
 
     const handleLogout = () => {
@@ -66,9 +66,6 @@ function ApplicantList() {
         applicant.fullName.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
-    const allApplicants = filteredApplicants.filter(applicant => !favoritedApplicants.includes(applicant));
-    const displayedApplicants = [...favoritedApplicants, ...allApplicants];
-
     return (
         <div className="dashboard-container">
             <header className="dashboard-header">
@@ -112,16 +109,19 @@ function ApplicantList() {
                 <div className="aesthetic-bar"></div>
                 <div className="job-listings">
                     <div className="job-list">
-                        <div className="job-count">Showing {displayedApplicants.length} Applicants</div>
-                        {displayedApplicants.length > 0 ? (
-                            displayedApplicants.map((applicant, index) => (
+                        <div className="job-count">Showing {filteredApplicants.length} Applicants</div>
+                        {filteredApplicants.length > 0 ? (
+                            filteredApplicants.map((applicant, index) => (
                                 <div
                                     key={index}
                                     className="applicant-item"
                                     onClick={() => setSelectedApplicant(applicant)}
                                 >
-                                    <div className="applicant-name">{applicant.fullName}</div>
-                                    <div className="applicant-email">{applicant.email}</div>
+                                    <div>
+                                        <div className="applicant-name">{applicant.fullName}</div>
+                                        <div className="applicant-email">{applicant.email}</div>
+                                        <div className="applicant-apply-date"><strong>Applied On:</strong> {applicant.applyDate}</div>
+                                    </div>
                                     <div
                                         className={`favorite-icon ${isFavorited(applicant) ? 'favorited' : ''}`}
                                         onClick={(e) => {
@@ -148,20 +148,22 @@ function ApplicantList() {
                                         <strong>Email:</strong> {selectedApplicant.email}
                                     </div>
                                     <div className="applicant-detail-section">
-                                        <strong>AI Generated Compatibility:</strong> To be implemented
+                                        <strong>Ai Generated Compatibility:</strong>
+                                        <p>To be implemented in another feature</p>
                                     </div>
                                     <div className="applicant-detail-section">
-                                        <strong>AI Generated Summary:</strong> To be implemented
+                                        <strong>Ai Generated Summary:</strong>
+                                        <p>To be implemented in another feature</p>
                                     </div>
                                     <div className="applicant-detail-section">
-                                        <strong>Resume:</strong> resume.pdf
+                                        <strong>Resume:</strong> {selectedApplicant.resume || 'Not available'}
                                     </div>
                                     <div className="applicant-detail-section">
-                                        <strong>Cover Letter:</strong> cover_letter.pdf
+                                        <strong>Cover Letter:</strong> {selectedApplicant.coverLetter || 'Not available'}
                                     </div>
                                     <div className="applicant-detail-section">
                                         <strong>Status:</strong>
-                                        <p>To be implemented</p>
+                                        <p>To be implemented in another feature</p>
                                     </div>
                                 </div>
                             </>

@@ -112,7 +112,7 @@ body {
 }
 
 .job-list {
-    width: 50%;
+    width: 30%;
     background-color: #f2f2f2;
     overflow-y: auto;
 }
@@ -138,11 +138,10 @@ body {
     flex-direction: column;
     padding: 10px;
     border-bottom: 1px solid #ddd;
+    cursor: pointer;
     width: 100%;
     box-sizing: border-box;
-    cursor: pointer;
-    position: relative;
-
+    position: relative; /* Add relative positioning for the absolute star */
 }
 
 .applicant-item:hover {
@@ -152,13 +151,19 @@ body {
 .applicant-name {
     color: #800020;
     font-weight: bold;
-    flex: 1;
 }
 
-.applicant-detail {
-    width: 50%;
-    padding: 20px;
-    overflow-y: auto;
+.applicant-email {
+    color: #000;
+}
+
+.applicant-apply-date {
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    font-weight: bold;
+    font-size: 14px;
+    color: #000; /* Change color to black */
 }
 
 .applicant-detail-header {
@@ -214,12 +219,13 @@ body {
 }
 
 .favorite-icon {
+    position: absolute;
+    top: 10px;
+    right: 10px;
     color: #ddd;
     cursor: pointer;
-    margin-left: 10px;
 }
 
 .favorite-icon.favorited {
     color: gold;
 }
-
