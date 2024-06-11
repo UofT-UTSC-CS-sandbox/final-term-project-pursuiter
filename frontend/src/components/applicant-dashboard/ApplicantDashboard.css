@@ -291,7 +291,7 @@ body {
     display: flex;
     flex-direction: column;
     padding: 20px;
-    width: 60vw;
+    width: 80vw;
     margin: auto;
 }
 
@@ -548,5 +548,5 @@ body {
     font-size: 12px;
     white-space: normal;
     word-wrap:normal;
-    margin-left: 60px;
+    margin-left: 125px;
 }
