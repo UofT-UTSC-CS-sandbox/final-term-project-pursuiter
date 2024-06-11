@@ -57,7 +57,7 @@ body {
   align-items: center;
   padding: 20px;
   justify-content: flex-start;
-  padding-top: 100px;
+  padding-top: 40px;
 }
 
 .column-right {
@@ -69,12 +69,12 @@ body {
   align-items: center;
   padding: 20px;
   justify-content: flex-end;
-  padding-bottom: 120px;
+  padding-bottom: 60px;
 }
 
 .content-container h1 {
-  font-size: 3.3em;
-  margin-bottom: 28px;
+  font-size: 3em;
+  margin-bottom: 14px;
   font-family: Poppins;
 }
 
