@@ -50,8 +50,8 @@ app.get("/jobs", async (req, res) => {
   }
 });
 
-app.post('/jobs/add', async (req, res) => {
-  const job = req.body;
+app.post("/jobs/add", async (req, res) => {
+  const jobs = req.body;
 
   if (!job || typeof job !== 'object') {
     return res.status(400).json({ message: "Expected a job object" });
