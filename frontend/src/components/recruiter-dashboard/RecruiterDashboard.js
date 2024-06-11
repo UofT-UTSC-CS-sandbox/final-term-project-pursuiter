@@ -146,7 +146,7 @@ function RecruiterDashboard() {
                 </div>
             </header>
             <div className="dashboard-content">
-                <button className="new-job-button" onClick={() => setShowJobForm(true)}>NEW JOB</button> {/* Show modal on click */}
+                <button className="new-job-button" onClick={() => setShowJobForm(true)}>NEW JOB</button> {}
                 <div className="aesthetic-bar"></div>
                 <div className="job-listings">
                     <div className="job-list">
@@ -223,7 +223,7 @@ function RecruiterDashboard() {
                     </div>
                 </div>
             </div>
-            <Modal show={showJobForm} onClose={() => setShowJobForm(false)}> {/* Modal component */}
+            <Modal show={showJobForm} onClose={() => setShowJobForm(false)}> {}
                 <form className="new-job-form" onSubmit={handleJobSubmit}>
                     <input
                         type="text"
