@@ -3,12 +3,8 @@ import "./ApplicantDashboard.css";
 import React, { useState, useEffect, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import { UserContext } from "../../contexts/UserContext";
-<<<<<<< HEAD
-import { Link } from "react-router-dom";
-=======
 import { FaStar } from "react-icons/fa";
 import axios from "axios";
->>>>>>> 422190c (changed the file location)
 
 function ApplicantDashboard() {
   const navigate = useNavigate();
@@ -68,22 +64,6 @@ function ApplicantDashboard() {
   const displayedJobs = [...favoritedJobs, ...allJobs];
 
   return (
-<<<<<<< HEAD
-    <div>
-      <h1>Applicant Dashboard</h1>
-      {user && (
-        <div>
-          <p>Welcome, {user.fullName}</p>
-          <p>Email: {user.email}</p>
-        </div>
-      )}
-      <div>
-        <Link to="/applicant-information">Personal Information</Link>
-      </div>      
-      <button onClick={handleLogout}>Logout</button>
-      <button onClick={() => navigate("/applicant-jobs")}>View Jobs</button>
-    </div>
-=======
       <div className="dashboard-container">
         <head>
           <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"></link>
@@ -241,7 +221,6 @@ function ApplicantDashboard() {
               </div>
           </div>
       </div>
->>>>>>> 422190c (changed the file location)
   );
 }
 
