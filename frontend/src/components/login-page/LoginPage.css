@@ -1,0 +1,25 @@
+.inline-link p {
+    font-family: Poppins;
+    font-size: 20px;
+    font-weight: 500;
+    line-height: 30px;
+    text-align: left;
+  }
+  
+  .inline-link {
+    text-align: left;
+  }
+  
+  .inline-link a {
+    color: #8b0000;
+    text-decoration: none;
+    font-family: Poppins;
+    font-size: 20px;
+    font-weight: 600;
+    line-height: 30px;
+    text-align: left;
+  }
+  
+  .inline-link a:hover {
+    text-decoration: underline;
+  }
