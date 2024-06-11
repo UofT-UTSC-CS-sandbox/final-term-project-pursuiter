@@ -465,6 +465,8 @@ body {
     background-color: #fff;
     padding-left: 20px;
     padding-top: 15px;
+    font-size: 14px;
+    font-family: Poppins;
     border: none;
     color: black;
 }
