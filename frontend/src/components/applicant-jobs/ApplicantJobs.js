@@ -35,6 +35,20 @@ function ApplicantJobs() {
       navigate('/');
   };
 
+    const handleApply = async () => {
+        const application = {
+            jobID: selectedJob._id, // Assuming the job object has an _id field
+            userID: user._id, // Assuming you have a user object with an _id field
+        };
+
+        try {
+            const response = await axios.post('http://localhost:4000/applications/', application);
+            console.log(response.data);
+        } catch (error) {
+            console.error(error);
+        }
+    };
+
   const handleFavorite = (job) => {
       setFavoritedJobs((prevFavorites) => {
           if (prevFavorites.includes(job)) {
@@ -53,20 +67,34 @@ function ApplicantJobs() {
   return (
       <div className="dashboard-container">
           <header className="dashboard-header">
-              <div className="logo">PERSUITER</div>
+              <div className="logo-container">  
+                    <img src="https://via.placeholder.com/20" alt="logo" className="logo-image" />
+                    <div className="logo">PERSUITER</div>
+              </div>
+              
               <div className="header-links">
                   <div className="header-link">Postings</div>
-                  <div className="header-link">Account</div>
-                  <div className="header-link logout-link" onClick={handleLogout}>Logout</div>
+                  <div className="header-link">ACCOUNT</div>
               </div>
           </header>
           <div className="dashboard-content">
-                <div className="search-bar">
-                    <input
-                        type="text"
-                        placeholder="Search for jobs"
-                        className="search-input"
-                    />
+                <h2 className="page-title">Job Listings</h2>
+
+                <div className="search-container">
+                    <div className="search-bar">
+                        <input
+                            type="text"
+                            placeholder="Search by: role, keywords, company...."
+                            className="search-input"
+                        />
+                    </div>
+                    <div className="location-bar">
+                        <input
+                            type="text"
+                            placeholder="Location or 'remote'"
+                            className="location-input"
+                        />
+                    </div>
                 </div>
 
               <button className="search-button">SEARCH</button>
@@ -85,7 +113,7 @@ function ApplicantJobs() {
                               <div className="job-location">{job.location}</div>
                               <div className="job-type">{job.type}</div>
                               <div className="job-apply-by">
-                                  <strong>Closing Date:</strong> {job.applyBy}
+                                  <strong>Due:</strong> {job.applyBy}
                               </div>
                               <div
                                   className={`favorite-icon ${isFavorited(job) ? 'favorited' : ''}`}
@@ -105,7 +133,7 @@ function ApplicantJobs() {
                               <div className="job-detail-header">
                                   <div className="job-detail-title">{selectedJob.title}</div>
                                   <div className="job-detail-actions">
-                                  <button className="apply-button">APPLY</button>
+                                  <button className="apply-button" onClick={handleApply}>APPLY</button>
                                   </div>
                               </div>
                               <div className="job-detail-body">
