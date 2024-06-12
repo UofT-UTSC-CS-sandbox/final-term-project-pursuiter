@@ -2,19 +2,20 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 3339px;
+  height: 1150px;
   background-color: #e7e7e7;
 }
 
 .profile-card {
   display: flex;
   width: 918px;
-  height: 3027px;
+  height: 1027px;
   background-color: #f3f3f3;
   border-radius: 35px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   overflow: hidden;
   font-family: Poppins;
+
 }
 
 .sidebar {
@@ -148,21 +149,17 @@
 }
 
 .sign-out-button {
-  background-color: #8a0032;
-  color: #ffffff;
-  padding: 10px;
-  border-radius: 45.5px;
-  border: 2px solid transparent;
+  padding: 12px 25px;
+  background-color: #800020;
+  color: #fff;
+  border: none;
   cursor: pointer;
-  width: 130px;
-  height: 50px;
-  margin-top: 10px;
-  margin-bottom: 20px;
-  font-family: Poppins;
+  border-radius: 25px;
   font-size: 16px;
-  font-weight: 600;
-  line-height: 30px;
-  text-align: center;
+  font-weight: bold;
+  font: Poppins;
+  border: 2px solid #8a0032;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.4);
 }
 
 .sign-out-button:hover {
@@ -173,21 +170,18 @@
 }
 
 .save-button {
-  background-color: #8a0032;
-  color: #ffffff;
-  padding: 10px;
-  border-radius: 45.5px;
-  border: 2px solid transparent;
+  margin-top: 20px;
+  padding: 12px 40px;
+  background-color: #800020;
+  color: #fff;
+  border: none;
   cursor: pointer;
-  width: 130px;
-  height: 50px;
-  margin-top: 10px;
-  margin-bottom: 20px;
-  font-family: Poppins;
+  border-radius: 25px;
   font-size: 16px;
-  font-weight: 600;
-  line-height: 30px;
-  text-align: center;
+  font-weight: bold;
+  font: Poppins;
+  border: 2px solid #8a0032;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.4);
 }
 
 .save-button:hover {
