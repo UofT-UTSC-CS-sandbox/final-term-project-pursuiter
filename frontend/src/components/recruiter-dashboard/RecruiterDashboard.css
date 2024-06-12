@@ -200,7 +200,6 @@ body {
     color: gold;
 }
 
-/* Modify the job-item to have relative positioning for the absolute star positioning */
 .job-item {
     display: flex;
     flex-direction: column;

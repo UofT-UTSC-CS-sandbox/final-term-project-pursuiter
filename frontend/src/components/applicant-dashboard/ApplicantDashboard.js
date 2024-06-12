@@ -14,13 +14,9 @@ function ApplicantDashboard() {
   const { user, logoutUser } = useContext(UserContext);
 
   useEffect(() => {
-      console.log('UserContext:', user); // Debugging line to check the user context
+      console.log('UserContext:', user); 
       axios.get('http://localhost:4000/jobs/')
           .then(response => {
-            // FILTER JOBS BY RECRUITER ID
-            //   const filteredJobs = response.data.filter(job => job.recruiterID.toString() === user.userId);
-            //   setJobs(filteredJobs);
-
                 setJobs(response.data);
           })
           .catch(error => {
@@ -75,7 +71,6 @@ function ApplicantDashboard() {
               
               <div className="header-links">
                   <div className="header-link">Jobs</div>
-                  {/* <div className="header-link" navigateTo="/applicant-information" >ACCOUNT</div> */}
                   <div className="header-link" onClick={() => navigate("/applicant-information")}>ACCOUNT</div>
                   <div className="header-link" onClick={handleLogout}>LOGOUT</div>
               </div>
