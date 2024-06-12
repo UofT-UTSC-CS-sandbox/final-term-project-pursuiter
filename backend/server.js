@@ -165,6 +165,9 @@ app.put("/updateUser", async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Error updating user" });
+  }
+});
+
 app.get('/jobs/:id/applicants', async (req, res) => {
   const jobId = req.params.id;
 
