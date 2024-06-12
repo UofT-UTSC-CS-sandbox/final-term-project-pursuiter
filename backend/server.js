@@ -1,4 +1,4 @@
-import express from 'express';
+import express, { application } from 'express';
 import { MongoClient, ObjectId } from 'mongodb'; // Ensure ObjectId is imported
 import bcrypt from 'bcrypt';
 import cors from 'cors';
@@ -63,6 +63,22 @@ app.post('/jobs/add', async (req, res) => {
   } catch (error) {
     console.error('Error adding job:', error);
     res.status(500).json({ message: "Error adding job", error: error.message });
+  }
+});
+
+app.post('/applications/add', async (req, res) => {
+  const application = req.body;
+
+  if (!application || typeof application !== 'object') {
+    return res.status(400).json({ message: "Expected a job object" });
+  }
+
+  try {
+    const result = await db.collection('applications').insertOne(application);
+    res.status(201).json({ message: "Application added!", insertedId: result.insertedId });
+  } catch (error) {
+    console.error('Error adding application:', error);
+    res.status(500).json({ message: "Error adding application", error: error.message });
   }
 });
 
