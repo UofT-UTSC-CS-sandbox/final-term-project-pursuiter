@@ -11,7 +11,7 @@ function ApplicantDashboard() {
   const [selectedJob, setSelectedJob] = useState(null);
   const [favoritedJobs, setFavoritedJobs] = useState([]);
   const [jobs, setJobs] = useState([]);
-  const [applications, setApplications] = useState([]);
+  const [setApplications] = useState([]);
   const { user, logoutUser } = useContext(UserContext);
 
   const [showConfirmation, setShowConfirmation] = useState(false);
