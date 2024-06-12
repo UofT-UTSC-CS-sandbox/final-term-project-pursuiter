@@ -126,101 +126,6 @@ body {
     font-weight: bold;
 }
 
-  /* .filter-dropdown {
-    float: left;
-    overflow: hidden;
-  } */
-  
-/* .filter-dropdown { */
-    /* font-size: 16px;   */
-    /* border: none; */
-    /* outline: none; */
-    /* color: #4B4B4B; */
-    /* padding: 15px 15px; */
-    /* background-color: inherit;
-    font-family: inherit;
-    margin: 0; */
-
-
-    /* padding-left: 15px; */
-    /* padding-right: 15px; */
-    /* padding-top: 10px; */
-    /* padding-bottom: 10px; */
-    /* background-color: #E7E7E7; */
-    /* color: #4B4B4B; */
-    /* font-size: 12px; */
-    /* font-family: Poppins; */
-
-    /* box-shadow: 0 4px 6px rgba(0,0,0,0.4); */
-    /* cursor: pointer; */
-
-    /* border-radius: 18px; */
-    /* display: flex; */
-    /* align-items: center; */
-    /* margin-bottom: 12px;   */
-/* }   */
-
- /* .dropdown {
-    /* font-size: 16px;   */
-    /* border: none; */
-    /* outline: none; */
-    /* color: #4B4B4B; */
-    /* padding: 15px 15px; */
-    /* background-color: inherit;
-    font-family: inherit;
-    margin: 0; */
-
-
-    /* padding-left: 15px; */
-    /* padding-right: 15px; */
-    /* padding-top: 10px; */
-    /* padding-bottom: 10px; */
-    /* background-color: #E7E7E7; */
-    /* color: #4B4B4B; */
-    /* font-size: 12px; */
-    /* font-family: Poppins; */
-
-    /* box-shadow: 0 4px 6px rgba(0,0,0,0.4); */
-    /* cursor: pointer; */
-
-    /* border-radius: 18px; */
-    /* display: flex; */
-    /* align-items: center; */
-    /* margin-bottom: 12px;   */
-/* }  */
-
-/* .filter-dropdown:hover .dropdown-content {
-    display: block;
-  }  */
-
-
-/* .dropdown-content {
-    display: none;
-    position: absolute;
-    background-color: #f9f9f9;
-    min-width: 125px;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.4);
-    z-index: 1;
-  }
-  
-.dropdown-content a {
-    float: none;
-    color: black;
-    padding: 10px 10px;
-    text-decoration: none;
-    display: block;
-    text-align: left;
-}
-
-.dropdown-content a:hover {
-    background-color: #ddd;
-} */
-
-
-
-
-
-
 
 .dropdown {
     float: left;
@@ -296,7 +201,7 @@ body {
 }
 
 .search-button {
-    width: 18vw;
+    width: 30%;
     padding: 12px;
     background-color: #800020;
     color: #fff;
@@ -548,5 +453,5 @@ body {
     font-size: 12px;
     white-space: normal;
     word-wrap:normal;
-    margin-left: 125px;
+    margin-left: auto;
 }
