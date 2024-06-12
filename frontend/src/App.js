@@ -21,8 +21,8 @@ function App() {
           <Route path="/login" element={<LoginPage />} />
           <Route path="/applicant-signup" element={<JobSeekerSignupPage />} />
           <Route path="/recruiter-signup" element={<RecruiterSignupPage />} />
-          <Route path="/applicant-dashboard" element={<ApplicantDashboard />} />
           <Route path="/recruiter-dashboard" element={<RecruiterDashboard />} />
+          <Route path="/applicant-dashboard" element={<ApplicantDashboard />} />
           <Route path="/applicant-information" element={<JobSeekerInformation />} />          
           <Route path="/applicants/:jobId" element={<SeeApplicants />} />
         </Routes>

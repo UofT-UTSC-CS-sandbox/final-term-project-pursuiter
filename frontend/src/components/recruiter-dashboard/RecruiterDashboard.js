@@ -148,13 +148,17 @@ function RecruiterDashboard() {
     return (
         <div className="dashboard-container">
             <header className="dashboard-header">
-                <div className="logo">PERSUITER</div>
-                <div className="header-links">
-                    <div className="header-link">Postings</div>
-                    <div className="header-link">Account</div>
-                    <div className="header-link logout-link" onClick={handleLogout}>Logout</div>
-                </div>
-            </header>
+              <div className="logo-container">  
+                    <img src="https://via.placeholder.com/20" alt="logo" className="logo-image" />
+                    <div className="logo">PERSUITER</div>
+              </div>
+              
+              <div className="header-links">
+                  <div className="header-link">Postings</div>
+                  <div className="header-link" >ACCOUNT</div>
+                  <div className="header-link" onClick={handleLogout}>LOGOUT</div>
+              </div>
+          </header>
             <div className="dashboard-content">
                 <button className="new-job-button" onClick={() => setShowJobForm(true)}>NEW JOB</button>
                 <div className="aesthetic-bar"></div>
