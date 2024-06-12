@@ -101,7 +101,7 @@ body {
     padding-bottom: 10px;
     background-color: #E7E7E7;
     color: #4B4B4B;
-    font-size: 12px;
+    font-size: 5px;
     font-family: Poppins;
 
     box-shadow: 0 4px 6px rgba(0,0,0,0.4);
@@ -144,9 +144,6 @@ body {
     padding: 14px 10px;
     background-color: inherit;
     font-family: inherit;
-    /* border-radius: 18px; */
-    /* margin: 0; */
-    /* border-radius: 18px; */
   }
   
   /* .navbar a:hover, .dropdown:hover .dropbtn {
@@ -162,12 +159,13 @@ body {
     z-index: 1;
     border-radius: 18px;
 
-    margin-top: 5px;
+    margin-top: 2px;
   }
   
   .dropdown-content a {
     float: none;
-    color: black;
+    font-size: 12px;  
+    color: #4B4B4B;
     padding: 12px 16px;
     text-decoration: none;
     display: block;
@@ -176,6 +174,7 @@ body {
   
   .dropdown-content a:hover {
     background-color: #ddd;
+    display: block;
   }
   
   .dropdown:hover .dropdown-content {
