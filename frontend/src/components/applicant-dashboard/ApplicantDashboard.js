@@ -11,16 +11,17 @@ function ApplicantDashboard() {
   const [selectedJob, setSelectedJob] = useState(null);
   const [favoritedJobs, setFavoritedJobs] = useState([]);
   const [jobs, setJobs] = useState([]);
-  const [setApplications] = useState([]);
+  const [applications, setApplications] = useState([]);
   const { user, logoutUser } = useContext(UserContext);
 
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [selectedApplication, setSelectedApplication] = useState(null);
   const [showApplicationForm, setShowApplicationForm] = useState(false);
   const [editMode, setEditMode] = useState(false);
-  const [newApplication, setNewApplication] = useState({
+const [newApplication] = useState({
     applicantID: '',
-    jobID: ''
+    jobID: '',
+    appliedDate: new Date().toISOString().split('T')[0]
 });
 
   useEffect(() => {
@@ -107,10 +108,6 @@ function ApplicantDashboard() {
                 setApplications(prevApplications => [response.data, ...prevApplications]);
             }
 
-            setNewApplication({
-                applicantID: '',
-                jobID: ''
-            });
             setShowApplicationForm(false);
             setShowConfirmation(true);
             window.location.reload();
