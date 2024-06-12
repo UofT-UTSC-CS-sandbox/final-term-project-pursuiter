@@ -12,6 +12,8 @@ function RecruiterDashboard() {
     const [favoritedJobs, setFavoritedJobs] = useState([]);
     const [jobs, setJobs] = useState([]);
     const [showJobForm, setShowJobForm] = useState(false);
+    const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+    const [jobToDelete, setJobToDelete] = useState(null);
     const [editMode, setEditMode] = useState(false);
     const [newJob, setNewJob] = useState({
         title: '',
@@ -118,22 +120,26 @@ function RecruiterDashboard() {
         setShowJobForm(true);
     };
 
-    const handleDelete = async (jobId) => {
+    const handleDelete = async () => {
         try {
-          const response = await axios.delete(
-            `http://localhost:4000/jobs/${jobId}`,
-          );
-          if (response.status === 200) {
-            console.log(response.data.message);
-            setJobs(jobs.filter((job) => job._id !== jobId));
-            setSelectedJob(null);
-          } else {
-            console.error(response.data.message);
-          }
+            const response = await axios.delete(`http://localhost:4000/jobs/${jobToDelete._id}`);
+            if (response.status === 200) {
+                console.log(response.data.message);
+                setJobs(jobs.filter((job) => job._id !== jobToDelete._id));
+                setSelectedJob(null);
+                setShowDeleteConfirm(false);
+            } else {
+                console.error(response.data.message);
+            }
         } catch (error) {
-          console.error("Error deleting job:", error);
+            console.error("Error deleting job:", error);
         }
-      };
+    };
+
+    const confirmDelete = (job) => {
+        setJobToDelete(job);
+        setShowDeleteConfirm(true);
+    };
 
     return (
         <div className="dashboard-container">
@@ -146,7 +152,7 @@ function RecruiterDashboard() {
                 </div>
             </header>
             <div className="dashboard-content">
-                <button className="new-job-button" onClick={() => setShowJobForm(true)}>NEW JOB</button> {}
+                <button className="new-job-button" onClick={() => setShowJobForm(true)}>NEW JOB</button>
                 <div className="aesthetic-bar"></div>
                 <div className="job-listings">
                     <div className="job-list">
@@ -186,7 +192,7 @@ function RecruiterDashboard() {
                                         <button className="edit-button" onClick={() => handleEdit(selectedJob)}>EDIT</button>
                                         <button
                                             className="delete-button"
-                                            onClick={() => handleDelete(selectedJob._id)}
+                                            onClick={() => confirmDelete(selectedJob)}
                                             >
                                             DELETE
                                         </button>
@@ -223,7 +229,7 @@ function RecruiterDashboard() {
                     </div>
                 </div>
             </div>
-            <Modal show={showJobForm} onClose={() => setShowJobForm(false)}> {}
+            <Modal show={showJobForm} onClose={() => setShowJobForm(false)} title={editMode ? 'Edit Job' : 'New Job'}>
                 <form className="new-job-form" onSubmit={handleJobSubmit}>
                     <input
                         type="text"
@@ -290,6 +296,13 @@ function RecruiterDashboard() {
                     <button type="submit">{editMode ? 'Update Job' : 'Submit'}</button>
                     <button type="button" onClick={() => setShowJobForm(false)}>Cancel</button>
                 </form>
+            </Modal>
+            <Modal show={showDeleteConfirm} onClose={() => setShowDeleteConfirm(false)} title="Confirm Deletion">
+                <p>Are you sure you want to delete this job?</p>
+                <div className="modal-footer">
+                    <button className="delete-button" onClick={handleDelete}>Delete</button>
+                    <button className="cancel-button" onClick={() => setShowDeleteConfirm(false)}>Cancel</button>
+                </div>
             </Modal>
         </div>
     );
