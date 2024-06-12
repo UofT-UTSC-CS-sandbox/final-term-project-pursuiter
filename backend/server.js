@@ -1,7 +1,7 @@
-import express from "express";
-import { MongoClient } from "mongodb";
-import bcrypt from "bcrypt";
-import cors from "cors";
+import express from 'express';
+import { MongoClient, ObjectId } from 'mongodb';
+import bcrypt from 'bcrypt';
+import cors from 'cors';
 
 const app = express();
 const PORT = 4000;
@@ -50,18 +50,59 @@ app.get("/jobs", async (req, res) => {
   }
 });
 
-app.post("/jobs/add", async (req, res) => {
-  const jobs = req.body;
+app.post('/jobs/add', async (req, res) => {
+  const job = req.body;
 
-  if (!Array.isArray(jobs)) {
-    return res.status(400).json({ message: "Expected an array of jobs" });
+  if (!job || typeof job !== 'object') {
+    return res.status(400).json({ message: "Expected a job object" });
   }
 
   try {
-    await db.collection("jobs").insertMany(jobs);
-    res.status(201).json({ message: "Jobs added!" });
+    const result = await db.collection('jobs').insertOne(job);
+    res.status(201).json({ message: "Job added!", insertedId: result.insertedId });
   } catch (error) {
-    res.status(500).json({ message: "Error adding jobs" });
+    console.error('Error adding job:', error);
+    res.status(500).json({ message: "Error adding job", error: error.message });
+  }
+});
+
+app.put('/jobs/:id', async (req, res) => {
+  const jobId = req.params.id;
+  const job = req.body;
+
+  console.log('Received PUT request for job:', jobId, job); // Add logging
+
+  if (!ObjectId.isValid(jobId)) {
+    return res.status(400).json({ message: "Invalid job ID" });
+  }
+
+  try {
+    const result = await db.collection('jobs').updateOne({ _id: new ObjectId(jobId) }, { $set: job });
+    if (result.modifiedCount === 1) {
+      res.json({ message: "Job updated", job: job });
+    } else {
+      res.status(404).json({ message: "Job not found" });
+    }
+  } catch (error) {
+    console.error('Error updating job:', error);
+    res.status(500).json({ message: "Error updating job", error: error.message });
+  }
+});
+
+app.delete('/jobs/:id', async (req, res) => {
+  const jobId = req.params.id;
+
+  try {
+    console.log(`Deleting job with ID: ${jobId}`);
+    const result = await db.collection('jobs').deleteOne({ _id: new ObjectId(jobId) });
+    if (result.deletedCount === 1) {
+      res.status(200).json({ message: "Job deleted!" });
+    } else {
+      res.status(404).json({ message: "Job not found" });
+    }
+  } catch (error) {
+    console.error("Error deleting job:", error);
+    res.status(500).json({ message: "Error deleting job" });
   }
 });
 

@@ -4,16 +4,32 @@ import { UserContext } from "../../contexts/UserContext";
 import { FaStar } from 'react-icons/fa';
 import './RecruiterDashboard.css';
 import axios from 'axios';
+import Modal from './Modal';
 
 function RecruiterDashboard() {
     const navigate = useNavigate();
     const [selectedJob, setSelectedJob] = useState(null);
     const [favoritedJobs, setFavoritedJobs] = useState([]);
     const [jobs, setJobs] = useState([]);
+    const [showJobForm, setShowJobForm] = useState(false);
+    const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+    const [jobToDelete, setJobToDelete] = useState(null);
+    const [editMode, setEditMode] = useState(false);
+    const [newJob, setNewJob] = useState({
+        title: '',
+        company: '',
+        location: '',
+        type: '',
+        applyBy: '',
+        hiddenKeywords: '',
+        description: '',
+        qualifications: '',
+        recruiterID: ''
+    });
     const { user, logoutUser } = useContext(UserContext);
 
     useEffect(() => {
-        console.log('UserContext:', user); // Debugging line to check the user context
+        console.log('UserContext:', user);
         axios.get('http://localhost:4000/jobs/')
             .then(response => {
                 const filteredJobs = response.data.filter(job => job.recruiterID.toString() === user.userId);
@@ -44,6 +60,87 @@ function RecruiterDashboard() {
     const allJobs = jobs.filter(job => !favoritedJobs.includes(job));
     const displayedJobs = [...favoritedJobs, ...allJobs];
 
+    const handleJobInputChange = (e) => {
+        const { name, value } = e.target;
+        setNewJob(prevJob => ({
+            ...prevJob,
+            [name]: value
+        }));
+    };
+
+    const handleJobSubmit = async (e) => {
+        e.preventDefault();
+        const jobToSubmit = { ...newJob, recruiterID: user.userId };
+    
+        try {
+            if (editMode) {
+                const response = await axios.put(`http://localhost:4000/jobs/${selectedJob._id}`, jobToSubmit);
+                setJobs(prevJobs => prevJobs.map(job => job._id === selectedJob._id ? response.data.job : job));
+                setEditMode(false);
+                setSelectedJob(null);
+                window.location.reload();
+            } else {
+                const response = await axios.post('http://localhost:4000/jobs/add', jobToSubmit);
+                setJobs(prevJobs => [response.data, ...prevJobs]);
+            }
+    
+            setNewJob({
+                title: '',
+                company: '',
+                location: '',
+                type: '',
+                applyBy: '',
+                hiddenKeywords: '',
+                description: '',
+                qualifications: '',
+                recruiterID: ''
+            });
+            setShowJobForm(false);
+            window.location.reload();
+        } catch (error) {
+            console.error('Error submitting job:', error);
+        }
+    };
+    
+
+    const handleEdit = (job) => {
+        setNewJob({
+            title: job.title,
+            company: job.company,
+            location: job.location,
+            type: job.type,
+            applyBy: job.applyBy,
+            hiddenKeywords: job.hiddenKeywords,
+            description: job.description,
+            qualifications: job.qualifications,
+            recruiterID: job.recruiterID
+        });
+        setSelectedJob(job);
+        setEditMode(true);
+        setShowJobForm(true);
+    };
+
+    const handleDelete = async () => {
+        try {
+            const response = await axios.delete(`http://localhost:4000/jobs/${jobToDelete._id}`);
+            if (response.status === 200) {
+                console.log(response.data.message);
+                setJobs(jobs.filter((job) => job._id !== jobToDelete._id));
+                setSelectedJob(null);
+                setShowDeleteConfirm(false);
+            } else {
+                console.error(response.data.message);
+            }
+        } catch (error) {
+            console.error("Error deleting job:", error);
+        }
+    };
+
+    const confirmDelete = (job) => {
+        setJobToDelete(job);
+        setShowDeleteConfirm(true);
+    };
+
     return (
         <div className="dashboard-container">
             <header className="dashboard-header">
@@ -55,7 +152,7 @@ function RecruiterDashboard() {
                 </div>
             </header>
             <div className="dashboard-content">
-                <button className="new-job-button">NEW JOB</button>
+                <button className="new-job-button" onClick={() => setShowJobForm(true)}>NEW JOB</button>
                 <div className="aesthetic-bar"></div>
                 <div className="job-listings">
                     <div className="job-list">
@@ -92,7 +189,13 @@ function RecruiterDashboard() {
                                     <div className="job-detail-title">{selectedJob.title}</div>
                                     <div className="job-detail-actions">
                                         <button className="see-applicants-button">SEE APPLICANTS</button>
-                                        <button className="edit-button">EDIT</button>
+                                        <button className="edit-button" onClick={() => handleEdit(selectedJob)}>EDIT</button>
+                                        <button
+                                            className="delete-button"
+                                            onClick={() => confirmDelete(selectedJob)}
+                                            >
+                                            DELETE
+                                        </button>
                                     </div>
                                 </div>
                                 <div className="job-detail-body">
@@ -126,6 +229,81 @@ function RecruiterDashboard() {
                     </div>
                 </div>
             </div>
+            <Modal show={showJobForm} onClose={() => setShowJobForm(false)} title={editMode ? 'Edit Job' : 'New Job'}>
+                <form className="new-job-form" onSubmit={handleJobSubmit}>
+                    <input
+                        type="text"
+                        name="title"
+                        placeholder="Job Title"
+                        value={newJob.title}
+                        onChange={handleJobInputChange}
+                        required
+                    />
+                    <input
+                        type="text"
+                        name="company"
+                        placeholder="Company"
+                        value={newJob.company}
+                        onChange={handleJobInputChange}
+                        required
+                    />
+                    <input
+                        type="text"
+                        name="location"
+                        placeholder="Location"
+                        value={newJob.location}
+                        onChange={handleJobInputChange}
+                        required
+                    />
+                    <input
+                        type="text"
+                        name="type"
+                        placeholder="Job Type"
+                        value={newJob.type}
+                        onChange={handleJobInputChange}
+                        required
+                    />
+                    <input
+                        type="date"
+                        name="applyBy"
+                        placeholder="Apply By"
+                        value={newJob.applyBy}
+                        onChange={handleJobInputChange}
+                        required
+                    />
+                    <input
+                        type="text"
+                        name="hiddenKeywords"
+                        placeholder="Hidden Keywords"
+                        value={newJob.hiddenKeywords}
+                        onChange={handleJobInputChange}
+                        required
+                    />
+                    <textarea
+                        name="description"
+                        placeholder="Job Description"
+                        value={newJob.description}
+                        onChange={handleJobInputChange}
+                        required
+                    ></textarea>
+                    <textarea
+                        name="qualifications"
+                        placeholder="Qualifications"
+                        value={newJob.qualifications}
+                        onChange={handleJobInputChange}
+                        required
+                    ></textarea>
+                    <button type="submit">{editMode ? 'Update Job' : 'Submit'}</button>
+                    <button type="button" onClick={() => setShowJobForm(false)}>Cancel</button>
+                </form>
+            </Modal>
+            <Modal show={showDeleteConfirm} onClose={() => setShowDeleteConfirm(false)} title="Confirm Deletion">
+                <p>Are you sure you want to delete this job?</p>
+                <div className="modal-footer">
+                    <button className="delete-button" onClick={handleDelete}>Delete</button>
+                    <button className="cancel-button" onClick={() => setShowDeleteConfirm(false)}>Cancel</button>
+                </div>
+            </Modal>
         </div>
     );
 }
