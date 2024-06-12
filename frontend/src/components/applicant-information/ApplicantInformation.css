@@ -60,6 +60,14 @@
   text-overflow: ellipsis;
 }
 
+.menu-item-container {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 20px;
+  width: 100%;
+}
+
 .menu-item {
   padding: 10px;
   background-color: #202020;
@@ -69,7 +77,7 @@
   cursor: pointer;
   text-align: left;
   border: 1px solid #000000;
-  width: 100%;
+  width: 375px;
   height: 60px;
   top: 589px;
   left: 276px;
@@ -122,7 +130,7 @@
   gap: 0px;
   opacity: 0px;
   left: 654px;
-  width: 65px;
+  width: 75px;
 }
 
 .form-group input {

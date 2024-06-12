@@ -221,7 +221,7 @@ app.post("/login", async (req, res) => {
 
 // Update the user fullName, email, address, positions
 app.put("/updateUser", async (req, res) => {
-  const { email, newEmail, fullName, address, positions } = req.body;
+  const { email, newEmail, fullName, address, positions, companyName, userType } = req.body;
   try {
     const user = await db.collection("users").findOne({ email });
     if (user) {
@@ -242,6 +242,7 @@ app.put("/updateUser", async (req, res) => {
       if (fullName) updatedUser.fullName = fullName;
       if (address) updatedUser.address = address;
       if (positions) updatedUser.positions = positions;
+      if (companyName) updatedUser.companyName = companyName;
 
       await db.collection("users").updateOne({ email }, { $set: updatedUser });
 
@@ -251,6 +252,8 @@ app.put("/updateUser", async (req, res) => {
         fullName: updatedUser.fullName,
         address: updatedUser.address,
         positions: updatedUser.positions,
+        companyName: updatedUser.companyName,
+        userType: updatedUser.userType,
       });
     } else {
       res.status(404).json({ message: "User not found" });
