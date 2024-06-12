@@ -64,7 +64,7 @@ body {
     width: 30%;
 }
 
-.search-input {
+.search-bar-input {
     padding: 10px; 
     background-color: #E7E7E7;
     font-family: Poppins;
@@ -76,7 +76,7 @@ body {
     margin-right: 5px;
 }
 
-.location-input {
+.location-bar-input {
     padding: 10px; 
     font-family: Poppins;
     box-sizing: border-box;
@@ -319,7 +319,7 @@ body {
     color: #4B4B4B;
 }
 
-.job-details {
+.jobs-details {
     width: 70%;
     padding: 20px;
     margin-left: 10px;
@@ -327,21 +327,21 @@ body {
     border-left: 1px solid #000000;
 }
 
-.job-details-header {
+.jobs-details-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
     margin-bottom: 0px;
 }
 
-.job-details-title {
+.jobs-details-title {
     font-size: 18px;
     font-weight: bold;
     color: #800020;
     margin-left: 20px;
 }
 
-.job-details-actions {
+.jobs-details-actions {
     display: flex;
     gap: 20px;
 }
@@ -366,7 +366,7 @@ body {
     border: 2px solid #8a0032;
 }
 
-.job-details-body {
+.jobs-details-body {
     background-color: #fff;
     padding-left: 20px;
     padding-top: 15px;
@@ -376,14 +376,14 @@ body {
     color: black;
 }
 
-.job-details-section-top-company {
+.jobs-details-section-top-company {
     display: flex;
     margin-bottom: 7px;
     font-size: 13px;
     font-family: 'Inter', Arial, sans-serif;
 }
 
-.job-details-section-top {
+.jobs-details-section-top {
     display: flex;
     color: #4B4B4B;
     margin-bottom: 7px;
@@ -391,7 +391,7 @@ body {
     font-family: 'Inter', Arial, sans-serif;
 }
 
-.job-details-section-top strong {
+.jobs-details-section-top strong {
     display: flex;
     color: #4B4B4B;
     /* margin-bottom: 25px; */
@@ -399,21 +399,21 @@ body {
     font-family: 'Inter', Arial, sans-serif;
 }
 
-.job-details-section {
+.jobs-details-section {
     margin-top: 20px;
     margin-bottom: 15px;
     font-size: 13px;
     font-family: 'Inter', Arial, sans-serif;
 }
 
-.job-details-section strong {
+.jobs-details-section strong {
     display: block;
     font-size: 13px;
     font-weight: 600;
     margin-bottom: 2px
 }
 
-.job-details-section div {
+.jobs-details-section div {
     font-size: 10px;
     font-weight: 400; 
 }

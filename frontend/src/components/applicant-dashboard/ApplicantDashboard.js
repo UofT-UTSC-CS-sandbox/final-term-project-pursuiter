@@ -83,14 +83,14 @@ function ApplicantDashboard() {
                         <input
                             type="text"
                             placeholder="Search by: role, keywords, company...."
-                            className="search-input"
+                            className="search-bar-input"
                         />
                     </div>
                     <div className="location-bar">
                         <input
                             type="text"
                             placeholder="Location or 'remote'"
-                            className="location-input"
+                            className="location-bar-input"
                         />
                     </div>
                 </div>
@@ -180,35 +180,35 @@ function ApplicantDashboard() {
                           </div>
                       ))}
                   </div>
-                  <div className="job-details">
+                  <div className="jobs-details">
                       {selectedJob ? (
                           <>
-                              <div className="job-details-header">
-                                  <div className="job-details-title">{selectedJob.title}</div>
-                                  <div className="job-details-actions">
+                              <div className="jobs-details-header">
+                                  <div className="jobs-details-title">{selectedJob.title}</div>
+                                  <div className="jobs-details-actions">
                                   <button className="apply-button" onClick={handleApply}>APPLY</button>
                                   </div>
                               </div>
-                              <div className="job-details-body">
-                                  <div className="job-details-section-top-company">
+                              <div className="jobs-details-body">
+                                  <div className="jobs-details-section-top-company">
                                       <strong>Company: &nbsp; </strong> {selectedJob.company}
                                   </div>
-                                  <div className="job-details-section-top">
+                                  <div className="jobs-details-section-top">
                                       <strong>Location: &nbsp; </strong> {selectedJob.location}
                                   </div>
-                                  <div className="job-details-section-top">
+                                  <div className="jobs-details-section-top">
                                       <strong>Type: &nbsp; </strong> {selectedJob.type}
                                   </div>
-                                  <div className="job-details-section">
+                                  <div className="jobs-details-section">
                                       <strong>Description:  </strong> {selectedJob.description}
                                   </div>
-                                  <div className="job-details-section">
+                                  <div className="jobs-details-section">
                                       <strong>Qualifications: </strong> {selectedJob.qualifications}
                                   </div>
                               </div>
                           </>
                       ) : (
-                          <div className="job-details-body">
+                          <div className="jobs-details-body">
                               <p>Select a job to see the details</p>
                           </div>
                       )}
