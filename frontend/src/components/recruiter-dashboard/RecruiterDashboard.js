@@ -193,7 +193,13 @@ function RecruiterDashboard() {
                                     <div className="job-detail-title">{selectedJob.title}</div>
                                     <div className="job-detail-actions">
                                         <button className="see-applicants-button" onClick={() => handleSeeApplicants(selectedJob)}>SEE APPLICANTS</button>
-                                        <button className="edit-button">EDIT</button>
+                                        <button className="edit-button" onClick={() => handleEdit(selectedJob)}>EDIT</button>
+                                        <button
+                                            className="delete-button"
+                                            onClick={() => confirmDelete(selectedJob)}
+                                            >
+                                            DELETE
+                                        </button>
                                     </div>
                                 </div>
                                 <div className="job-detail-body">
