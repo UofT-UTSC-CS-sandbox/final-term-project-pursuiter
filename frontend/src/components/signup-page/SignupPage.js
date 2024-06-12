@@ -100,7 +100,7 @@ function SignupPage({ userType }) {
             <div className="inline-link">
               <p>
                 Are you a job-seeker?{" "}
-                <Link to="/applicant-signup">Create an Job-Seeker Account</Link>
+                <Link to="/applicant-signup">Create a Job-Seeker Account</Link>
               </p>
             </div>
           ) : (
