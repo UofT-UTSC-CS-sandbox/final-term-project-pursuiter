@@ -29,7 +29,7 @@ function RecruiterDashboard() {
     const { user, logoutUser } = useContext(UserContext);
 
     useEffect(() => {
-        console.log('UserContext:', user);
+        console.log('UserContext:', user); // Debugging line to check the user context (to remove later)
         axios.get('http://localhost:4000/jobs/')
             .then(response => {
                 const filteredJobs = response.data.filter(job => job.recruiterID.toString() === user.userId);
@@ -56,6 +56,10 @@ function RecruiterDashboard() {
     };
 
     const isFavorited = (job) => favoritedJobs.includes(job);
+
+    const handleSeeApplicants = (job) => {
+        navigate(`/applicants/${job._id}`);
+    };
 
     const allJobs = jobs.filter(job => !favoritedJobs.includes(job));
     const displayedJobs = [...favoritedJobs, ...allJobs];
@@ -188,7 +192,7 @@ function RecruiterDashboard() {
                                 <div className="job-detail-header">
                                     <div className="job-detail-title">{selectedJob.title}</div>
                                     <div className="job-detail-actions">
-                                        <button className="see-applicants-button">SEE APPLICANTS</button>
+                                        <button className="see-applicants-button" onClick={() => handleSeeApplicants(selectedJob)}>SEE APPLICANTS</button>
                                         <button className="edit-button" onClick={() => handleEdit(selectedJob)}>EDIT</button>
                                         <button
                                             className="delete-button"
