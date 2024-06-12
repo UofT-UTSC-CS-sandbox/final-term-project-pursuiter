@@ -38,6 +38,18 @@ function JobSeekerInformation() {
   };
 
   return (
+    <div className="ApplicantInformation">
+      <header className="dashboard-header">
+        <div className="logo-container">  
+              <img src="https://via.placeholder.com/20" alt="logo" className="logo-image" />
+              <div className="logo">PERSUITER</div>
+        </div>
+        <div className="header-links">
+            <div className="header-link" onClick={() => navigate("/applicant-dashboard")}>Jobs</div>
+            <div className="header-link" onClick={() => navigate("/applicant-information")}>ACCOUNT</div>
+            <div className="header-link" onClick={handleLogout}>LOGOUT</div>
+        </div>
+      </header>
     <div className="page-container">
       <div className="profile-card">
         <div className="sidebar">
@@ -128,6 +140,7 @@ function JobSeekerInformation() {
         </div>
       </div>
     </div>
+  </div>
   );
 }
 
