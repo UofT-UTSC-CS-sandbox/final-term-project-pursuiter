@@ -13,6 +13,8 @@ function JobSeekerInformation() {
   const [email] = useState(user.email);
   const [newEmail, setNewEmail] = useState(user.email);
   const [positions, setPositions] = useState(user.positions);
+  const [companyName, setCompanyName] = useState(user.companyName);
+  const [userType] = useState(user.userType);
 
   const handleLogout = () => {
     logoutUser();
@@ -27,7 +29,9 @@ function JobSeekerInformation() {
         newEmail,
         fullName,
         address,
-        positions
+        positions,
+        companyName,
+        userType
       );
       console.log("Personal information update successful", updatingUser);
       alert("Personal information update successful!");
@@ -57,28 +61,43 @@ function JobSeekerInformation() {
           <div className="profile-name">
             <h1>{user.fullName}</h1>
           </div>
-          <button
-            className={`menu-item ${
-              activeMenu === "Personal Details" ? "active" : ""
-            }`}
-            onClick={() => setActiveMenu("Personal Details")}
-          >
-            Personal Details
-          </button>
-          <button
-            className={`menu-item ${activeMenu === "Files" ? "active" : ""}`}
-            onClick={() => setActiveMenu("Files")}
-          >
-            Files
-          </button>
-          <button
-            className={`menu-item ${
-              activeMenu === "Applications" ? "active" : ""
-            }`}
-            onClick={() => setActiveMenu("Applications")}
-          >
-            Applications
-          </button>
+          {userType === "applicant" ? (
+            <div className="menu-container">
+              <button
+              className={`menu-item ${
+                activeMenu === "Personal Details" ? "active" : ""
+              }`}
+              onClick={() => setActiveMenu("Personal Details")}
+            >
+              Personal Details
+            </button>
+            <button
+              className={`menu-item ${activeMenu === "Files" ? "active" : ""}`}
+              onClick={() => setActiveMenu("Files")}
+            >
+              Files
+            </button>
+            <button
+              className={`menu-item ${
+                activeMenu === "Applications" ? "active" : ""
+              }`}
+              onClick={() => setActiveMenu("Applications")}
+            >
+              Applications
+            </button>
+            </div>
+          ) : (
+            <div className="menu-container">
+              <button
+              className={`menu-item ${
+                activeMenu === "Personal Details" ? "active" : ""
+              }`}
+              onClick={() => setActiveMenu("Personal Details")}
+            >
+              Personal Details
+            </button>
+            </div>
+          )}
         </div>
         <div className="main-content">
           <div className="header-container">
@@ -121,18 +140,32 @@ function JobSeekerInformation() {
                 required
               />
             </div>
-            <div className="form-group">
-              <label htmlFor="positions">Positions wanted:</label>
-              <input
+            {userType === "applicant" ? (
+              <div className="form-group">
+                <label htmlFor="positions">Positions wanted:</label>
+                <input
                 type="text"
                 id="positions"
                 name="positions"
-                placeholder="Seperate using commas. Eg: Software Engineer, Data Analyst"
+                placeholder="Separate using commas. Eg: Software Engineer, Data Analyst"
                 value={positions}
                 onChange={(e) => setPositions(e.target.value)}
                 required
+                />
+              </div>
+          ) : (
+            <div className="form-group">
+              <label htmlFor="companyName">Company:</label>
+              <input
+                type="text"
+                id="companyName"
+                name="companyName"
+                value={companyName}
+                onChange={(e) => setCompanyName(e.target.value)}
+                required
               />
             </div>
+          )}
             <button type="submit" className="save-button">
               Save
             </button>
