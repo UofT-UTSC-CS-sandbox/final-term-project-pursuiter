@@ -20,7 +20,6 @@ function ApplicantDashboard() {
             // FILTER JOBS BY RECRUITER ID
             //   const filteredJobs = response.data.filter(job => job.recruiterID.toString() === user.userId);
             //   setJobs(filteredJobs);
-            // ////////////////////////////
 
                 setJobs(response.data);
           })
