@@ -15,6 +15,7 @@ function AccountInformation() {
   const [positions, setPositions] = useState(user.positions);
   const [companyName, setCompanyName] = useState(user.companyName);
   const [userType] = useState(user.userType);
+  const [userId] = useState(user._id);
 
   const handleLogout = () => {
     logoutUser();
@@ -31,7 +32,8 @@ function AccountInformation() {
         address,
         positions,
         companyName,
-        userType
+        userType,
+        userId
       );
       console.log("Personal information update successful", updatingUser);
       alert("Personal information update successful!");
