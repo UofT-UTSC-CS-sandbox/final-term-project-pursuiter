@@ -287,12 +287,6 @@ function handleFileChange(event, fileType) {
                                   <div className="jobs-details-section">
                                       <strong>Qualifications: </strong> {selectedJob.qualifications}
                                   </div>
-                                  {/* <input type="file" accept=".pdf" onChange={handleFileChange} /> */}
-                                  {/* <h1>Preview Resume</h1> */}
-                                  {/* {preview && <img src={preview} alt="" />} */}
-                                  {/* <button onClick={onSubmit}>Submit</button> */}
-                                  {/* <h1>Show resume</h1> */}
-                                  {/* {showFile && <img src={showFile} />} */}
                               </div>
                           </>
                       ) : (
