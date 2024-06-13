@@ -49,7 +49,11 @@ function AccountInformation() {
               <div className="logo">PERSUITER</div>
         </div>
         <div className="header-links">
-            <div className="header-link" onClick={() => navigate("/applicant-dashboard")}>Jobs</div>
+            {userType === "applicant" ? (
+              <div className="header-link" onClick={() => navigate("/applicant-dashboard")}>Jobs</div>
+              ) : (
+              <div className="header-link" onClick={() => navigate("/recruiter-dashboard")}>Postings</div>
+            )}             
             <div className="header-link" onClick={() => navigate("/applicant-information")}>ACCOUNT</div>
             <div className="header-link" onClick={handleLogout}>LOGOUT</div>
         </div>
