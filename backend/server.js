@@ -22,7 +22,9 @@ const mongoURL = "mongodb://localhost:27017";
 const dbName = "pursuiter";
 
 
-app.use(express.json());
+// Set larger limit for JSON payloads
+app.use(express.json({ limit: '50mb' }));
+app.use(express.urlencoded({ limit: '50mb', extended: true }));
 app.use(cors());
 
 let db;
@@ -358,13 +360,17 @@ app.get('/applications/:jobId', async (req, res) => {
       const applicantIds = applications.map(app => app.applicantID);
       const applicants = await db.collection('users').find({ _id: { $in: applicantIds.map(id => new ObjectId(id)) } }).toArray();
 
-      // Merge applicants with their applyDate
-      const applicantsWithApplyDate = applicants.map(applicant => {
+      // Merge applicants with their applyDate and resume data
+      const applicantsWithDetails = applicants.map(applicant => {
         const application = applications.find(app => app.applicantID === applicant._id.toString());
-        return { ...applicant, applyDate: application ? application.applyDate : null };
+        return { 
+          ...applicant, 
+          applyDate: application ? application.applyDate : null,
+          resumeData: application ? application.resumeData : null
+        };
       });
 
-      res.json(applicantsWithApplyDate);
+      res.json(applicantsWithDetails);
   } catch (error) {
       console.error('Error fetching applicants:', error);
       res.status(500).json({ message: "Error fetching applicants", error: error.message });
