@@ -54,14 +54,17 @@ const UserProvider = ({ children }) => {
     }
   };
 
-  const updateUser = async (email, newEmail, fullName, address, positions) => {
+  const updateUser = async (email, newEmail, fullName, address, positions, companyName, userType, userId) => {
     try {
       const updatedUser = await UserController.updateUser(
         email,
         newEmail,
         fullName,
         address,
-        positions
+        positions,
+        companyName,
+        userType,
+        userId
       );
       setUser(updatedUser);
       return updatedUser;

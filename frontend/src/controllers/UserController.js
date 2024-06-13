@@ -56,7 +56,7 @@ async function signupUser(
   }
 }
 
-async function updateUser(email, newEmail, fullName, address, positions) {
+async function updateUser(email, newEmail, fullName, address, positions, companyName, userType, userId) {
   try {
     const response = await fetch(`${API_URL}/updateUser`, {
       method: "PUT",
@@ -69,6 +69,9 @@ async function updateUser(email, newEmail, fullName, address, positions) {
         fullName,
         address,
         positions,
+        companyName,
+        userType,
+        userId,
       }),
     });
     if (!response.ok) {
