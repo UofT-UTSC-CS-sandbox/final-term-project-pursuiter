@@ -27,7 +27,7 @@ const [newApplication] = useState({
     jobID: '',
     appliedDate: new Date().toISOString().split('T')[0],
     resumeData: '',
-    coverLetterData: ''
+    // coverLetterData: ''
 });
 
   useEffect(() => {
