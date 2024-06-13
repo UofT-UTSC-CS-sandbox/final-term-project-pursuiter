@@ -87,6 +87,11 @@ const [newApplication] = useState({
     };
     
 
+  function handleFileChange(event) {
+    const file = event.target.files[0];
+    // Now you can send `file` to your server
+  }
+
   const isFavorited = (job) => favoritedJobs.includes(job);
 
   const allJobs = jobs.filter(job => !favoritedJobs.includes(job));
@@ -277,13 +282,11 @@ const [newApplication] = useState({
           <Modal show={showApplicationForm} onClose={() => setShowApplicationForm(false)} title={editMode ? 'Edit Application' : 'New Application'}>
                 <form className="new-job-form" onSubmit={handleApplicationSubmit}>
                     {/* insert resume selection here */}
-                    <input
-                        placeholder="Select a resume:"
-                    />
+                    <input type="file" accept=".pdf" onChange={handleFileChange} />
                     {/* insert cover letter selection here */}
-                    <input
+                    {/* <input
                         placeholder="Select a cover letter:"
-                    />
+                    /> */}
                     <button type="submit">{editMode ? 'Update Application' : 'Submit'}</button>
                     <button type="button" onClick={() => setShowApplicationForm(false)}>Cancel</button>
                 </form>
