@@ -118,7 +118,9 @@ function handleFileChange(event, fileType) {
     const handleApplicationSubmit = async (e) => {
         e.preventDefault();
 
-        const applicationToSubmit = { ...newApplication, applicantID: user.userId, jobID: selectedJob._id, resumeData: resumeFile, coverLetterData: resumeFile};
+        const applicationToSubmit = { ...newApplication, applicantID: user.userId, jobID: selectedJob._id, resumeData: resumeFile};
+        // const applicationToSubmit = { ...newApplication, applicantID: user.userId, jobID: selectedJob._id, resumeData: resumeFile, coverLetterData: coverLetterFile};
+
 
         try {
             if (editMode) {
