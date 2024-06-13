@@ -14,7 +14,8 @@ function ApplicantDashboard() {
   const [file, setFile] = useState('');
   const [preview, setPreview] = useState('');
   const [applications, setApplications] = useState([]);
-  const [showFile, setShowFile] = useState(null);
+  const [resumeFile, setResumeFile] = React.useState(null);
+//   const [coverLetterFile, setCoverLetterFile] = React.useState(null);
   const { user, logoutUser } = useContext(UserContext);
 
   const [showConfirmation, setShowConfirmation] = useState(false);
@@ -26,6 +27,7 @@ const [newApplication] = useState({
     jobID: '',
     appliedDate: new Date().toISOString().split('T')[0],
     resumeData: '',
+    coverLetterData: ''
 });
 
   useEffect(() => {
@@ -91,45 +93,21 @@ const [newApplication] = useState({
     };
     
 
-//   function handleFileChange(event) {
-//     const inputFile = event.target.files[0];
-//     setFile(inputFile);
-//     const img = URL.createObjectURL(inputFile);
-//     setPreview(img);
-//   }
 
-function handleFileChange(event) {
+
+function handleFileChange(event, fileType) {
   const file = event.target.files[0];
   const reader = new FileReader();
   reader.onload = () => {
-    setFile(reader.result);
+    if (fileType === 'resume') {
+        setResumeFile(reader.result);
+      } 
+    //   else if (fileType === 'coverLetter') {
+    //     setCoverLetterFile(reader.result);
+    //   }
   };
   reader.readAsDataURL(file);
-
-  // cut off the 'data:image/jpeg;base64,' part of file
-//   file = reader.result.split(',')[1];
 }
-
-//   const toBase64 = (file) =>
-//     new Promise((resolve, reject) => {
-//         const reader = new FileReader();
-//         reader.readAsDataURL(file);
-//         reader.onload = () => resolve(reader.result);
-//         reader.onerror = (error) => reject(error);
-//     });
-
-//     const onSubmit = async e => {
-//         e.preventDefault();
-//         let b64file = await toBase64(file);
-//         console.log(b64file);
-
-//         // setShowFile(b64file);
-//         await axios.post('http://localhost:4000/upload', { file: b64file });
-        
-//         // fetchData();
-//         setFile(null);
-//         setPreview(null);
-//     };
 
 
   const isFavorited = (job) => favoritedJobs.includes(job);
@@ -140,7 +118,7 @@ function handleFileChange(event) {
     const handleApplicationSubmit = async (e) => {
         e.preventDefault();
 
-        const applicationToSubmit = { ...newApplication, applicantID: user.userId, jobID: selectedJob._id, resumeData: file};
+        const applicationToSubmit = { ...newApplication, applicantID: user.userId, jobID: selectedJob._id, resumeData: resumeFile, coverLetterData: resumeFile};
 
         try {
             if (editMode) {
@@ -328,12 +306,10 @@ function handleFileChange(event) {
 
           <Modal show={showApplicationForm} onClose={() => setShowApplicationForm(false)} title={editMode ? 'Edit Application' : 'New Application'}>
                 <form className="new-job-form" onSubmit={handleApplicationSubmit}>
-                    {/* insert resume selection here */}
-                    <input type="file" accept=".pdf" onChange={handleFileChange} />
-                    {/* insert cover letter selection here */}
-                    {/* <input
-                        placeholder="Select a cover letter:"
-                    /> */}
+                    <p>Upload Resume:{" "}</p>
+                        <input type="file" accept=".pdf" onChange={(event) => handleFileChange(event, 'resume')} />
+                    {/* <p>Upload Cover Letter:{" "}</p>
+                        <input type="file" accept=".pdf" onChange={(event) => handleFileChange(event, 'coverLetter')} /> */}
                     <button type="submit">{editMode ? 'Update Application' : 'Submit'}</button>
                     <button type="button" onClick={() => setShowApplicationForm(false)}>Cancel</button>
                 </form>

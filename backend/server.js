@@ -2,19 +2,6 @@ import express, { application } from 'express';
 import { MongoClient, ObjectId } from 'mongodb'; // Ensure ObjectId is imported
 import bcrypt from 'bcrypt';
 import cors from 'cors';
-import multer from 'multer';
-// import { createRequire } from 'module';
-
-// import { createRequire } from 'module';
-// const require = createRequire(import.meta.url);
-
-////////////////////////////////////////////////////
-// import imagesSchema from './model/imagesSchema.js';
-// const imagesSchema = require('./model/imagesSchema.js');
-// const express = require('express');
-// const cors = require('cors');
-////////////////////////////////////////////////////
-
 
 const app = express();
 const PORT = 4000;
@@ -28,17 +15,6 @@ app.use(express.urlencoded({ limit: '50mb', extended: true }));
 app.use(cors());
 
 let db;
-
-// const storage = multer.diskStorage({
-//   destination: function (req, file, cb) {
-//     cb(null, './uploads/')
-//   },
-//   filename: function (req, file, cb) {
-//     cb(null, new Date().toISOString() + file.originalname)
-//   }
-// });
-
-// const upload = multer({ storage: storage });
 
 async function connectToMongo() {
   const client = new MongoClient(mongoURL);
@@ -108,17 +84,6 @@ app.post('/applications/add', async (req, res) => {
     res.status(500).json({ message: "Error adding application", error: error.message });
   }
 });
-
-// app.post('/upload', async (req, res) => {
-//   // console.log(req.body.file);
-
-//   await imagesSchema.create({ 
-//     binImage: req.body.file
-//   });
-
-//   console.log('Received file upload request');
-//   res.send('File uploaded');
-// });
 
 app.put('/jobs/:id', async (req, res) => {
   const jobId = req.params.id;

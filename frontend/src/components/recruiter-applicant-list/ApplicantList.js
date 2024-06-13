@@ -4,6 +4,7 @@ import { UserContext } from "../../contexts/UserContext";
 import './ApplicantList.css';
 import axios from 'axios';
 import { FaStar } from 'react-icons/fa';
+// import { set } from 'mongoose';
 
 function ApplicantList() {
     const { jobId } = useParams();
@@ -14,6 +15,7 @@ function ApplicantList() {
     const [jobDetails, setJobDetails] = useState({});
     const [favoritedApplicants, setFavoritedApplicants] = useState([]);
     const [selectedResume, setSelectedResume] = useState(null);
+    // const [selectedCoverLetter, setSelectedCoverLetter] = useState(null);
     const { user, logoutUser } = useContext(UserContext);
 
     const handleLogout = () => {
@@ -70,28 +72,8 @@ function ApplicantList() {
     const handleSelectApplicant = (applicant) => {
         setSelectedApplicant(applicant);
         setSelectedResume(applicant.resumeData);
+        // setSelectedCoverLetter(applicant.coverLetterData);
     };
-
-    // function displayPDFFromDatabase(fileData) {
-    //     const reader = new FileReader();
-    //     let substringData = fileData;
-    //     reader.onload = function(event) {
-    //         const fileData = event.target.result; // This should be a string
-    //         if (typeof fileData === 'string') {
-    //             substringData = fileData.substring(28);
-    //             console.log(substringData);
-    //         } else {
-    //             console.error('fileData is not a string');
-    //         }
-    //     };
-    //     // change substringData to a blob:
-    //     const blob = new Blob([substringData], { type: 'application/pdf' });
-    //     const url = URL.createObjectURL(blob);
-    //     // window.open(url);
-
-    //     reader.readAsText(blob);
-    
-    //   }
 
     return (
         <div className="dashboard-container">
@@ -198,6 +180,18 @@ function ApplicantList() {
                                             'Resume not available'
                                         )}
                                     </div>
+                                    {/* <div className="applicant-detail-section">
+                                        <strong>CoverLetter:</strong>
+                                        {selectedCoverLetter ? (
+                                            <iframe
+                                                src={selectedCoverLetter}
+                                                className="cover-letter-iframe"
+                                                title="CoverLetter"
+                                            ></iframe>
+                                        ) : (
+                                            'CoverLetter not available'
+                                        )}
+                                    </div> */}
                                 </div>
                             </>
                         ) : (
