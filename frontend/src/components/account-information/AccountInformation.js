@@ -1,10 +1,10 @@
-import "./ApplicantInformation.css";
+import "./AccountInformation.css";
 
 import React, { useState, useContext } from "react";
 import { UserContext } from "../../contexts/UserContext";
 import { useNavigate } from "react-router-dom";
 
-function JobSeekerInformation() {
+function AccountInformation() {
   const navigate = useNavigate();
   const { user, logoutUser, updateUser } = useContext(UserContext);
   const [activeMenu, setActiveMenu] = useState("Personal Details");
@@ -177,4 +177,4 @@ function JobSeekerInformation() {
   );
 }
 
-export default JobSeekerInformation;
+export default AccountInformation;
