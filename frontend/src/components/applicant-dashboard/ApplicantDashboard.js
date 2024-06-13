@@ -11,7 +11,10 @@ function ApplicantDashboard() {
   const [selectedJob, setSelectedJob] = useState(null);
   const [favoritedJobs, setFavoritedJobs] = useState([]);
   const [jobs, setJobs] = useState([]);
+  const [file, setFile] = useState('');
+  const [preview, setPreview] = useState('');
   const [applications, setApplications] = useState([]);
+  const [showFile, setShowFile] = useState(null);
   const { user, logoutUser } = useContext(UserContext);
 
   const [showConfirmation, setShowConfirmation] = useState(false);
@@ -21,7 +24,8 @@ function ApplicantDashboard() {
 const [newApplication] = useState({
     applicantID: '',
     jobID: '',
-    appliedDate: new Date().toISOString().split('T')[0]
+    appliedDate: new Date().toISOString().split('T')[0],
+    resumeData: '',
 });
 
   useEffect(() => {
@@ -87,10 +91,46 @@ const [newApplication] = useState({
     };
     
 
-  function handleFileChange(event) {
-    const file = event.target.files[0];
-    // Now you can send `file` to your server
-  }
+//   function handleFileChange(event) {
+//     const inputFile = event.target.files[0];
+//     setFile(inputFile);
+//     const img = URL.createObjectURL(inputFile);
+//     setPreview(img);
+//   }
+
+function handleFileChange(event) {
+  const file = event.target.files[0];
+  const reader = new FileReader();
+  reader.onload = () => {
+    setFile(reader.result);
+  };
+  reader.readAsDataURL(file);
+
+  // cut off the 'data:image/jpeg;base64,' part of file
+//   file = reader.result.split(',')[1];
+}
+
+//   const toBase64 = (file) =>
+//     new Promise((resolve, reject) => {
+//         const reader = new FileReader();
+//         reader.readAsDataURL(file);
+//         reader.onload = () => resolve(reader.result);
+//         reader.onerror = (error) => reject(error);
+//     });
+
+//     const onSubmit = async e => {
+//         e.preventDefault();
+//         let b64file = await toBase64(file);
+//         console.log(b64file);
+
+//         // setShowFile(b64file);
+//         await axios.post('http://localhost:4000/upload', { file: b64file });
+        
+//         // fetchData();
+//         setFile(null);
+//         setPreview(null);
+//     };
+
 
   const isFavorited = (job) => favoritedJobs.includes(job);
 
@@ -99,7 +139,8 @@ const [newApplication] = useState({
 
     const handleApplicationSubmit = async (e) => {
         e.preventDefault();
-        const applicationToSubmit = { ...newApplication, applicantID: user.userId, jobID: selectedJob._id };
+
+        const applicationToSubmit = { ...newApplication, applicantID: user.userId, jobID: selectedJob._id, resumeData: file};
 
         try {
             if (editMode) {
@@ -268,6 +309,12 @@ const [newApplication] = useState({
                                   <div className="jobs-details-section">
                                       <strong>Qualifications: </strong> {selectedJob.qualifications}
                                   </div>
+                                  {/* <input type="file" accept=".pdf" onChange={handleFileChange} /> */}
+                                  {/* <h1>Preview Resume</h1> */}
+                                  {/* {preview && <img src={preview} alt="" />} */}
+                                  {/* <button onClick={onSubmit}>Submit</button> */}
+                                  {/* <h1>Show resume</h1> */}
+                                  {/* {showFile && <img src={showFile} />} */}
                               </div>
                           </>
                       ) : (

@@ -66,6 +66,27 @@ function ApplicantList() {
         applicant.fullName.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
+    // function displayPDFFromDatabase(fileData) {
+    //     const reader = new FileReader();
+    //     let substringData = fileData;
+    //     reader.onload = function(event) {
+    //         const fileData = event.target.result; // This should be a string
+    //         if (typeof fileData === 'string') {
+    //             substringData = fileData.substring(28);
+    //             console.log(substringData);
+    //         } else {
+    //             console.error('fileData is not a string');
+    //         }
+    //     };
+    //     // change substringData to a blob:
+    //     const blob = new Blob([substringData], { type: 'application/pdf' });
+    //     const url = URL.createObjectURL(blob);
+    //     // window.open(url);
+
+    //     reader.readAsText(blob);
+    
+    //   }
+
     return (
         <div className="dashboard-container">
             <header className="dashboard-header">
@@ -164,6 +185,9 @@ function ApplicantList() {
                                     <div className="applicant-detail-section">
                                         <strong>Status:</strong>
                                         <p>To be implemented in another feature</p>
+                                    </div>
+                                    <div className="applicant-detail-section">
+                                        {/* <strong>Resume:</strong> {displayPDFFromDatabase(selectedApplicant.resumeData) || 'Not available'} */}
                                     </div>
                                 </div>
                             </>
