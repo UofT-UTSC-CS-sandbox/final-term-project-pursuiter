@@ -103,6 +103,7 @@ function RecruiterDashboard() {
         }));
     };
 
+
     const handleJobSubmit = async (e) => {
         e.preventDefault();
         const jobToSubmit = { ...newJob, recruiterID: user.userId };

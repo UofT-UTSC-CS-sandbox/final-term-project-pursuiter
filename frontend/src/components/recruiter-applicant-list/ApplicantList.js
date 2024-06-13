@@ -4,6 +4,7 @@ import { UserContext } from "../../contexts/UserContext";
 import './ApplicantList.css';
 import axios from 'axios';
 import { FaStar } from 'react-icons/fa';
+// import { set } from 'mongoose';
 
 function ApplicantList() {
     const { jobId } = useParams();
@@ -13,6 +14,8 @@ function ApplicantList() {
     const [searchTerm, setSearchTerm] = useState('');
     const [jobDetails, setJobDetails] = useState({});
     const [favoritedApplicants, setFavoritedApplicants] = useState([]);
+    const [selectedResume, setSelectedResume] = useState(null);
+    // const [selectedCoverLetter, setSelectedCoverLetter] = useState(null);
     const { user, logoutUser } = useContext(UserContext);
 
     const handleLogout = () => {
@@ -22,30 +25,30 @@ function ApplicantList() {
 
     useEffect(() => {
         const fetchApplicants = async () => {
-            console.log(`Fetching applicants for jobId: ${jobId}`); // Log the jobId
-    
+            console.log(`Fetching applicants for jobId: ${jobId}`);
+
             try {
                 const response = await axios.get(`http://localhost:4000/applications/${jobId}`);
-                console.log('Applicants fetched:', response.data); // Log the fetched applicants
+                console.log('Applicants fetched:', response.data);
                 setApplicants(response.data);
             } catch (error) {
                 console.error('Error fetching applicants:', error);
             }
         };
-    
+
         const fetchJobDetails = async () => {
-            console.log(`Fetching job details for jobId: ${jobId}`); // Log the jobId
-    
+            console.log(`Fetching job details for jobId: ${jobId}`);
+
             try {
                 const response = await axios.get('http://localhost:4000/jobs');
                 const job = response.data.find(job => job._id === jobId);
-                console.log('Job details:', job); // Log the job details
+                console.log('Job details:', job);
                 setJobDetails(job);
             } catch (error) {
                 console.error('Error fetching job details:', error);
             }
         };
-    
+
         fetchApplicants();
         fetchJobDetails();
     }, [jobId]);
@@ -65,6 +68,12 @@ function ApplicantList() {
     const filteredApplicants = applicants.filter(applicant =>
         applicant.fullName.toLowerCase().includes(searchTerm.toLowerCase())
     );
+
+    const handleSelectApplicant = (applicant) => {
+        setSelectedApplicant(applicant);
+        setSelectedResume(applicant.resumeData);
+        // setSelectedCoverLetter(applicant.coverLetterData);
+    };
 
     return (
         <div className="dashboard-container">
@@ -115,7 +124,7 @@ function ApplicantList() {
                                 <div
                                     key={index}
                                     className="applicant-item"
-                                    onClick={() => setSelectedApplicant(applicant)}
+                                    onClick={() => handleSelectApplicant(applicant)}
                                 >
                                     <div>
                                         <div className="applicant-name">{applicant.fullName}</div>
@@ -156,15 +165,33 @@ function ApplicantList() {
                                         <p>To be implemented in another feature</p>
                                     </div>
                                     <div className="applicant-detail-section">
-                                        <strong>Resume:</strong> {selectedApplicant.resume || 'Not available'}
-                                    </div>
-                                    <div className="applicant-detail-section">
-                                        <strong>Cover Letter:</strong> {selectedApplicant.coverLetter || 'Not available'}
-                                    </div>
-                                    <div className="applicant-detail-section">
                                         <strong>Status:</strong>
                                         <p>To be implemented in another feature</p>
                                     </div>
+                                    <div className="applicant-detail-section">
+                                        <strong>Resume:</strong>
+                                        {selectedResume ? (
+                                            <iframe
+                                                src={selectedResume}
+                                                className="resume-iframe"
+                                                title="Resume"
+                                            ></iframe>
+                                        ) : (
+                                            'Resume not available'
+                                        )}
+                                    </div>
+                                    {/* <div className="applicant-detail-section">
+                                        <strong>CoverLetter:</strong>
+                                        {selectedCoverLetter ? (
+                                            <iframe
+                                                src={selectedCoverLetter}
+                                                className="cover-letter-iframe"
+                                                title="CoverLetter"
+                                            ></iframe>
+                                        ) : (
+                                            'CoverLetter not available'
+                                        )}
+                                    </div> */}
                                 </div>
                             </>
                         ) : (

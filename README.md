@@ -27,7 +27,7 @@ Run `cd backend` to navigate to the backend directory.
 npm install
 ```
 
-2. Setup database cirectory
+2. Setup database directory
 
 ```
 mkdir data

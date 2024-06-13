@@ -126,6 +126,18 @@ describe("PUT /updateUser", () => {
   });
 });
 
+// describe("Job Application", () => {
+//   it("should apply to a job", async () => {
+//     const res = await request(app).post("/apply").send({
+//       jobId: "123",
+//       userId: "456",
+//     });
+
+//     expect(res.status).to.equal(200);
+//     expect(res.body).to.have.property("message", "Application successful");
+//   });
+// });
+
 after(async () => {
   await db.collection("users").deleteMany({}); // Clean up the users collection after tests
 });

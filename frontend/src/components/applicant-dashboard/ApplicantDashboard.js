@@ -1,17 +1,34 @@
-import "./ApplicantDashboard.css";
-
 import React, { useState, useEffect, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import { UserContext } from "../../contexts/UserContext";
 import { FaStar } from "react-icons/fa";
+import "./ApplicantDashboard.css";
 import axios from "axios";
+import Modal from './Modal';
 
 function ApplicantDashboard() {
   const navigate = useNavigate();
   const [selectedJob, setSelectedJob] = useState(null);
   const [favoritedJobs, setFavoritedJobs] = useState([]);
   const [jobs, setJobs] = useState([]);
+  const [file, setFile] = useState('');
+  const [preview, setPreview] = useState('');
+  const [applications, setApplications] = useState([]);
+  const [resumeFile, setResumeFile] = React.useState(null);
+//   const [coverLetterFile, setCoverLetterFile] = React.useState(null);
   const { user, logoutUser } = useContext(UserContext);
+
+  const [showConfirmation, setShowConfirmation] = useState(false);
+  const [selectedApplication, setSelectedApplication] = useState(null);
+  const [showApplicationForm, setShowApplicationForm] = useState(false);
+  const [editMode, setEditMode] = useState(false);
+const [newApplication] = useState({
+    applicantID: '',
+    jobID: '',
+    appliedDate: new Date().toISOString().split('T')[0],
+    resumeData: '',
+    // coverLetterData: ''
+});
 
   useEffect(() => {
     const fetchFavoritedJobs = async () => {
@@ -76,10 +93,54 @@ function ApplicantDashboard() {
     };
     
 
+
+
+function handleFileChange(event, fileType) {
+  const file = event.target.files[0];
+  const reader = new FileReader();
+  reader.onload = () => {
+    if (fileType === 'resume') {
+        setResumeFile(reader.result);
+      } 
+    //   else if (fileType === 'coverLetter') {
+    //     setCoverLetterFile(reader.result);
+    //   }
+  };
+  reader.readAsDataURL(file);
+}
+
+
   const isFavorited = (job) => favoritedJobs.includes(job);
 
-  const allJobs = jobs.filter(job => !favoritedJobs.some(fav => fav._id === job._id));
-  const displayedJobs = [...favoritedJobs, ...allJobs];  
+  const allJobs = jobs.filter(job => !favoritedJobs.includes(job));
+  const displayedJobs = [...favoritedJobs, ...allJobs];
+
+    const handleApplicationSubmit = async (e) => {
+        e.preventDefault();
+
+        const applicationToSubmit = { ...newApplication, applicantID: user.userId, jobID: selectedJob._id, resumeData: resumeFile};
+        // const applicationToSubmit = { ...newApplication, applicantID: user.userId, jobID: selectedJob._id, resumeData: resumeFile, coverLetterData: coverLetterFile};
+
+
+        try {
+            if (editMode) {
+                const response = await axios.put(`http://localhost:4000/applications/${selectedApplication._id}`, applicationToSubmit);
+                setApplications(prevApplications => prevApplications.map(application => application._id === selectedApplication._id ? response.data.application : application));
+                setEditMode(false);
+                setSelectedApplication(null);
+                window.location.reload();
+            } else {
+                const response = await axios.post('http://localhost:4000/applications/add', applicationToSubmit);
+                setApplications(prevApplications => [response.data, ...prevApplications]);
+            }
+
+            setShowApplicationForm(false);
+            setShowConfirmation(true);
+            window.location.reload();
+        } catch (error) {
+            console.error('Error submitting application:', error);
+        }
+    };
 
   return (
       <div className="dashboard-container">
@@ -209,7 +270,7 @@ function ApplicantDashboard() {
                               <div className="jobs-details-header">
                                   <div className="jobs-details-title">{selectedJob.title}</div>
                                   <div className="jobs-details-actions">
-                                  <button className="apply-button" onClick={handleApply}>APPLY</button>
+                                  <button className="apply-button" onClick={() => setShowApplicationForm(true)}>APPLY</button>
                                   </div>
                               </div>
                               <div className="jobs-details-body">
@@ -238,6 +299,20 @@ function ApplicantDashboard() {
                   </div>
               </div>
           </div>
+
+          <Modal show={showApplicationForm} onClose={() => setShowApplicationForm(false)} title={editMode ? 'Edit Application' : 'New Application'}>
+                <form className="new-job-form" onSubmit={handleApplicationSubmit}>
+                    <p>Upload Resume:{" "}</p>
+                        <input type="file" accept=".pdf" onChange={(event) => handleFileChange(event, 'resume')} />
+                    {/* <p>Upload Cover Letter:{" "}</p>
+                        <input type="file" accept=".pdf" onChange={(event) => handleFileChange(event, 'coverLetter')} /> */}
+                    <button type="submit">{editMode ? 'Update Application' : 'Submit'}</button>
+                    <button type="button" onClick={() => setShowApplicationForm(false)}>Cancel</button>
+                </form>
+            </Modal>
+            <Modal show={showConfirmation} onClose={() => setShowConfirmation(false)}>
+                <p>Application submitted successfully!</p>
+            </Modal>
       </div>
   );
 }
