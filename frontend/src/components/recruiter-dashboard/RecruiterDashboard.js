@@ -27,33 +27,64 @@ function RecruiterDashboard() {
         recruiterID: ''
     });
     const { user, logoutUser } = useContext(UserContext);
-
     useEffect(() => {
-        console.log('UserContext:', user); // Debugging line to check the user context (to remove later)
-        axios.get('http://localhost:4000/jobs/')
-            .then(response => {
-                const filteredJobs = response.data.filter(job => job.recruiterID.toString() === user.userId);
-                setJobs(filteredJobs);
-            })
-            .catch(error => {
-                console.log(error);
-            });
+        const fetchFavoritedJobs = async () => {
+            try {
+                const response = await axios.get(`http://localhost:4000/favorites/${user.userId}`);
+                setFavoritedJobs(response.data);
+            } catch (error) {
+                console.error("Error fetching favorited jobs:", error);
+            }
+        };
+    
+        if (user) {
+            fetchFavoritedJobs();
+            axios.get('http://localhost:4000/jobs/')
+                .then(response => {
+                    const filteredJobs = response.data.filter(job => job.recruiterID.toString() === user.userId);
+                    setJobs(filteredJobs);
+                })
+                .catch(error => {
+                    console.log(error);
+                });
+        }
     }, [user]);
+    
 
     const handleLogout = () => {
         logoutUser();
         navigate('/');
     };
-
-    const handleFavorite = (job) => {
-        setFavoritedJobs((prevFavorites) => {
-            if (prevFavorites.includes(job)) {
-                return prevFavorites.filter((fav) => fav !== job);
-            } else {
-                return [job, ...prevFavorites];
-            }
-        });
+    
+    const handleFavorite = async (job) => {
+        try {
+            const isFav = isFavorited(job);
+            const url = isFav ? 'http://localhost:4000/favorites/remove' : 'http://localhost:4000/favorites/add';
+            const payload = { userId: user.userId, jobId: job._id };
+    
+            await axios.post(url, payload);
+    
+            setFavoritedJobs((prevFavorites) => {
+                if (isFav) {
+                    return prevFavorites.filter((fav) => fav._id !== job._id);
+                } else {
+                    return [...prevFavorites, job];
+                }
+            });
+        } catch (error) {
+            console.error("Error updating favorites:", error);
+        }
     };
+    
+
+    const updateFavorite = async (jobId, userId, isFav) => {
+        const url = isFav ? 'http://localhost:4000/favorites/remove' : 'http://localhost:4000/favorites/add';
+        const payload = { userId, jobId };
+    
+        await axios.post(url, payload);
+    };
+    
+    
 
     const isFavorited = (job) => favoritedJobs.includes(job);
 
@@ -61,8 +92,8 @@ function RecruiterDashboard() {
         navigate(`/applicants/${job._id}`);
     };
 
-    const allJobs = jobs.filter(job => !favoritedJobs.includes(job));
-    const displayedJobs = [...favoritedJobs, ...allJobs];
+    const allJobs = jobs.filter(job => !favoritedJobs.some(fav => fav._id === job._id));
+    const displayedJobs = [...favoritedJobs, ...allJobs];    
 
     const handleJobInputChange = (e) => {
         const { name, value } = e.target;

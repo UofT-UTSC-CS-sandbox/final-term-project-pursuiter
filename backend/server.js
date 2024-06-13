@@ -106,6 +106,57 @@ app.delete('/jobs/:id', async (req, res) => {
   }
 });
 
+// Add a job to favorites
+app.post('/favorites/add', async (req, res) => {
+  const { userId, jobId } = req.body;
+
+  try {
+    await db.collection('users').updateOne(
+      { _id: new ObjectId(userId) },
+      { $addToSet: { favorites: new ObjectId(jobId) } }
+    );
+    res.status(200).json({ message: "Job added to favorites" });
+  } catch (error) {
+    console.error("Error adding to favorites:", error);
+    res.status(500).json({ message: "Error adding to favorites" });
+  }
+});
+
+// Remove a job from favorites
+app.post('/favorites/remove', async (req, res) => {
+  const { userId, jobId } = req.body;
+
+  try {
+    await db.collection('users').updateOne(
+      { _id: new ObjectId(userId) },
+      { $pull: { favorites: new ObjectId(jobId) } }
+    );
+    res.status(200).json({ message: "Job removed from favorites" });
+  } catch (error) {
+    console.error("Error removing from favorites:", error);
+    res.status(500).json({ message: "Error removing from favorites" });
+  }
+});
+
+// Get favorite jobs
+app.get('/favorites/:userId', async (req, res) => {
+  const userId = req.params.userId;
+
+  try {
+    const user = await db.collection('users').findOne({ _id: new ObjectId(userId) });
+    if (user && user.favorites) {
+      const favoriteJobs = await db.collection('jobs').find({ _id: { $in: user.favorites } }).toArray();
+      res.status(200).json(favoriteJobs);
+    } else {
+      res.status(404).json({ message: "User or favorites not found" });
+    }
+  } catch (error) {
+    console.error("Error fetching favorite jobs:", error);
+    res.status(500).json({ message: "Error fetching favorite jobs" });
+  }
+});
+
+
 app.post("/signup", async (req, res) => {
   const {
     userType,
@@ -158,6 +209,7 @@ app.post("/login", async (req, res) => {
         address: user.address,
         positions: user.positions,
         userId: user._id,
+        favorites: user.favorites || [],
       });
     } else {
       res.status(401).json({ message: "Invalid credentials" });
