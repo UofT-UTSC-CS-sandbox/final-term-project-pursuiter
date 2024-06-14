@@ -6,10 +6,10 @@ import { UserContext } from "../../contexts/UserContext";
 import UserController from "../../controllers/UserController";
 
 function LoginPage() {
-  const [email, setEmail] = useState("");             
-  const [password, setPassword] = useState("");         
-  const navigate = useNavigate();                       
-  const { loginUser } = useContext(UserContext);    
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const navigate = useNavigate();
+  const { loginUser } = useContext(UserContext);
 
   // Hangle login form submission
   const handleSubmit = async (event) => {
@@ -33,7 +33,7 @@ function LoginPage() {
   return (
     <div className="users-page-container">
       <div className="users-header">
-        <h1 className="pursuiter-heading">PURSUITER</h1>
+        <h1 className="pursuiter-header">PURSUITER</h1>
       </div>
       <div className="users-container">
         <h1>Login</h1>

@@ -23,10 +23,7 @@ function App() {
           <Route path="/recruiter-signup" element={<RecruiterSignupPage />} />
           <Route path="/recruiter-dashboard" element={<RecruiterDashboard />} />
           <Route path="/applicant-dashboard" element={<ApplicantDashboard />} />
-          <Route
-            path="/user-information"
-            element={<UserInformation />}
-          />
+          <Route path="/user-information" element={<UserInformation />} />
           <Route path="/applicants/:jobId" element={<SeeApplicants />} />
         </Routes>
       </BrowserRouter>

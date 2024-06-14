@@ -6,14 +6,14 @@ import { UserContext } from "../../contexts/UserContext";
 import UserController from "../../controllers/UserController";
 
 function SignupPage({ userType }) {
-  const [email, setEmail] = useState("");                
-  const [password, setPassword] = useState("");          
-  const [fullName, setFullName] = useState("");         
-  const [companyName, setCompanyName] = useState("");   
-  const [address] = useState("");                       
-  const [positions] = useState("");                      
-  const navigate = useNavigate();                        
-  const { loginUser } = useContext(UserContext);         
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [fullName, setFullName] = useState("");
+  const [companyName, setCompanyName] = useState("");
+  const [address] = useState("");
+  const [positions] = useState("");
+  const navigate = useNavigate();
+  const { loginUser } = useContext(UserContext);
 
   const heading =
     userType === "applicant"
@@ -33,7 +33,7 @@ function SignupPage({ userType }) {
         address,
         positions,
       });
-      
+
       alert("Signup successful!");
 
       await loginUser(email, password);
@@ -52,12 +52,12 @@ function SignupPage({ userType }) {
   return (
     <div className="users-page-container">
       <div className="users-header">
-        <h1 className="pursuiter-heading">PURSUITER</h1>
+        <h1 className="pursuiter-header">PURSUITER</h1>
       </div>
       <div className="users-container">
         <h1>{heading}</h1>
         <form onSubmit={handleSubmit}>
-          <div>
+          <div className="users-from-group">
             <label>Full Name</label>
             <input
               type="text"
@@ -66,7 +66,7 @@ function SignupPage({ userType }) {
               required
             />
           </div>
-          <div>
+          <div className="users-from-group">
             <label>Email</label>
             <input
               type="text"
@@ -75,7 +75,7 @@ function SignupPage({ userType }) {
               required
             />
           </div>
-          <div>
+          <div className="users-from-group">
             <label>Password</label>
             <input
               type="password"
@@ -85,7 +85,7 @@ function SignupPage({ userType }) {
             />
           </div>
           {userType === "recruiter" && (
-            <div>
+            <div className="users-from-group">
               <label>Company Name</label>
               <input
                 type="text"

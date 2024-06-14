@@ -13,17 +13,23 @@
   display: flex;
   justify-content: left;
   align-items: flex-start;
+  width: auto;
 }
 
 /************************************
  * Headers
  *************************************/
 
-.users-header {
-  margin: 20px;
+.users-info-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  width: 100%;
 }
 
-.pursuiter-heading {
+.pursuiter-header {
+  margin: 20px;
   font-family: Poppins;
   font-size: 64px;
   font-weight: 800;
@@ -31,7 +37,7 @@
   text-align: left;
 }
 
-.users-header .pursuiter-heading::before {
+.pursuiter-header::before {
   content: "";
   display: inline-block;
   background-color: #000000;
@@ -56,6 +62,8 @@
 .users-info-container {
   display: flex;
   align-items: center;
+  margin: 0 auto;
+  width: 776px;
 }
 
 .users-container form {
@@ -64,12 +72,25 @@
   flex-direction: column;
 }
 
+.users-info-container form {
+  max-width: 100%;
+}
+
 .users-container label {
   font-family: Poppins;
   font-size: 20px;
   font-weight: 500;
   line-height: 30px;
   text-align: left;
+}
+
+.users-info-container label {
+  margin-right: 10px;
+  font-size: 14px;
+  line-height: 21px;
+  left: 654px;
+  width: 170px;
+  white-space: nowrap;
 }
 
 .users-container input {
@@ -82,6 +103,21 @@
   border: 1px solid #000000;
   box-shadow: 0px 4px 4px 0px #00000040;
   margin-bottom: 20px;
+}
+
+.users-info-container input {
+  width: 691px;
+  height: 27px;
+  top: 391px;
+  left: 416px;
+}
+
+.users-info-form-group {
+  flex: 1;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
 }
 
 /************************************
@@ -108,6 +144,20 @@
   font-weight: 600;
   line-height: 30px;
   text-align: center;
+}
+
+.users-info-container button {
+  width: auto;
+  width: 165px;
+  height: 40px;
+  top: 336px;
+  left: 942px;
+  gap: 0px;
+  opacity: 0px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
 }
 
 .users-container button:hover {
@@ -160,7 +210,9 @@
 }
 
 .users-info-container h1 {
-  font-size: 30px;
-  align-items: center;
   display: flex;
+  font-size: 20px;
+  font-weight: 600;
+  line-height: 30px;
+  text-align: left;
 }

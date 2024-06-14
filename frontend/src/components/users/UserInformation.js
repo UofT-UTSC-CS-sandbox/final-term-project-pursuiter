@@ -107,66 +107,70 @@ function UserInformation() {
         </div>
       </header>
       <div className="users-container users-info-container">
-            <h1>Personal Information</h1>
-            <form onSubmit={handleSubmit}>
-              <div>
-                <label>Name:</label>
-                <input
-                  type="text"
-                  name="name"
-                  value={fullName}
-                  onChange={(e) => setFullName(e.target.value)}
-                  required
-                />
-              </div>
-              <div>
-                <label>Address:</label>
-                <input
-                  type="text"
-                  name="address"
-                  value={address}
-                  onChange={(e) => setAddress(e.target.value)}
-                  required
-                />
-              </div>
-              <div>
-                <label>Email:</label>
-                <input
-                  type="email"
-                  name="email"
-                  value={newEmail}
-                  onChange={(e) => setNewEmail(e.target.value)}
-                  required
-                />
-              </div>
-              {userType === "applicant" ? (
-                <div>
-                  <label>Positions Wanted:</label>
-                  <input
-                    type="text"
-                    name="positions"
-                    placeholder="Separate using commas. Eg: Software Engineer, Data Analyst"
-                    value={positions}
-                    onChange={(e) => setPositions(e.target.value)}
-                    required
-                  />
-                </div>
-              ) : (
-                <div>
-                  <label>Company</label>
-                  <input
-                    type="text"
-                    name="companyName"
-                    value={companyName}
-                    onChange={(e) => setCompanyName(e.target.value)}
-                    required
-                  />
-                </div>
-              )}
+        <div className="users-container users-info-container">
+          <form onSubmit={handleSubmit}>
+            <div className="users-header users-info-header">
+              <h1>Personal Information</h1>
               <button type="submit">Save</button>
-            </form>
-          </div>
+            </div>
+            <div className="users-from-group users-info-form-group">
+              <label>Name:</label>
+              <input
+                type="text"
+                name="name"
+                value={fullName}
+                onChange={(e) => setFullName(e.target.value)}
+                required
+              />
+            </div>
+            <div className="users-from-group users-info-form-group">
+              <label>Address:</label>
+              <input
+                type="text"
+                name="address"
+                value={address}
+                onChange={(e) => setAddress(e.target.value)}
+                required
+              />
+            </div>
+            <div className="users-from-group users-info-form-group">
+              <label>Email:</label>
+              <input
+                type="email"
+                name="email"
+                value={newEmail}
+                onChange={(e) => setNewEmail(e.target.value)}
+                required
+              />
+            </div>
+            {userType === "applicant" ? (
+              <div className="users-from-group users-info-form-group">
+                <label>Positions Wanted:</label>
+                <input
+                  type="text"
+                  name="positions"
+                  placeholder="Separate using commas. Eg: Software Engineer, Data Analyst"
+                  value={positions}
+                  onChange={(e) => setPositions(e.target.value)}
+                  required
+                />
+              </div>
+            ) : (
+              <div className="users-from-group users-info-form-group">
+                <label>Company</label>
+                <input
+                  type="text"
+                  name="companyName"
+                  value={companyName}
+                  onChange={(e) => setCompanyName(e.target.value)}
+                  required
+                />
+              </div>
+            )}
+          </form>
         </div>
+      </div>
+    </div>
   );
 }
 
