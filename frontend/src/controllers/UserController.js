@@ -27,7 +27,7 @@ async function signupUser(
   fullName,
   companyName,
   address,
-  positions
+  positions,
 ) {
   try {
     const response = await fetch(`${API_URL}/signup`, {
@@ -56,7 +56,16 @@ async function signupUser(
   }
 }
 
-async function updateUser(email, newEmail, fullName, address, positions, companyName, userType, userId) {
+async function updateUser(
+  email,
+  newEmail,
+  fullName,
+  address,
+  positions,
+  companyName,
+  userType,
+  userId,
+) {
   try {
     const response = await fetch(`${API_URL}/updateUser`, {
       method: "PUT",

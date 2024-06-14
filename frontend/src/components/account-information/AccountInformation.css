@@ -15,7 +15,6 @@
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   overflow: hidden;
   font-family: Poppins;
-
 }
 
 .sidebar {
@@ -167,7 +166,7 @@
   font-weight: bold;
   font: Poppins;
   border: 2px solid #8a0032;
-  box-shadow: 0 4px 6px rgba(0,0,0,0.4);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.4);
 }
 
 .sign-out-button:hover {
@@ -189,7 +188,7 @@
   font-weight: bold;
   font: Poppins;
   border: 2px solid #8a0032;
-  box-shadow: 0 4px 6px rgba(0,0,0,0.4);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.4);
 }
 
 .save-button:hover {

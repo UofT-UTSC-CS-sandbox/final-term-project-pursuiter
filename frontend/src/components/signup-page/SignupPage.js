@@ -30,7 +30,7 @@ function SignupPage({ userType }) {
         fullName,
         companyName,
         address,
-        positions        
+        positions,
       );
       console.log("Signup successful", user);
       alert("Signup successful!");
@@ -122,4 +122,3 @@ function SignupPage({ userType }) {
 }
 
 export default SignupPage;
-

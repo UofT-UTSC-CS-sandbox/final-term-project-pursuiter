@@ -13,14 +13,17 @@ const PORT = process.env.PORT || 4000;
 const mongoURL = process.env.MONGO_URI || "mongodb://localhost:27017";
 const dbName = process.env.DB_NAME || "pursuiter";
 
-
-// Set larger limit for JSON payloads
-app.use(express.json({ limit: '50mb' }));
-app.use(express.urlencoded({ limit: '50mb', extended: true }));
+app.use(express.json({ limit: "50mb" }));
+app.use(express.urlencoded({ limit: "50mb", extended: true }));
 app.use(cors());
 
 let db;
 
+/************************************
+ * MongoDB Connection
+ *************************************/
+
+// Connect to MongoDB
 async function connectToMongo() {
   try {
     await mongoose.connect(mongoURL, {
@@ -176,36 +179,16 @@ app.get('/favorites/:userId', async (req, res) => {
 
 
 app.post("/signup", async (req, res) => {
-  const {
-    userType,
-    email,
-    password,
-    fullName,
-    companyName,
-    address,
-    positions,
-  } = req.body;
+  const { userType, email, password, fullName, companyName, address, positions, favorites } = req.body;
   try {
     const existingUser = await db.collection("users").findOne({ email });
     if (existingUser) {
       return res.status(409).json({ message: "User already exists" });
     }
-
     const hashedPassword = await bcrypt.hash(password, 10);
-    const newUser = {
-      userType,
-      email,
-      password: hashedPassword,
-      fullName,
-      companyName,
-      address,
-      positions,
-    };
-
+    const newUser = { userType, email, password: hashedPassword, fullName, companyName, address, positions, favorites };
     const result = await db.collection("users").insertOne(newUser);
-    res
-      .status(201)
-      .json({ message: "User created", userId: result.insertedId });
+    res.status(201).json({ message: "User created", userId: result.insertedId });
   } catch (error) {
     console.error("Error in signup:", error);
     res.status(500).json({ message: "Error creating user" });
@@ -217,7 +200,7 @@ app.post("/login", async (req, res) => {
   const { email, password } = req.body;
   try {
     const user = await db.collection("users").findOne({ email });
-    if (user && (await bcrypt.compare(password, user.password))) {
+    if (user && await bcrypt.compare(password, user.password)) {
       res.json({
         message: "Login successful",
         userType: user.userType,
@@ -237,44 +220,35 @@ app.post("/login", async (req, res) => {
   }
 });
 
-// Update the user fullName, email, address, positions
+// Update user information
 app.put("/updateUser", async (req, res) => {
-  const { email, newEmail, fullName, address, positions, companyName, userType, userId } = req.body;
+  const { email, newEmail, fullName, address, positions, companyName, userType } = req.body;
   try {
     const user = await db.collection("users").findOne({ email });
     if (user) {
       const updatedUser = { ...user };
       if (newEmail) {
-        const emailUsed = await db
-          .collection("users")
-          .findOne({ email: newEmail });
+        const emailUsed = await db.collection("users").findOne({ email: newEmail });
         if (emailUsed && newEmail !== email) {
-          return res
-            .status(400)
-            .json({ message: "New email already used by another account" });
+          return res.status(400).json({ message: "New email already used by another account" });
         } else {
           updatedUser.email = newEmail;
         }
       }
-
       if (fullName) updatedUser.fullName = fullName;
       if (address) updatedUser.address = address;
       if (positions) updatedUser.positions = positions;
       if (companyName) updatedUser.companyName = companyName;
       if (userType) updatedUser.userType = userType;
-      if (userId) updatedUser._id = userId;
-
       await db.collection("users").updateOne({ email }, { $set: updatedUser });
-
       res.json({
         message: "Update successful",
-        email: updatedUser.email,
         fullName: updatedUser.fullName,
         address: updatedUser.address,
+        email: updatedUser.email,
         positions: updatedUser.positions,
         companyName: updatedUser.companyName,
         userType: updatedUser.userType,
-        userId: updatedUser._id
       });
     } else {
       res.status(404).json({ message: "User not found" });
@@ -285,13 +259,115 @@ app.put("/updateUser", async (req, res) => {
   }
 });
 
-app.get('/jobs/:id/applicants', async (req, res) => {
+/************************************
+ * Job API Endpoints
+ *************************************/
+
+// Fetch all jobs
+app.get("/jobs", async (req, res) => {
+  try {
+    const jobs = await db.collection("jobs").find().toArray();
+    res.json(jobs);
+  } catch (error) {
+    res.status(500).json({ message: "Error fetching jobs" });
+  }
+});
+
+// Fetch job details
+app.get("/jobs/:id", async (req, res) => {
   const jobId = req.params.id;
+  try {
+    const job = await db.collection("jobs").findOne({ _id: new ObjectId(jobId) });
+    if (job) {
+      res.json(job);
+    } else {
+      res.status(404).json({ message: "Job not found" });
+    }
+  } catch (error) {
+    res.status(500).json({ message: "Error fetching job details" });
+  }
+});
+
+// Post a job
+app.post("/jobs/add", async (req, res) => {
+  const job = req.body;
+
+  if (!job || typeof job !== "object") {
+    return res.status(400).json({ message: "Expected a job object" });
+  }
+  try {
+    const result = await db.collection("jobs").insertOne(job);
+    res.status(201).json({ message: "Job added!", insertedId: result.insertedId });
+  } catch (error) {
+    console.error("Error adding job:", error);
+    res.status(500).json({ message: "Error adding job", error: error.message });
+  }
+});
+
+// Edit a job
+app.put("/jobs/:id", async (req, res) => {
+  const jobId = req.params.id;
+  const job = req.body;
+  if (!ObjectId.isValid(jobId)) {
+    return res.status(400).json({ message: "Invalid job ID" });
+  }
+  try {
+    const result = await db.collection("jobs").updateOne({ _id: new ObjectId(jobId) }, { $set: job });
+    if (result.modifiedCount === 1) {
+      res.json({ message: "Job updated", job });
+    } else {
+      res.status(404).json({ message: "Job not found" });
+    }
+  } catch (error) {
+    console.error("Error updating job:", error);
+    res.status(500).json({ message: "Error updating job", error: error.message });
+  }
+});
+
+// Delete a job
+app.delete("/jobs/:id", async (req, res) => {
+  const jobId = req.params.id;
+  try {
+    const result = await db.collection("jobs").deleteOne({ _id: new ObjectId(jobId) });
+    if (result.deletedCount === 1) {
+      res.status(200).json({ message: "Job deleted!" });
+    } else {
+      res.status(404).json({ message: "Job not found" });
+    }
+  } catch (error) {
+    console.error("Error deleting job:", error);
+    res.status(500).json({ message: "Error deleting job" });
+  }
+});
+
+/************************************
+ * Application API Endpoints
+ *************************************/
+
+// Add an application
+app.post("/applications/add", async (req, res) => {
+  const application = req.body;
+
+  if (!application || typeof application !== "object") {
+    return res.status(400).json({ message: "Expected an application object" });
+  }
 
   try {
-    const applications = await db.collection('applications').find({ jobId: new ObjectId(jobId) }).toArray();
-    const userIds = applications.map(app => app.userId);
-    const applicants = await db.collection('users').find({ _id: { $in: userIds } }).toArray();
+    const result = await db.collection("applications").insertOne(application);
+    res.status(201).json({ message: "Application added!", insertedId: result.insertedId });
+  } catch (error) {
+    console.error("Error adding application:", error);
+    res.status(500).json({ message: "Error adding application", error: error.message });
+  }
+});
+
+// Fetch user details of applicants for a job
+app.get("/jobs/:id/applicants", async (req, res) => {
+  const jobId = req.params.id;
+  try {
+    const applications = await db.collection("applications").find({ jobId: new ObjectId(jobId) }).toArray();
+    const userIds = applications.map((app) => app.userId);
+    const applicants = await db.collection("users").find({ _id: { $in: userIds } }).toArray();
     res.json(applicants);
   } catch (error) {
     console.error("Error fetching applicants:", error);
@@ -299,45 +375,28 @@ app.get('/jobs/:id/applicants', async (req, res) => {
   }
 });
 
-app.get('/jobs/:id', async (req, res) => {
-  const jobId = req.params.id;
-
-  try {
-      const job = await db.collection('jobs').findOne({ _id: new ObjectId(jobId) });
-      if (job) {
-          res.json(job);
-      } else {
-          res.status(404).json({ message: "Job not found" });
-      }
-  } catch (error) {
-      res.status(500).json({ message: "Error fetching job details" });
-  }
-});
-
-app.get('/applications/:jobId', async (req, res) => {
+// Fetch applications for a job
+app.get("/applications/:jobId", async (req, res) => {
   const jobId = req.params.jobId;
   try {
-      const applications = await db.collection('applications').find({ jobID: jobId }).toArray();
-      if (applications.length === 0) {
-          return res.status(404).json({ message: "No applications found for this job" });
-      }
-      const applicantIds = applications.map(app => app.applicantID);
-      const applicants = await db.collection('users').find({ _id: { $in: applicantIds.map(id => new ObjectId(id)) } }).toArray();
-
-      // Merge applicants with their applyDate and resume data
-      const applicantsWithDetails = applicants.map(applicant => {
-        const application = applications.find(app => app.applicantID === applicant._id.toString());
-        return { 
-          ...applicant, 
-          applyDate: application ? application.applyDate : null,
-          resumeData: application ? application.resumeData : null
-        };
-      });
-
-      res.json(applicantsWithDetails);
+    const applications = await db.collection("applications").find({ jobID: jobId }).toArray();
+    if (applications.length === 0) {
+      return res.status(404).json({ message: "No applications found for this job" });
+    }
+    const applicantIds = applications.map((app) => app.applicantID);
+    const applicants = await db.collection("users").find({ _id: { $in: applicantIds.map((id) => new ObjectId(id)) } }).toArray();
+    const applicantsWithDetails = applicants.map((applicant) => {
+      const application = applications.find((app) => app.applicantID === applicant._id.toString());
+      return {
+        ...applicant,
+        applyDate: application ? application.applyDate : null,
+        resumeData: application ? application.resumeData : null,
+      };
+    });
+    res.json(applicantsWithDetails);
   } catch (error) {
-      console.error('Error fetching applicants:', error);
-      res.status(500).json({ message: "Error fetching applicants", error: error.message });
+    console.error("Error fetching applicants:", error);
+    res.status(500).json({ message: "Error fetching applicants", error: error.message });
   }
 });
 
