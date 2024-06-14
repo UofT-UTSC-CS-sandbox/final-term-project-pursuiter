@@ -4,49 +4,10 @@
  * General Styles
  *************************************/
 
-body {
-  margin: 0;
-  font-family: "Inter", Arial, sans-serif;
-}
-
 .dashboard-container {
   display: flex;
   flex-direction: column;
   height: 100vh;
-}
-
-/************************************
- * Headers
- *************************************/
-
-.dashboard-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background-color: #000;
-  color: #fff;
-  padding: 10px 20px;
-}
-
-.logo {
-  font-size: 24px;
-}
-
-.header-links {
-  display: flex;
-  gap: 20px;
-}
-
-.header-link {
-  color: #fff;
-  text-decoration: none;
-  cursor: pointer;
-  font-size: 16px;
-  font-weight: bold;
-}
-
-.logout-link {
-  cursor: pointer;
 }
 
 /************************************
@@ -140,13 +101,6 @@ body {
   margin-bottom: 30px;
   font-size: 18px;
   font-family: "Inter", Arial, sans-serif;
-}
-
-.dashboard-detail-section strong {
-  display: block;
-  font-size: 16px;
-  font-weight: 600;
-  margin-bottom: 5px;
 }
 
 .dashboard-detail-section div {
@@ -294,90 +248,107 @@ body {
  * Buttons and Icons
  *************************************/
 
- .new-item-button {
-    width: 200px;
-    padding: 15px;
-    background-color: #800020;
-    color: #fff;
-    border: none;
-    border-radius: 25px;
-    cursor: pointer;
-    font-size: 16px;
-    font-weight: bold;
-    text-align: center;
-    align-self: flex-start;
-    margin-bottom: 20px;
-  }
-  
-  .delete-button,
-  .see-applicants-button,
-  .edit-button,
-  .apply-button {
-    padding: 15px 20px;
-    background-color: #800020;
-    color: #fff;
-    border: none;
-    cursor: pointer;
-    border-radius: 25px;
-    font-size: 16px;
-    font-weight: bold;
-  }
-  
-  .modal-footer .delete-button {
-    margin: 10px;
-    padding: 10px;
-    font-size: 16px;
-    border: none;
-    border-radius: 5px;
-    background-color: #800020;
-    color: #fff;
-    cursor: pointer;
-  }
-  
-  .modal-footer .cancel-button {
-    margin: 10px;
-    padding: 10px;
-    font-size: 16px;
-    border: none;
-    border-radius: 5px;
-    background-color: #ccc;
-    color: #000;
-    cursor: pointer;
-  }
-  
-  .close-button {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    background: none;
-    border: none;
-    font-size: 18px;
-    cursor: pointer;
-  }
-  
-  .new-item-form button {
-    padding: 10px;
-    font-size: 16px;
-    border: none;
-    border-radius: 5px;
-    background-color: #800020;
-    color: #fff;
-    cursor: pointer;
-  }
-  
-  .new-item-form button[type="button"] {
-    background-color: #ccc;
-    color: #000;
-  }
-  
-  .favorite-icon {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    color: #ddd;
-    cursor: pointer;
-  }
-  
-  .favorite-icon.favorited {
-    color: gold;
-  }
+.new-item-button {
+  width: 200px;
+  padding: 15px;
+  background-color: #800020;
+  color: #fff;
+  border: none;
+  border-radius: 25px;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: bold;
+  text-align: center;
+  align-self: flex-start;
+  margin-bottom: 20px;
+}
+
+.delete-button,
+.see-applicants-button,
+.edit-button,
+.apply-button {
+  padding: 15px 20px;
+  background-color: #800020;
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  border-radius: 25px;
+  font-size: 16px;
+  font-weight: bold;
+}
+
+.modal-footer .delete-button {
+  margin: 10px;
+  padding: 10px;
+  font-size: 16px;
+  border: none;
+  border-radius: 5px;
+  background-color: #800020;
+  color: #fff;
+  cursor: pointer;
+}
+
+.modal-footer .cancel-button {
+  margin: 10px;
+  padding: 10px;
+  font-size: 16px;
+  border: none;
+  border-radius: 5px;
+  background-color: #ccc;
+  color: #000;
+  cursor: pointer;
+}
+
+.close-button {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: none;
+  border: none;
+  font-size: 18px;
+  cursor: pointer;
+}
+
+.new-item-form button {
+  padding: 10px;
+  font-size: 16px;
+  border: none;
+  border-radius: 5px;
+  background-color: #800020;
+  color: #fff;
+  cursor: pointer;
+}
+
+.new-item-form button[type="button"] {
+  background-color: #ccc;
+  color: #000;
+}
+
+.favorite-icon {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  color: #ddd;
+  cursor: pointer;
+}
+
+.favorite-icon.favorited {
+  color: gold;
+}
+
+/************************************
+ * Fonts
+ *************************************/
+ 
+body {
+  margin: 0;
+  font-family: "Inter", Arial, sans-serif;
+}
+
+.dashboard-detail-section strong {
+  display: block;
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 5px;
+}
+

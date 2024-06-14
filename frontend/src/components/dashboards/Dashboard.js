@@ -42,11 +42,6 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
     }
   }, [user, fetchFavoritedJobs, fetchJobs]);
 
-  const handleLogout = () => {
-    logoutUser();
-    navigate("/");
-  };
-
   // Handle favorite
   const handleFavorite = async (item) => {
     try {
@@ -224,28 +219,6 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
 
   return (
     <div className="dashboard-container">
-      <header className="dashboard-header">
-        <div className="logo-container">
-          <img
-            src="https://via.placeholder.com/20"
-            alt="logo"
-            className="logo-image"
-          />
-          <div className="logo">PERSUITER</div>
-        </div>
-        <div className="header-links">
-          <div className="header-link">Postings</div>
-          <div
-            className="header-link"
-            onClick={() => navigate("/user-information")}
-          >
-            ACCOUNT
-          </div>
-          <div className="header-link" onClick={handleLogout}>
-            LOGOUT
-          </div>
-        </div>
-      </header>
       <div className="dashboard-content">
         {role === "recruiter" && (
           <button

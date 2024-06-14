@@ -17,16 +17,6 @@ function LandingPage() {
 
   return (
     <div className="landing-page-container">
-      <header className="landing-page-header">
-        <div className="logo">PERSUITER</div>
-        <div className="header-links">
-          <div>
-            <Link className="login-link" to="/login">
-              LOGIN
-            </Link>
-          </div>
-        </div>
-      </header>
       <div className="content-container">
         <div className="column-left">
           <h1>Find a job you love.</h1>

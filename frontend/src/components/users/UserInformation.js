@@ -31,12 +31,6 @@ function UserInformation() {
     }
   }, [user]);
 
-  // Handle logout
-  const handleLogout = () => {
-    logoutUser();
-    navigate("/");
-  };
-
   // Handle update info form submission
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -60,42 +54,6 @@ function UserInformation() {
 
   return (
     <div className="users-page-container">
-      <header className="dashboard-header">
-        <div className="logo-container">
-          <img
-            src="https://via.placeholder.com/20"
-            alt="logo"
-            className="logo-image"
-          />
-          <div className="logo">PERSUITER</div>
-        </div>
-        <div className="header-links">
-          {userType === "applicant" ? (
-            <div
-              className="header-link"
-              onClick={() => navigate("/applicant-dashboard")}
-            >
-              Jobs
-            </div>
-          ) : (
-            <div
-              className="header-link"
-              onClick={() => navigate("/recruiter-dashboard")}
-            >
-              Postings
-            </div>
-          )}
-          <div
-            className="header-link"
-            onClick={() => navigate("/user-information")}
-          >
-            ACCOUNT
-          </div>
-          <div className="header-link" onClick={handleLogout}>
-            LOGOUT
-          </div>
-        </div>
-      </header>
       <div className="users-container users-info-container">
         <div className="users-container users-info-container">
           <form onSubmit={handleSubmit}>

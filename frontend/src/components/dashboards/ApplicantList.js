@@ -16,12 +16,6 @@ function ApplicantList() {
   const [selectedResume, setSelectedResume] = useState(null);
   const { user, logoutUser } = useContext(UserContext);
 
-  // Handle logout
-  const handleLogout = () => {
-    logoutUser();
-    navigate("/");
-  };
-
   // Fetch applicants and job details
   useEffect(() => {
     const fetchApplicants = async () => {
@@ -71,27 +65,6 @@ function ApplicantList() {
 
   return (
     <div className="dashboard-container">
-      <header className="dashboard-header">
-        <div className="logo-container">
-          <img
-            src="https://via.placeholder.com/20"
-            alt="logo"
-            className="logo-image"
-          />
-          <div className="logo">PERSUITER</div>
-        </div>
-        <div className="header-links">
-          <div
-            className="header-link"
-            onClick={() => navigate("/recruiter-dashboard")}
-          >
-            Dashboard
-          </div>
-          <div className="header-link logout-link" onClick={handleLogout}>
-            Logout
-          </div>
-        </div>
-      </header>
       <div className="dashboard-content">
         <div className="aesthetic-bar"></div>
         <div className="job-details">

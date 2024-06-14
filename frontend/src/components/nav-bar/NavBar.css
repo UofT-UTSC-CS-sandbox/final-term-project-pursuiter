@@ -1,0 +1,57 @@
+/************************************
+ * General Styles
+ *************************************/
+
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #000000;
+  color: white;
+  padding: 10px 20px;
+}
+
+/************************************
+ * Logo
+ *************************************/
+
+.logo {
+  font-size: 20px;
+  font-weight: bold;
+}
+
+.logo::before {
+  content: "";
+  display: inline-block;
+  background-color: #fff;
+  margin-right: 10px;
+  width: 17px;
+  height: 17px;
+  top: 6px;
+  gap: 0px;
+  opacity: 0px;
+}
+
+/************************************
+ * Links
+ *************************************/
+
+.header-links {
+  display: flex;
+  align-items: center;
+}
+
+.link {
+  margin-left: 20px;
+  color: white;
+  text-decoration: none;
+  font-family: Poppins;
+  font-size: 20px;
+  font-weight: 800;
+  line-height: 30px;
+  text-align: center;
+}
+
+.link:hover {
+  text-decoration: underline;
+}
