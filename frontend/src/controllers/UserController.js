@@ -71,16 +71,6 @@ const UserController = {
     userId,
   }) => {
     try {
-      console.log("Sending update request with data:", {
-        email,
-        newEmail,
-        fullName,
-        address,
-        positions,
-        companyName,
-        userType,
-        userId,
-      });
       const response = await fetch(`${API_URL}/updateUser`, {
         method: "PUT",
         headers: {
@@ -102,7 +92,6 @@ const UserController = {
         throw new Error(errorData.message || "Failed to update");
       }
       const user = await response.json();
-      console.log("Received updated user data:", user);
       return user;
     } catch (error) {
       throw error;

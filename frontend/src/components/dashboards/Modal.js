@@ -1,5 +1,5 @@
 import React from "react";
-import "./Modal.css";
+import "./Dashboard.css";
 
 function Modal({ show, onClose, children }) {
   if (!show) {

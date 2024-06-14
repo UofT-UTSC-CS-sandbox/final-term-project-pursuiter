@@ -1,10 +1,9 @@
 import React, { useState, useEffect, useContext } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { UserContext } from "../../contexts/UserContext";
-import "./ApplicantList.css";
-import axios from "axios";
+import DashboardController from "../../controllers/DashboardController";
+import "./Dashboard.css";
 import { FaStar } from "react-icons/fa";
-// import { set } from 'mongoose';
 
 function ApplicantList() {
   const { jobId } = useParams();
@@ -15,37 +14,29 @@ function ApplicantList() {
   const [jobDetails, setJobDetails] = useState({});
   const [favoritedApplicants, setFavoritedApplicants] = useState([]);
   const [selectedResume, setSelectedResume] = useState(null);
-  // const [selectedCoverLetter, setSelectedCoverLetter] = useState(null);
   const { user, logoutUser } = useContext(UserContext);
 
+  // Handle logout
   const handleLogout = () => {
     logoutUser();
     navigate("/");
   };
 
+  // Fetch applicants and job details
   useEffect(() => {
     const fetchApplicants = async () => {
-      console.log(`Fetching applicants for jobId: ${jobId}`);
-
       try {
-        const response = await axios.get(
-          `http://localhost:4000/applications/${jobId}`,
-        );
-        console.log("Applicants fetched:", response.data);
-        setApplicants(response.data);
+        const response = await DashboardController.fetchApplicants(jobId);
+        setApplicants(response);
       } catch (error) {
         console.error("Error fetching applicants:", error);
       }
     };
 
     const fetchJobDetails = async () => {
-      console.log(`Fetching job details for jobId: ${jobId}`);
-
       try {
-        const response = await axios.get("http://localhost:4000/jobs");
-        const job = response.data.find((job) => job._id === jobId);
-        console.log("Job details:", job);
-        setJobDetails(job);
+        const response = await DashboardController.fetchJobDetails(jobId);
+        setJobDetails(response);
       } catch (error) {
         console.error("Error fetching job details:", error);
       }
@@ -55,6 +46,7 @@ function ApplicantList() {
     fetchJobDetails();
   }, [jobId]);
 
+  // Handle favorite
   const handleFavorite = (applicant) => {
     setFavoritedApplicants((prevFavorites) => {
       if (prevFavorites.includes(applicant)) {
@@ -71,16 +63,23 @@ function ApplicantList() {
     applicant.fullName.toLowerCase().includes(searchTerm.toLowerCase()),
   );
 
+  // Handle select applicant
   const handleSelectApplicant = (applicant) => {
     setSelectedApplicant(applicant);
     setSelectedResume(applicant.resumeData);
-    // setSelectedCoverLetter(applicant.coverLetterData);
   };
 
   return (
     <div className="dashboard-container">
       <header className="dashboard-header">
-        <div className="logo">PERSUITER</div>
+        <div className="logo-container">
+          <img
+            src="https://via.placeholder.com/20"
+            alt="logo"
+            className="logo-image"
+          />
+          <div className="logo">PERSUITER</div>
+        </div>
         <div className="header-links">
           <div
             className="header-link"
@@ -96,54 +95,55 @@ function ApplicantList() {
       <div className="dashboard-content">
         <div className="aesthetic-bar"></div>
         <div className="job-details">
-          {console.log("Job Details:", jobDetails)}{" "}
-          {/* Debugging line to check the job details */}
-          <div className="job-detail-section">
+          <div className="dashboard-detail-section">
             <strong>Job Title:</strong> {jobDetails.title || "Loading..."}
           </div>
-          <div className="job-detail-section">
+          <div className="dashboard-detail-section">
             <strong>Company:</strong> {jobDetails.company || user.companyName}
           </div>
-          <div className="job-detail-section">
+          <div className="dashboard-detail-section">
             <strong>Location:</strong> {jobDetails.location || "Loading..."}
           </div>
-          <div className="job-detail-section">
+          <div className="dashboard-detail-section">
             <strong>Type:</strong> {jobDetails.type || "Loading..."}
           </div>
         </div>
-        <input
-          type="text"
-          className="search-input"
-          placeholder="Search by experience, keywords..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-        />
-        <div className="filter-buttons">
-          <button className="filter-button">Experience</button>
-          <button className="filter-button">Education</button>
-          <button className="filter-button">Keywords</button>
-          <button className="filter-button">Skills</button>
-          <button className="search-button">SEARCH</button>
-        </div>
         <div className="aesthetic-bar"></div>
-        <div className="job-listings">
-          <div className="job-list">
-            <div className="job-count">
+        <div className="search-and-filters">
+          <div className="search">
+            <input
+              type="text"
+              className="search-input"
+              placeholder="Search by experience, keywords..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+            <button className="search-button">SEARCH</button>
+          </div>
+          <div className="filter-buttons">
+            <p>Filter by:</p>
+            <button className="filter-button">Experience</button>
+            <button className="filter-button">Education</button>
+            <button className="filter-button">Keywords</button>
+            <button className="filter-button">Skills</button>
+          </div>
+        </div>
+        <div className="dashboard-listings">
+          <div className="dashboard-list">
+            <div className="dashboard-count">
               Showing {filteredApplicants.length} Applicants
             </div>
             {filteredApplicants.length > 0 ? (
               filteredApplicants.map((applicant, index) => (
                 <div
                   key={index}
-                  className="applicant-item"
+                  className="dashboard-item"
                   onClick={() => handleSelectApplicant(applicant)}
                 >
-                  <div>
-                    <div className="applicant-name">{applicant.fullName}</div>
-                    <div className="applicant-email">{applicant.email}</div>
-                    <div className="applicant-apply-date">
-                      <strong>Applied On:</strong> {applicant.applyDate}
-                    </div>
+                  <div className="dashboard-title">{applicant.fullName}</div>
+                  <div className="dashboard-company">{applicant.email}</div>
+                  <div className="dashboard-apply-by">
+                    <strong>Applied On:</strong> {applicant.applyDate}
                   </div>
                   <div
                     className={`favorite-icon ${isFavorited(applicant) ? "favorited" : ""}`}
@@ -162,31 +162,31 @@ function ApplicantList() {
               </div>
             )}
           </div>
-          <div className="applicant-detail">
+          <div className="dashboard-detail">
             {selectedApplicant ? (
               <>
-                <div className="applicant-detail-header">
-                  <div className="applicant-detail-title">
+                <div className="dashboard-detail-header">
+                  <div className="dashboard-detail-title">
                     {selectedApplicant.fullName}
                   </div>
                 </div>
-                <div className="applicant-detail-body">
-                  <div className="applicant-detail-section">
+                <div className="dashboard-detail-body">
+                  <div className="dashboard-detail-section">
                     <strong>Email:</strong> {selectedApplicant.email}
                   </div>
-                  <div className="applicant-detail-section">
-                    <strong>Ai Generated Compatibility:</strong>
+                  <div className="dashboard-detail-section">
+                    <strong>AI Generated Compatibility:</strong>
                     <p>To be implemented in another feature</p>
                   </div>
-                  <div className="applicant-detail-section">
-                    <strong>Ai Generated Summary:</strong>
+                  <div className="dashboard-detail-section">
+                    <strong>AI Generated Summary:</strong>
                     <p>To be implemented in another feature</p>
                   </div>
-                  <div className="applicant-detail-section">
+                  <div className="dashboard-detail-section">
                     <strong>Status:</strong>
                     <p>To be implemented in another feature</p>
                   </div>
-                  <div className="applicant-detail-section">
+                  <div className="dashboard-detail-section">
                     <strong>Resume:</strong>
                     {selectedResume ? (
                       <iframe
@@ -198,22 +198,10 @@ function ApplicantList() {
                       "Resume not available"
                     )}
                   </div>
-                  {/* <div className="applicant-detail-section">
-                                        <strong>CoverLetter:</strong>
-                                        {selectedCoverLetter ? (
-                                            <iframe
-                                                src={selectedCoverLetter}
-                                                className="cover-letter-iframe"
-                                                title="CoverLetter"
-                                            ></iframe>
-                                        ) : (
-                                            'CoverLetter not available'
-                                        )}
-                                    </div> */}
                 </div>
               </>
             ) : (
-              <div className="applicant-detail-body">
+              <div className="dashboard-detail-body">
                 <p>Select an applicant to see the details</p>
               </div>
             )}

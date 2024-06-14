@@ -41,16 +41,6 @@ function UserInformation() {
   const handleSubmit = async (event) => {
     event.preventDefault();
     try {
-      console.log("Updating user with:", {
-        email,
-        newEmail,
-        fullName,
-        address,
-        positions,
-        companyName,
-        userType,
-        userId,
-      });
       const updatingUser = await updateUser({
         email,
         newEmail,

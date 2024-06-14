@@ -7,10 +7,10 @@ import LandingPage from "./components/landing-page/LandingPage";
 import LoginPage from "./components/users/LoginPage";
 import JobSeekerSignupPage from "./components/users/ApplicantSignupPage";
 import RecruiterSignupPage from "./components/users/RecruiterSignupPage";
-import ApplicantDashboard from "./components/applicant-dashboard/ApplicantDashboard";
-import RecruiterDashboard from "./components/recruiter-dashboard/RecruiterDashboard";
+import ApplicantDashboard from "./components/dashboards/ApplicantDashboard";
+import RecruiterDashboard from "./components/dashboards/RecruiterDashboard";
 import UserInformation from "./components/users/UserInformation";
-import SeeApplicants from "./components/recruiter-applicant-list/ApplicantList";
+import ApplicantList from "./components/dashboards/ApplicantList";
 
 function App() {
   return (
@@ -24,7 +24,7 @@ function App() {
           <Route path="/recruiter-dashboard" element={<RecruiterDashboard />} />
           <Route path="/applicant-dashboard" element={<ApplicantDashboard />} />
           <Route path="/user-information" element={<UserInformation />} />
-          <Route path="/applicants/:jobId" element={<SeeApplicants />} />
+          <Route path="/applicants/:jobId" element={<ApplicantList />} />
         </Routes>
       </BrowserRouter>
     </UserProvider>
