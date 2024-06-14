@@ -1,12 +1,17 @@
-import express, { application } from 'express';
-import { MongoClient, ObjectId } from 'mongodb'; // Ensure ObjectId is imported
+import express from 'express';
+import { MongoClient, ObjectId } from 'mongodb';
+import mongoose from 'mongoose';
 import bcrypt from 'bcrypt';
 import cors from 'cors';
+import dotenv from 'dotenv';
+
+const env = process.env.NODE_ENV || 'development';
+dotenv.config({ path: `.env.${env}` });
 
 const app = express();
-const PORT = 4000;
-const mongoURL = "mongodb://localhost:27017";
-const dbName = "pursuiter";
+const PORT = process.env.PORT || 4000;
+const mongoURL = process.env.MONGO_URI || "mongodb://localhost:27017";
+const dbName = process.env.DB_NAME || "pursuiter";
 
 
 // Set larger limit for JSON payloads
@@ -17,30 +22,28 @@ app.use(cors());
 let db;
 
 async function connectToMongo() {
-  const client = new MongoClient(mongoURL);
-
   try {
-    await client.connect();
+    await mongoose.connect(mongoURL, {
+      dbName,
+    });
     console.log("Connected to MongoDB");
-    db = client.db(dbName);
-    return db;
+    return mongoose.connection;
   } catch (error) {
     console.error("Error connecting to MongoDB:", error);
     throw error;
   }
 }
 
-// Ensure MongoDB is connected before handling requests
+
 app.use(async (req, res, next) => {
   if (!db) {
     try {
       db = await connectToMongo();
     } catch (error) {
-      return res
-        .status(500)
-        .json({ message: "Error connecting to the database" });
+      return res.status(500).json({ message: "Error connecting to the database" });
     }
   }
+  req.db = db;
   next();
 });
 
@@ -89,8 +92,6 @@ app.put('/jobs/:id', async (req, res) => {
   const jobId = req.params.id;
   const job = req.body;
 
-  console.log('Received PUT request for job:', jobId, job); // Add logging
-
   if (!ObjectId.isValid(jobId)) {
     return res.status(400).json({ message: "Invalid job ID" });
   }
@@ -112,7 +113,6 @@ app.delete('/jobs/:id', async (req, res) => {
   const jobId = req.params.id;
 
   try {
-    console.log(`Deleting job with ID: ${jobId}`);
     const result = await db.collection('jobs').deleteOne({ _id: new ObjectId(jobId) });
     if (result.deletedCount === 1) {
       res.status(200).json({ message: "Job deleted!" });
@@ -157,7 +157,6 @@ app.post('/favorites/remove', async (req, res) => {
   }
 });
 
-// Get favorite jobs
 app.get('/favorites/:userId', async (req, res) => {
   const userId = req.params.userId;
 
@@ -343,7 +342,7 @@ app.get('/applications/:jobId', async (req, res) => {
 });
 
 async function startServer() {
-  await connectToMongo();
+  db = await connectToMongo();
   app.listen(PORT, () => {
     console.log(`Server is running on http://localhost:${PORT}`);
   });
@@ -352,3 +351,4 @@ async function startServer() {
 startServer();
 
 export default app;
+export { app, connectToMongo };

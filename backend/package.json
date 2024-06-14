@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "main": "server.js",
   "scripts": {
-    "test": "mocha --timeout 10000",
+    "test": "NODE_ENV=test mocha --require @babel/register --timeout 10000 \"test/**/*.test.js\" --exit",
     "start": "node server.js",
     "dev": "nodemon server.js"
   },
@@ -15,18 +15,22 @@
     "@fortawesome/fontawesome-free": "^6.5.2",
     "bcrypt": "^5.1.1",
     "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
     "express": "^4.19.2",
     "fs": "^0.0.1-security",
     "jsonwebtoken": "^9.0.2",
     "mongodb": "^6.6.2",
-    "mongoose": "^8.4.1",
     "multer": "^1.4.5-lts.1",
     "path": "^0.12.7"
   },
   "devDependencies": {
+    "@babel/core": "^7.24.7",
+    "@babel/preset-env": "^7.24.7",
+    "@babel/register": "^7.24.6",
     "chai": "^5.1.1",
     "mocha": "^10.4.0",
     "mongodb-memory-server": "^9.3.0",
+    "mongoose": "^8.4.1",
     "nodemon": "^3.1.0",
     "supertest": "^7.0.0"
   }
