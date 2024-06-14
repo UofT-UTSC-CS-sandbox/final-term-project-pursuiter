@@ -116,7 +116,7 @@ function ApplicantDashboard() {
   const isFavorited = (job) => favoritedJobs.includes(job);
 
   const allJobs = jobs.filter((job) => !favoritedJobs.includes(job));
-  const displayedJobs = [...favoritedJobs, ...allJobs];
+  const displayedJobs = [...favoritedJobs, ...allJobs.filter(job => !favoritedJobs.some(fav => fav._id === job._id))];
 
   const handleApplicationSubmit = async (e) => {
     e.preventDefault();

@@ -179,14 +179,23 @@ app.get('/favorites/:userId', async (req, res) => {
 
 
 app.post("/signup", async (req, res) => {
-  const { userType, email, password, fullName, companyName, address, positions, favorites } = req.body;
+  const { userType, email, password, fullName, companyName, address, positions } = req.body;
   try {
     const existingUser = await db.collection("users").findOne({ email });
     if (existingUser) {
       return res.status(409).json({ message: "User already exists" });
     }
     const hashedPassword = await bcrypt.hash(password, 10);
-    const newUser = { userType, email, password: hashedPassword, fullName, companyName, address, positions, favorites };
+    const newUser = {
+      userType,
+      email,
+      password: hashedPassword,
+      fullName,
+      companyName,
+      address,
+      positions,
+      favorites: []
+    };
     const result = await db.collection("users").insertOne(newUser);
     res.status(201).json({ message: "User created", userId: result.insertedId });
   } catch (error) {
