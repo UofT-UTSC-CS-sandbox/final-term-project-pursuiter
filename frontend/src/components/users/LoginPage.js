@@ -1,21 +1,24 @@
-import "./LoginPage.css";
-import "../Users.css";
+import "./Users.css";
 
 import React, { useState, useContext } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { UserContext } from "../../contexts/UserContext";
+import UserController from "../../controllers/UserController";
 
 function LoginPage() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const navigate = useNavigate();
-  const { loginUser } = useContext(UserContext);
+  const [email, setEmail] = useState("");             
+  const [password, setPassword] = useState("");         
+  const navigate = useNavigate();                       
+  const { loginUser } = useContext(UserContext);    
 
+  // Hangle login form submission
   const handleSubmit = async (event) => {
     event.preventDefault();
     try {
-      const user = await loginUser(email, password);
-      console.log("Login successful");
+      const user = await UserController.loginUser(email, password);
+
+      await loginUser(email, password);
+
       if (user.userType === "applicant") {
         navigate("/applicant-dashboard");
       } else if (user.userType === "recruiter") {

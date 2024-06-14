@@ -186,7 +186,7 @@ function ApplicantDashboard() {
           <div className="header-link">Jobs</div>
           <div
             className="header-link"
-            onClick={() => navigate("/applicant-information")}
+            onClick={() => navigate("/user-information")}
           >
             ACCOUNT
           </div>

@@ -4,12 +4,12 @@ import React from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { UserProvider } from "./contexts/UserContext";
 import LandingPage from "./components/landing-page/LandingPage";
-import LoginPage from "./components/login-page/LoginPage";
-import JobSeekerSignupPage from "./components/applicant-signup-page/ApplicantSignupPage";
-import RecruiterSignupPage from "./components/recruiter-signup-page/RecruiterSignupPage";
+import LoginPage from "./components/users/LoginPage";
+import JobSeekerSignupPage from "./components/users/ApplicantSignupPage";
+import RecruiterSignupPage from "./components/users/RecruiterSignupPage";
 import ApplicantDashboard from "./components/applicant-dashboard/ApplicantDashboard";
 import RecruiterDashboard from "./components/recruiter-dashboard/RecruiterDashboard";
-import AccountInformation from "./components/account-information/AccountInformation";
+import UserInformation from "./components/users/UserInformation";
 import SeeApplicants from "./components/recruiter-applicant-list/ApplicantList";
 
 function App() {
@@ -24,8 +24,8 @@ function App() {
           <Route path="/recruiter-dashboard" element={<RecruiterDashboard />} />
           <Route path="/applicant-dashboard" element={<ApplicantDashboard />} />
           <Route
-            path="/applicant-information"
-            element={<AccountInformation />}
+            path="/user-information"
+            element={<UserInformation />}
           />
           <Route path="/applicants/:jobId" element={<SeeApplicants />} />
         </Routes>

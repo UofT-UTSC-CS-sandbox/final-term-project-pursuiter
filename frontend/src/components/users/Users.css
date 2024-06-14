@@ -1,5 +1,9 @@
 @import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap");
 
+/************************************
+ * General Styles
+ *************************************/
+
 .users-page-container body {
   background-color: #f3f3f3;
   color: #000;
@@ -11,24 +15,20 @@
   align-items: flex-start;
 }
 
+/************************************
+ * Headers
+ *************************************/
+
+.users-header {
+  margin: 20px;
+}
+
 .pursuiter-heading {
   font-family: Poppins;
   font-size: 64px;
   font-weight: 800;
   line-height: 96px;
   text-align: left;
-}
-
-.users-container h1 {
-  font-family: Poppins;
-  font-size: 48px;
-  font-weight: 400;
-  line-height: 72px;
-  text-align: left;
-}
-
-.users-header {
-  margin: 20px;
 }
 
 .users-header .pursuiter-heading::before {
@@ -43,10 +43,19 @@
   opacity: 0px;
 }
 
+/************************************
+ * Bosy and Form
+ *************************************/
+
 .users-container {
   margin: 20px;
   display: flex;
   flex-direction: column;
+}
+
+.users-info-container {
+  display: flex;
+  align-items: center;
 }
 
 .users-container form {
@@ -75,6 +84,10 @@
   margin-bottom: 20px;
 }
 
+/************************************
+ * Buttons
+ *************************************/
+
 .users-container button {
   background-color: #8a0032;
   color: #ffffff;
@@ -102,4 +115,52 @@
   color: #8a0032;
   border-color: #8a0032;
   border-width: 2px;
+}
+
+/************************************
+ * Links
+ *************************************/
+
+.inline-link p {
+  font-family: Poppins;
+  font-size: 20px;
+  font-weight: 500;
+  line-height: 30px;
+  text-align: left;
+}
+
+.inline-link {
+  text-align: left;
+}
+
+.inline-link a {
+  color: #8b0000;
+  text-decoration: none;
+  font-family: Poppins;
+  font-size: 20px;
+  font-weight: 600;
+  line-height: 30px;
+  text-align: left;
+}
+
+.inline-link a:hover {
+  text-decoration: underline;
+}
+
+/************************************
+ * Fonts
+ *************************************/
+
+.users-container h1 {
+  font-family: Poppins;
+  font-size: 48px;
+  font-weight: 400;
+  line-height: 72px;
+  text-align: left;
+}
+
+.users-info-container h1 {
+  font-size: 30px;
+  align-items: center;
+  display: flex;
 }

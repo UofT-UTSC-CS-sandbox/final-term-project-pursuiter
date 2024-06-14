@@ -178,7 +178,8 @@ function RecruiterDashboard() {
       );
       if (response.status === 200) {
         console.log(response.data.message);
-        setJobs(jobs.filter((job) => job._id !== jobToDelete._id));
+        setJobs((prevJobs) => prevJobs.filter((job) => job._id !== jobToDelete._id));
+        setFavoritedJobs((prevFavoritedJobs) => prevFavoritedJobs.filter((fav) => fav._id !== jobToDelete._id));
         setSelectedJob(null);
         setShowDeleteConfirm(false);
       } else {
@@ -187,7 +188,7 @@ function RecruiterDashboard() {
     } catch (error) {
       console.error("Error deleting job:", error);
     }
-  };
+  };  
 
   const confirmDelete = (job) => {
     setJobToDelete(job);
@@ -210,7 +211,7 @@ function RecruiterDashboard() {
           <div className="header-link">Postings</div>
           <div
             className="header-link"
-            onClick={() => navigate("/applicant-information")}
+            onClick={() => navigate("/user-information")}
           >
             ACCOUNT
           </div>

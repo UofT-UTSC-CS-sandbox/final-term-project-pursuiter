@@ -1,29 +1,30 @@
-import "../Users.css";
-import "./SignupPage.css";
+import "./Users.css";
 
-import UserController from "../../controllers/UserController";
 import React, { useState, useContext } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { UserContext } from "../../contexts/UserContext";
+import UserController from "../../controllers/UserController";
 
 function SignupPage({ userType }) {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [fullName, setFullName] = useState("");
-  const [companyName, setCompanyName] = useState("");
-  const [address] = useState("");
-  const [positions] = useState("");
-  const navigate = useNavigate();
-  const { loginUser } = useContext(UserContext);
+  const [email, setEmail] = useState("");                
+  const [password, setPassword] = useState("");          
+  const [fullName, setFullName] = useState("");         
+  const [companyName, setCompanyName] = useState("");   
+  const [address] = useState("");                       
+  const [positions] = useState("");                      
+  const navigate = useNavigate();                        
+  const { loginUser } = useContext(UserContext);         
+
   const heading =
     userType === "applicant"
       ? "Create Job-Seeker Account"
       : "Create Recruiter Account";
 
+  // Handle signup form submission
   const handleSubmit = async (event) => {
     event.preventDefault();
     try {
-      const user = await UserController.signupUser(
+      const user = await UserController.signupUser({
         userType,
         email,
         password,
@@ -31,8 +32,8 @@ function SignupPage({ userType }) {
         companyName,
         address,
         positions,
-      );
-      console.log("Signup successful", user);
+      });
+      
       alert("Signup successful!");
 
       await loginUser(email, password);
