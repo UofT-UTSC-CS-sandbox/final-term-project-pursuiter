@@ -1,14 +1,17 @@
-import express from 'express';
-import { MongoClient, ObjectId } from 'mongodb';
-import mongoose from 'mongoose';
-import bcrypt from 'bcrypt';
-import cors from 'cors';
-import dotenv from 'dotenv';
+import express from "express"; // Express.js framework
+import { MongoClient, ObjectId } from "mongodb"; // MongoDB Node.js driver
+import bcrypt from "bcrypt"; // Password hashing library
+import cors from "cors"; // Cross-origin resource sharing middleware
+import mongoose from 'mongoose'; // Mongoose library
+import dotenv from 'dotenv'; // Dotenv library
 
 const env = process.env.NODE_ENV || 'development';
 dotenv.config({ path: `.env.${env}` });
 
 const app = express();
+const PORT = process.env.PORT || 4000;
+const mongoURL = process.env.MONGO_URI || "mongodb://localhost:27017";
+const dbName = process.env.DB_NAME || "pursuiter";
 const PORT = process.env.PORT || 4000;
 const mongoURL = process.env.MONGO_URI || "mongodb://localhost:27017";
 const dbName = process.env.DB_NAME || "pursuiter";
@@ -29,7 +32,11 @@ async function connectToMongo() {
     await mongoose.connect(mongoURL, {
       dbName,
     });
+    await mongoose.connect(mongoURL, {
+      dbName,
+    });
     console.log("Connected to MongoDB");
+    return mongoose.connection;
     return mongoose.connection;
   } catch (error) {
     console.error("Error connecting to MongoDB:", error);
@@ -49,102 +56,19 @@ app.use(async (req, res, next) => {
     }
   }
   req.db = db;
+  req.db = db;
   next();
 });
 
-app.get("/jobs", async (req, res) => {
-  try {
-    const jobs = await db.collection("jobs").find().toArray();
-    res.json(jobs);
-  } catch (error) {
-    res.status(500).json({ message: "Error fetching jobs" });
-  }
-});
+// Start the server
+async function startServer() {
+  db = await connectToMongo();
+  app.listen(PORT, () => {
+    console.log(`Server is running on http://localhost:${PORT}`);
+  });
+}
 
-app.post('/jobs/add', async (req, res) => {
-  const job = req.body;
-
-  if (!job || typeof job !== 'object') {
-    return res.status(400).json({ message: "Expected a job object" });
-  }
-
-  try {
-    const result = await db.collection('jobs').insertOne(job);
-    res.status(201).json({ message: "Job added!", insertedId: result.insertedId });
-  } catch (error) {
-    console.error('Error adding job:', error);
-    res.status(500).json({ message: "Error adding job", error: error.message });
-  }
-});
-
-app.post('/applications/add', async (req, res) => {
-  const application = req.body;
-
-  if (!application || typeof application !== 'object') {
-    return res.status(400).json({ message: "Expected a job object" });
-  }
-
-  try {
-    const result = await db.collection('applications').insertOne(application);
-    res.status(201).json({ message: "Application added!", insertedId: result.insertedId });
-  } catch (error) {
-    console.error('Error adding application:', error);
-    res.status(500).json({ message: "Error adding application", error: error.message });
-  }
-});
-
-app.put('/jobs/:id', async (req, res) => {
-  const jobId = req.params.id;
-  const job = req.body;
-
-  if (!ObjectId.isValid(jobId)) {
-    return res.status(400).json({ message: "Invalid job ID" });
-  }
-
-  try {
-    const result = await db.collection('jobs').updateOne({ _id: new ObjectId(jobId) }, { $set: job });
-    if (result.modifiedCount === 1) {
-      res.json({ message: "Job updated", job: job });
-    } else {
-      res.status(404).json({ message: "Job not found" });
-    }
-  } catch (error) {
-    console.error('Error updating job:', error);
-    res.status(500).json({ message: "Error updating job", error: error.message });
-  }
-});
-
-app.delete('/jobs/:id', async (req, res) => {
-  const jobId = req.params.id;
-
-  try {
-    const result = await db.collection('jobs').deleteOne({ _id: new ObjectId(jobId) });
-    if (result.deletedCount === 1) {
-      res.status(200).json({ message: "Job deleted!" });
-    } else {
-      res.status(404).json({ message: "Job not found" });
-    }
-  } catch (error) {
-    console.error("Error deleting job:", error);
-    res.status(500).json({ message: "Error deleting job" });
-  }
-});
-
-// Add a job to favorites
-app.post('/favorites/add', async (req, res) => {
-  const { userId, jobId } = req.body;
-
-  try {
-    await db.collection('users').updateOne(
-      { _id: new ObjectId(userId) },
-      { $addToSet: { favorites: new ObjectId(jobId) } }
-    );
-    res.status(200).json({ message: "Job added to favorites" });
-  } catch (error) {
-    console.error("Error adding to favorites:", error);
-    res.status(500).json({ message: "Error adding to favorites" });
-  }
-});
+startServer();
 
 // Remove a job from favorites
 app.post('/favorites/remove', async (req, res) => {
