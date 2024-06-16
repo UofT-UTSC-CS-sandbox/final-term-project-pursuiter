@@ -1,38 +1,114 @@
-.App {
-  text-align: center;
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap");
+
+#root {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+p {
+  font-family: "Poppins", sans-serif;
+  font-size: 18px;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
+h1 {
+    font-family: "Poppins", sans-serif;
+    font-size: 42px;
+    font-weight: 400;
+    line-height: 72px;
+    text-align: left;
+    margin: 0;
 }
 
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
+button {
+  width: auto;
+  height: 45px;
+  padding: 15px 15px;
+  background-color: #800020;
+  color: #f3f3f3;
+  border-color: #800020;
+  border-width: 2px;
+  border-style: solid;
+  border-radius: 25px;
+  font-family: "Poppins", sans-serif;
+  font-size: 16px;
+  font-weight: bold;
   display: flex;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
+  cursor: pointer;
 }
 
-.App-link {
-  color: #61dafb;
+button:hover {
+  background-color: #f3f3f3;
+  color: #800020;
+  border-color: #800020;
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
+@media (max-width: 600px) {
+  p {
+    font-size: 14px;
   }
-  to {
-    transform: rotate(360deg);
+  
+  h1 {
+    font-size: 28px;
+    line-height: 48px;
+  }
+  
+  button {
+    width: 100%;
+    font-size: 14px;
+    padding: 10px 10px;
+  }
+}
+
+@media (max-width: 768px) {
+  p {
+    font-size: 16px;
+  }
+  
+  h1 {
+    font-size: 36px;
+    line-height: 60px;
+  }
+  
+  button {
+    width: 100%;
+    font-size: 15px;
+    padding: 12px 12px;
+  }
+}
+
+@media (max-width: 1200px) {
+  p {
+    font-size: 18px;
+  }
+  
+  h1 {
+    font-size: 42px;
+    line-height: 72px;
+  }
+  
+  button {
+    width: auto;
+    font-size: 16px;
+    padding: 15px 15px;
+  }
+}
+
+@media (min-width: 1201px) {
+  p {
+    font-size: 20px;
+  }
+  
+  h1 {
+    font-size: 48px;
+    line-height: 80px;
+  }
+  
+  button {
+    width: auto;
+    font-size: 18px;
+    padding: 18px 18px;
   }
 }

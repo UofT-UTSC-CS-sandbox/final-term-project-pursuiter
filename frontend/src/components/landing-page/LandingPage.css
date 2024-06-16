@@ -1,22 +1,11 @@
-@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap");
-
-body {
-  margin: 0;
-  font-family: "Inter", Arial, sans-serif;
-}
-
 /************************************
  * General Styles
  *************************************/
 
-.landing-page-container {
+ .landing-page-container {
   display: flex;
   flex-direction: column;
   height: 100vh;
-}
-
-.content-container {
-  display: flex;
   flex: 1;
   flex-direction: row;
 }
@@ -25,81 +14,119 @@ body {
  * Content
  *************************************/
 
-.column-left {
-  background-color: #f3f3f3;
-  color: #1e1e1e;
-  flex: 1;
+.column-left,
+.column-right {
   display: flex;
   flex-direction: column;
-  align-items: center;
+  flex: 1;
   padding: 20px;
+  align-items: center;
+}
+
+.column-left {
+  background-color: #f3f3f3;
+  color: #000;
   justify-content: flex-start;
-  padding-top: 40px;
 }
 
 .column-right {
   background-color: #1e1e1e;
   color: #f3f3f3;
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 20px;
   justify-content: flex-end;
-  padding-bottom: 60px;
-}
-
-.left-paragraph {
-  font-size: 1.4em;
-  margin-bottom: 56px;
-  max-width: 80%;
-  text-align: center;
-  font-family: Poppins;
-  color: #4f4f4fcc;
-}
-
-.right-paragraph {
-  font-size: 1.4em;
-  margin-bottom: 56px;
-  max-width: 80%;
-  text-align: center;
-  font-family: Poppins;
-  color: #c8c8c8cc;
 }
 
 /************************************
  * Fonts
  *************************************/
 
-.content-container h1 {
-  font-size: 3em;
-  margin-bottom: 14px;
-  font-family: Poppins;
+.left-paragraph,
+.right-paragraph {
+  max-width: 80%;
+  text-align: center;
+}
+
+.left-paragraph {
+  color: #000;
+}
+
+.right-paragraph {
+  color: #f3f3f3;
 }
 
 /************************************
  * Buttons
  *************************************/
 
-.landing-page-button {
-  background-color: #8a0032;
-  color: #ffffff;
-  padding: 21px 42px;
-  border-radius: 45.5px;
-  border: 2px solid transparent;
-  cursor: pointer;
-  font-family: Poppins;
-  width: 300px;
-  height: 80px;
-  font-size: 1.2em;
-  font-weight: 600;
-  line-height: 30px;
-  text-align: center;
+.column-right button:hover {
+  background-color: #1e1e1e;
+  color: #f3f3f3;
+  border-color: #f3f3f3;
 }
 
-.landing-page-button:hover {
-  background-color: #f3f3f3;
-  color: #8a0032;
-  border-color: #8a0032;
-  border-width: 2px;
+/************************************
+ * Media Queries for Responsive Design
+ *************************************/
+
+@media (max-width: 600px) {
+  .landing-page-container {
+    flex-direction: column;
+  }
+  
+  .column-left,
+  .column-right {
+    padding: 10px;
+  }
+
+  .left-paragraph,
+  .right-paragraph {
+    max-width: 90%;
+    font-size: 14px;
+  }
+
+  .column-left {
+    justify-content: center;
+  }
+
+  .column-right {
+    justify-content: center;
+  }
+}
+
+@media (max-width: 768px) {
+  .landing-page-container {
+    flex-direction: column;
+  }
+  
+  .column-left,
+  .column-right {
+    padding: 15px;
+  }
+
+  .left-paragraph,
+  .right-paragraph {
+    max-width: 85%;
+    font-size: 16px;
+  }
+
+  .column-left {
+    justify-content: center;
+  }
+
+  .column-right {
+    justify-content: center;
+  }
+}
+
+@media (max-width: 1200px) {
+  .left-paragraph,
+  .right-paragraph {
+    font-size: 18px;
+  }
+}
+
+@media (min-width: 1201px) {
+  .left-paragraph,
+  .right-paragraph {
+    font-size: 20px;
+  }
 }

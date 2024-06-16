@@ -2,10 +2,10 @@ import express from "express"; // Express.js framework
 import { MongoClient, ObjectId } from "mongodb"; // MongoDB Node.js driver
 import bcrypt from "bcrypt"; // Password hashing library
 import cors from "cors"; // Cross-origin resource sharing middleware
-import mongoose from 'mongoose'; // Mongoose library
-import dotenv from 'dotenv'; // Dotenv library
+import mongoose from "mongoose"; // Mongoose library
+import dotenv from "dotenv"; // Dotenv library
 
-const env = process.env.NODE_ENV || 'development';
+const env = process.env.NODE_ENV || "development";
 dotenv.config({ path: `.env.${env}` });
 
 const app = express();

@@ -6,9 +6,10 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background-color: #000000;
+  background-color: #1e1e1e;
   color: white;
-  padding: 10px 20px;
+  padding: 5px 20px;
+  height: auto;
 }
 
 /************************************

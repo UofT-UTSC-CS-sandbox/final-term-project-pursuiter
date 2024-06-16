@@ -9,7 +9,7 @@ import ApplicantDashboard from "./components/dashboards/ApplicantDashboard";
 import RecruiterDashboard from "./components/dashboards/RecruiterDashboard";
 import UserInformation from "./components/users/UserInformation";
 import ApplicantList from "./components/dashboards/ApplicantList";
-import NavBar from "./components/nav-bar/NavBar"; // Import NavBar
+import NavBar from "./components/nav-bar/NavBar";
 
 function App() {
   return (
