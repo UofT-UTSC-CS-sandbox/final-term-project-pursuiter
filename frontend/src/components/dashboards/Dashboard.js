@@ -319,24 +319,27 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
                 </div>
                 <div className="dashboard-detail-body">
                   <div className="dashboard-detail-section">
-                    <strong>Company:</strong> {selectedItem.company}
+                    <h2>Company:</h2>
+                    <p>{selectedItem.company}</p>
                   </div>
                   <div className="dashboard-detail-section">
-                    <strong>Location:</strong> {selectedItem.location}
+                    <h2>Location:</h2>
+                    <p>{selectedItem.location}</p>
                   </div>
                   <div className="dashboard-detail-section">
-                    <strong>Type:</strong> {selectedItem.type}
+                    <h2>Type:</h2>
+                    <p>{selectedItem.type}</p>
                   </div>
                   <div className="dashboard-detail-section">
-                    <strong>Hidden Keywords:</strong>{" "}
-                    {selectedItem.hiddenKeywords}
+                    <h2>Hidden Keywords:</h2>{" "}
+                    <p>{selectedItem.hiddenKeywords}</p>
                   </div>
                   <div className="dashboard-detail-section">
-                    <strong>Description:</strong>
+                    <h2>Description:</h2>
                     <p>{selectedItem.description}</p>
                   </div>
                   <div className="dashboard-detail-section">
-                    <strong>Qualifications:</strong>
+                    <h2>Qualifications:</h2>
                     <p>{selectedItem.qualifications}</p>
                   </div>
                 </div>
@@ -418,7 +421,10 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
             required
           ></textarea>
           <button type="submit">{editMode ? "Update Job" : "Submit"}</button>
-          <button type="button" onClick={() => setShowItemForm(false)}>
+          <button
+            className="cancel-button"
+            onClick={() => setShowItemForm(false)}
+          >
             Cancel
           </button>
         </form>
@@ -438,7 +444,10 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
           <button type="submit">
             {editMode ? "Update Application" : "Submit"}
           </button>
-          <button type="button" onClick={() => setShowApplicationForm(false)}>
+          <button
+            className="cancel-button"
+            onClick={() => setShowApplicationForm(false)}
+          >
             Cancel
           </button>
         </form>

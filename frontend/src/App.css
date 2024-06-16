@@ -9,6 +9,7 @@
   flex-direction: column;
   min-height: 100vh;
   min-width: 100vh;
+  /* background-color: #fff; */
 }
 
 /************************************
@@ -22,12 +23,12 @@ p {
 }
 
 label {
-    font-family: "Poppins", sans-serif;
-    font-size: 18px;
-    margin: 0;
-    white-space: nowrap;
-        display: flex;
-        align-items: center;
+  font-family: "Poppins", sans-serif;
+  font-size: 18px;
+  margin: 0;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
 }
 
 h1 {
@@ -44,7 +45,7 @@ button {
   height: 45px;
   padding: 15px 15px;
   background-color: #800020;
-  color: #f3f3f3;
+  color: #fff;
   border-color: #800020;
   border-width: 2px;
   border-style: solid;
@@ -59,7 +60,7 @@ button {
 }
 
 button:hover {
-  background-color: #f3f3f3;
+  background-color: #fff;
   color: #800020;
   border-color: #800020;
 }

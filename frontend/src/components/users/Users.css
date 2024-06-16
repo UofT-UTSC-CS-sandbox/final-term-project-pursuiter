@@ -73,16 +73,16 @@
 }
 
 .users-container input {
-  width: 700px;
+  width: 70vh;
   height: 40px;
   border: 1px solid #1e1e1e;
-  background: #f3f3f3;
+  background: #fff;
   box-shadow: 0px 4px 4px 0px #1e1e1e40;
   margin-bottom: 20px;
 }
 
 .users-info-container input {
-  width: 700px;
+  width: 70vh;
   height: 25px;
 }
 
@@ -94,7 +94,7 @@
   margin-bottom: 20px;
   white-space: nowrap;
 
-    width: fit-content;
+  width: fit-content;
 }
 
 .users-info-container button {

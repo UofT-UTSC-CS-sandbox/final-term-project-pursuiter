@@ -104,7 +104,7 @@ function UserInformation() {
             </div>
           ) : (
             <div className="users-from-group users-info-form-group">
-              <label>Company</label>
+              <label>Company:</label>
               <input
                 type="text"
                 name="companyName"

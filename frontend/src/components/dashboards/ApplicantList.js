@@ -68,17 +68,21 @@ function ApplicantList() {
       <div className="dashboard-content">
         <div className="aesthetic-bar"></div>
         <div className="job-details">
-          <div className="dashboard-detail-section">
-            <strong>Job Title:</strong> {jobDetails.title || "Loading..."}
+          <div className="dashboard-detail-section job-detail-section">
+            <h2>Job Title:</h2>
+            <p>{jobDetails.title || "Loading..."}</p>
           </div>
-          <div className="dashboard-detail-section">
-            <strong>Company:</strong> {jobDetails.company || user.companyName}
+          <div className="dashboard-detail-section job-detail-section">
+            <h2>Company:</h2>
+            <p>{jobDetails.company || user.companyName}</p>
           </div>
-          <div className="dashboard-detail-section">
-            <strong>Location:</strong> {jobDetails.location || "Loading..."}
+          <div className="dashboard-detail-section job-detail-section">
+            <h2>Location:</h2>
+            <p>{jobDetails.location || "Loading..."}</p>
           </div>
-          <div className="dashboard-detail-section">
-            <strong>Type:</strong> {jobDetails.type || "Loading..."}
+          <div className="dashboard-detail-section job-detail-section">
+            <h2>Type:</h2>
+            <p>{jobDetails.type || "Loading..."}</p>
           </div>
         </div>
         <div className="aesthetic-bar"></div>
@@ -145,22 +149,23 @@ function ApplicantList() {
                 </div>
                 <div className="dashboard-detail-body">
                   <div className="dashboard-detail-section">
-                    <strong>Email:</strong> {selectedApplicant.email}
+                    <h2>Email:</h2>
+                    <p>{selectedApplicant.email}</p>
                   </div>
                   <div className="dashboard-detail-section">
-                    <strong>AI Generated Compatibility:</strong>
+                    <h2>AI Generated Compatibility:</h2>
                     <p>To be implemented in another feature</p>
                   </div>
                   <div className="dashboard-detail-section">
-                    <strong>AI Generated Summary:</strong>
+                    <h2>AI Generated Summary:</h2>
                     <p>To be implemented in another feature</p>
                   </div>
                   <div className="dashboard-detail-section">
-                    <strong>Status:</strong>
+                    <h2>Status:</h2>
                     <p>To be implemented in another feature</p>
                   </div>
                   <div className="dashboard-detail-section">
-                    <strong>Resume:</strong>
+                    <h2>Resume:</h2>
                     {selectedResume ? (
                       <iframe
                         src={selectedResume}

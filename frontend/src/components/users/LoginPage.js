@@ -32,7 +32,7 @@ function LoginPage() {
 
   return (
     <div className="users-page-container">
-        <h1 className="logo">PURSUITER</h1>
+      <h1 className="logo">PURSUITER</h1>
       <div className="users-container">
         <h1>Login</h1>
         <form onSubmit={handleSubmit}>

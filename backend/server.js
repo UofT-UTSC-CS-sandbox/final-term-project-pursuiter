@@ -398,5 +398,4 @@ async function startServer() {
 
 startServer();
 
-export default app;
 export { app, connectToMongo };

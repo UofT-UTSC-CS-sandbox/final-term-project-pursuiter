@@ -8,12 +8,7 @@ function Modal({ show, onClose, children }) {
 
   return (
     <div className="modal-overlay">
-      <div className="modal-content">
-        <button className="close-button" onClick={onClose}>
-          X
-        </button>
-        {children}
-      </div>
+      <div className="modal-content">{children}</div>
     </div>
   );
 }
