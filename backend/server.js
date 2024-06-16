@@ -12,9 +12,6 @@ const app = express();
 const PORT = process.env.PORT || 4000;
 const mongoURL = process.env.MONGO_URI || "mongodb://localhost:27017";
 const dbName = process.env.DB_NAME || "pursuiter";
-const PORT = process.env.PORT || 4000;
-const mongoURL = process.env.MONGO_URI || "mongodb://localhost:27017";
-const dbName = process.env.DB_NAME || "pursuiter";
 
 app.use(express.json({ limit: "50mb" }));
 app.use(express.urlencoded({ limit: "50mb", extended: true }));
@@ -32,11 +29,7 @@ async function connectToMongo() {
     await mongoose.connect(mongoURL, {
       dbName,
     });
-    await mongoose.connect(mongoURL, {
-      dbName,
-    });
     console.log("Connected to MongoDB");
-    return mongoose.connection;
     return mongoose.connection;
   } catch (error) {
     console.error("Error connecting to MongoDB:", error);
@@ -44,7 +37,7 @@ async function connectToMongo() {
   }
 }
 
-
+// Middleware to connect to MongoDB
 app.use(async (req, res, next) => {
   if (!db) {
     try {
@@ -55,7 +48,6 @@ app.use(async (req, res, next) => {
         .json({ message: "Error connecting to the database" });
     }
   }
-  req.db = db;
   req.db = db;
   next();
 });
@@ -70,40 +62,11 @@ async function startServer() {
 
 startServer();
 
-// Remove a job from favorites
-app.post('/favorites/remove', async (req, res) => {
-  const { userId, jobId } = req.body;
+/************************************
+ * User API Endpoints
+ *************************************/
 
-  try {
-    await db.collection('users').updateOne(
-      { _id: new ObjectId(userId) },
-      { $pull: { favorites: new ObjectId(jobId) } }
-    );
-    res.status(200).json({ message: "Job removed from favorites" });
-  } catch (error) {
-    console.error("Error removing from favorites:", error);
-    res.status(500).json({ message: "Error removing from favorites" });
-  }
-});
-
-app.get('/favorites/:userId', async (req, res) => {
-  const userId = req.params.userId;
-
-  try {
-    const user = await db.collection('users').findOne({ _id: new ObjectId(userId) });
-    if (user && user.favorites) {
-      const favoriteJobs = await db.collection('jobs').find({ _id: { $in: user.favorites } }).toArray();
-      res.status(200).json(favoriteJobs);
-    } else {
-      res.status(404).json({ message: "User or favorites not found" });
-    }
-  } catch (error) {
-    console.error("Error fetching favorite jobs:", error);
-    res.status(500).json({ message: "Error fetching favorite jobs" });
-  }
-});
-
-
+// Signup
 app.post("/signup", async (req, res) => {
   const {
     userType,
@@ -389,13 +352,67 @@ app.get("/applications/:jobId", async (req, res) => {
   }
 });
 
-async function startServer() {
-  db = await connectToMongo();
-  app.listen(PORT, () => {
-    console.log(`Server is running on http://localhost:${PORT}`);
-  });
-}
+/************************************
+ * Favorites API Endpoints
+ *************************************/
 
-startServer();
+// Fetch user's favorite jobs
+app.get("/favorites/:userId", async (req, res) => {
+  const userId = req.params.userId;
+
+  try {
+    const user = await db
+      .collection("users")
+      .findOne({ _id: new ObjectId(userId) });
+    if (user && user.favorites) {
+      const favoriteJobs = await db
+        .collection("jobs")
+        .find({ _id: { $in: user.favorites } })
+        .toArray();
+      res.status(200).json(favoriteJobs);
+    } else {
+      res.status(404).json({ message: "User or favorites not found" });
+    }
+  } catch (error) {
+    console.error("Error fetching favorite jobs:", error);
+    res.status(500).json({ message: "Error fetching favorite jobs" });
+  }
+});
+
+// Add a job to favorites
+app.post("/favorites/add", async (req, res) => {
+  const { userId, jobId } = req.body;
+
+  try {
+    await db
+      .collection("users")
+      .updateOne(
+        { _id: new ObjectId(userId) },
+        { $addToSet: { favorites: new ObjectId(jobId) } },
+      );
+    res.status(200).json({ message: "Job added to favorites" });
+  } catch (error) {
+    console.error("Error adding to favorites:", error);
+    res.status(500).json({ message: "Error adding to favorites" });
+  }
+});
+
+// Remove a job from favorites
+app.post("/favorites/remove", async (req, res) => {
+  const { userId, jobId } = req.body;
+
+  try {
+    await db
+      .collection("users")
+      .updateOne(
+        { _id: new ObjectId(userId) },
+        { $pull: { favorites: new ObjectId(jobId) } },
+      );
+    res.status(200).json({ message: "Job removed from favorites" });
+  } catch (error) {
+    console.error("Error removing from favorites:", error);
+    res.status(500).json({ message: "Error removing from favorites" });
+  }
+});
 
 export { app, connectToMongo };
