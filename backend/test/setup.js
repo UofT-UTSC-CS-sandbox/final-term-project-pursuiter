@@ -1,14 +1,14 @@
-import mongoose from 'mongoose';
-import dotenv from 'dotenv';
+import mongoose from "mongoose";
+import dotenv from "dotenv";
 
-process.env.NODE_ENV = 'test'; 
-dotenv.config({ path: '.env.test' });
+process.env.NODE_ENV = "test";
+dotenv.config({ path: ".env.test" });
 
 before(async () => {
-    const dbUri = process.env.MONGO_URI;
-    const dbName = process.env.DB_NAME;
-    await mongoose.connect(dbUri, { dbName });
-    console.log("Connected to MongoDB");
+  const dbUri = process.env.MONGO_URI;
+  const dbName = process.env.DB_NAME;
+  await mongoose.connect(dbUri, { dbName });
+  console.log("Connected to MongoDB");
 });
 
 beforeEach(async () => {

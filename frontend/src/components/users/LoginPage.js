@@ -1,9 +1,9 @@
-import "./LoginPage.css";
-import "../Users.css";
+import "./Users.css";
 
 import React, { useState, useContext } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { UserContext } from "../../contexts/UserContext";
+import UserController from "../../controllers/UserController";
 
 function LoginPage() {
   const [email, setEmail] = useState("");
@@ -11,11 +11,14 @@ function LoginPage() {
   const navigate = useNavigate();
   const { loginUser } = useContext(UserContext);
 
+  // Hangle login form submission
   const handleSubmit = async (event) => {
     event.preventDefault();
     try {
-      const user = await loginUser(email, password);
-      console.log("Login successful");
+      const user = await UserController.loginUser(email, password);
+
+      await loginUser(email, password);
+
       if (user.userType === "applicant") {
         navigate("/applicant-dashboard");
       } else if (user.userType === "recruiter") {
@@ -29,13 +32,11 @@ function LoginPage() {
 
   return (
     <div className="users-page-container">
-      <div className="users-header">
-        <h1 className="pursuiter-heading">PURSUITER</h1>
-      </div>
+      <h1 className="logo">PURSUITER</h1>
       <div className="users-container">
         <h1>Login</h1>
         <form onSubmit={handleSubmit}>
-          <div>
+          <div className="users-form-group">
             <label>Email:</label>
             <input
               type="text"
@@ -57,12 +58,14 @@ function LoginPage() {
         </form>
         <div className="inline-link">
           <p>
-            Want a job seeker account? <Link to="/applicant-signup">Create a Job-Seeker Account</Link>
+            Want a job seeker account?{" "}
+            <Link to="/applicant-signup">Create a Job-Seeker Account</Link>
           </p>
           <p>
-            Want a recruiter account? <Link to="/recruiter-signup">Create a Recruiter Account</Link>
-          </p>         
-        </div>                  
+            Want a recruiter account?{" "}
+            <Link to="/recruiter-signup">Create a Recruiter Account</Link>
+          </p>
+        </div>
       </div>
     </div>
   );

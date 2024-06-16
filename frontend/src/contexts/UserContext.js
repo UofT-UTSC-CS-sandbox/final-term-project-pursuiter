@@ -35,7 +35,7 @@ const UserProvider = ({ children }) => {
     fullName,
     companyName,
     address,
-    positions
+    positions,
   ) => {
     try {
       const user = await UserController.signupUser(
@@ -45,7 +45,7 @@ const UserProvider = ({ children }) => {
         fullName,
         companyName,
         address,
-        positions
+        positions,
       );
       setUser(user);
       return user;
@@ -54,7 +54,16 @@ const UserProvider = ({ children }) => {
     }
   };
 
-  const updateUser = async (email, newEmail, fullName, address, positions, companyName, userType, userId) => {
+  const updateUser = async (
+    email,
+    newEmail,
+    fullName,
+    address,
+    positions,
+    companyName,
+    userType,
+    userId,
+  ) => {
     try {
       const updatedUser = await UserController.updateUser(
         email,
@@ -64,7 +73,7 @@ const UserProvider = ({ children }) => {
         positions,
         companyName,
         userType,
-        userId
+        userId,
       );
       setUser(updatedUser);
       return updatedUser;

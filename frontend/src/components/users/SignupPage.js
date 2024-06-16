@@ -1,10 +1,9 @@
-import "../Users.css";
-import "./SignupPage.css";
+import "./Users.css";
 
-import UserController from "../../controllers/UserController";
 import React, { useState, useContext } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { UserContext } from "../../contexts/UserContext";
+import UserController from "../../controllers/UserController";
 
 function SignupPage({ userType }) {
   const [email, setEmail] = useState("");
@@ -15,24 +14,26 @@ function SignupPage({ userType }) {
   const [positions] = useState("");
   const navigate = useNavigate();
   const { loginUser } = useContext(UserContext);
+
   const heading =
     userType === "applicant"
       ? "Create Job-Seeker Account"
       : "Create Recruiter Account";
 
+  // Handle signup form submission
   const handleSubmit = async (event) => {
     event.preventDefault();
     try {
-      const user = await UserController.signupUser(
+      const user = await UserController.signupUser({
         userType,
         email,
         password,
         fullName,
         companyName,
         address,
-        positions        
-      );
-      console.log("Signup successful", user);
+        positions,
+      });
+
       alert("Signup successful!");
 
       await loginUser(email, password);
@@ -50,14 +51,12 @@ function SignupPage({ userType }) {
 
   return (
     <div className="users-page-container">
-      <div className="users-header">
-        <h1 className="pursuiter-heading">PURSUITER</h1>
-      </div>
+      <h1 className="logo">PURSUITER</h1>
       <div className="users-container">
         <h1>{heading}</h1>
         <form onSubmit={handleSubmit}>
-          <div>
-            <label>Full Name</label>
+          <div className="users-from-group">
+            <label>Full Name:</label>
             <input
               type="text"
               value={fullName}
@@ -65,8 +64,8 @@ function SignupPage({ userType }) {
               required
             />
           </div>
-          <div>
-            <label>Email</label>
+          <div className="users-from-group">
+            <label>Email:</label>
             <input
               type="text"
               value={email}
@@ -74,8 +73,8 @@ function SignupPage({ userType }) {
               required
             />
           </div>
-          <div>
-            <label>Password</label>
+          <div className="users-from-group">
+            <label>Password:</label>
             <input
               type="password"
               value={password}
@@ -84,8 +83,8 @@ function SignupPage({ userType }) {
             />
           </div>
           {userType === "recruiter" && (
-            <div>
-              <label>Company Name</label>
+            <div className="users-from-group">
+              <label>Company Name:</label>
               <input
                 type="text"
                 value={companyName}
@@ -122,4 +121,3 @@ function SignupPage({ userType }) {
 }
 
 export default SignupPage;
-
