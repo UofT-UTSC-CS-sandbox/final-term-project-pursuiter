@@ -7,30 +7,10 @@
   justify-content: space-between;
   align-items: center;
   background-color: #1e1e1e;
-  color: white;
+  color: #f3f3f3;
   padding: 5px 20px;
   height: auto;
-}
-
-/************************************
- * Logo
- *************************************/
-
-.logo {
-  font-size: 20px;
-  font-weight: bold;
-}
-
-.logo::before {
-  content: "";
-  display: inline-block;
-  background-color: #fff;
-  margin-right: 10px;
-  width: 17px;
-  height: 17px;
-  top: 6px;
-  gap: 0px;
-  opacity: 0px;
+  flex-wrap: wrap;
 }
 
 /************************************
@@ -40,19 +20,82 @@
 .header-links {
   display: flex;
   align-items: center;
+  flex-wrap: wrap;
 }
 
 .link {
-  margin-left: 20px;
-  color: white;
+  margin: 5px 10px;
+  color: #f3f3f3;
   text-decoration: none;
-  font-family: Poppins;
+  font-family: "Poppins", sans-serif;
   font-size: 20px;
   font-weight: 800;
   line-height: 30px;
   text-align: center;
+  display: flex;
+  align-items: center;
 }
 
 .link:hover {
   text-decoration: underline;
+}
+
+.navbar-logo:before {
+  content: "";
+  display: inline-block;
+  background-color: #f3f3f3;
+  margin: 0px 5px;
+  width: 17px;
+  height: 17px;
+}
+
+/************************************
+ * Responsive Styling
+ *************************************/
+
+@media (max-width: 600px) {
+  .navbar {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 10px;
+  }
+
+  .header-links {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .link {
+    font-size: 16px;
+    margin: 5px;
+  }
+}
+
+@media (max-width: 768px) {
+  .navbar {
+    padding: 10px 15px;
+  }
+
+  .header-links {
+    width: auto;
+  }
+
+  .link {
+    font-size: 18px;
+    margin: 5px 8px;
+  }
+}
+
+@media (max-width: 1200px) {
+  .link {
+    font-size: 20px;
+    margin: 5px 10px;
+  }
+}
+
+@media (min-width: 1201px) {
+  .link {
+    font-size: 22px;
+    margin: 5px 12px;
+  }
 }

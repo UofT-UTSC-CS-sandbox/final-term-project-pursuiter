@@ -22,7 +22,9 @@ const NavBar = () => {
 
   return (
     <header className="navbar">
-      <div className="logo">PURSUITER</div>
+      <Link className="link navbar-logo" to="/">
+        PURSUITER
+      </Link>
       <div className="header-links">
         {isAuthPage ? null : location.pathname === "/" ? (
           <Link className="link" to="/login">

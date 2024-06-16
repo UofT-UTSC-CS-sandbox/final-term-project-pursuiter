@@ -2,7 +2,7 @@
  * General Styles
  *************************************/
 
- .landing-page-container {
+.landing-page-container {
   display: flex;
   flex-direction: column;
   height: 100vh;
@@ -19,7 +19,7 @@
   display: flex;
   flex-direction: column;
   flex: 1;
-  padding: 20px;
+  padding: 50px;
   align-items: center;
 }
 
@@ -43,6 +43,7 @@
 .right-paragraph {
   max-width: 80%;
   text-align: center;
+  margin: 10px;
 }
 
 .left-paragraph {
@@ -64,14 +65,14 @@
 }
 
 /************************************
- * Media Queries for Responsive Design
+ * Responsive Styling
  *************************************/
 
 @media (max-width: 600px) {
   .landing-page-container {
     flex-direction: column;
   }
-  
+
   .column-left,
   .column-right {
     padding: 10px;
@@ -96,7 +97,7 @@
   .landing-page-container {
     flex-direction: column;
   }
-  
+
   .column-left,
   .column-right {
     padding: 15px;

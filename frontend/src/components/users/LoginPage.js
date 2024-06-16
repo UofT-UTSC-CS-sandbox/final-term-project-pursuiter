@@ -32,13 +32,11 @@ function LoginPage() {
 
   return (
     <div className="users-page-container">
-      <div className="users-header">
-        <h1 className="pursuiter-header">PURSUITER</h1>
-      </div>
+        <h1 className="logo">PURSUITER</h1>
       <div className="users-container">
         <h1>Login</h1>
         <form onSubmit={handleSubmit}>
-          <div>
+          <div className="users-form-group">
             <label>Email:</label>
             <input
               type="text"
