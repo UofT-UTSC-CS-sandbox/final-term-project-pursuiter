@@ -95,7 +95,7 @@ function ApplicantList() {
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
-            <button className="search-button">SEARCH</button>
+            <button className="search-button">Search</button>
           </div>
           <div className="filter-buttons">
             <p>Filter by:</p>

@@ -225,7 +225,7 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
             className="new-item-button"
             onClick={() => setShowItemForm(true)}
           >
-            NEW JOB
+            New Job
           </button>
         )}
         <div className="aesthetic-bar"></div>
@@ -238,7 +238,7 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
-            <button className="search-button">SEARCH</button>
+            <button className="search-button">Search</button>
           </div>
           <div className="filter-buttons">
             <p>Filter by:</p>
@@ -292,19 +292,19 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
                           className="see-applicants-button"
                           onClick={() => handleSeeApplicants(selectedItem)}
                         >
-                          SEE APPLICANTS
+                          See Applicants
                         </button>
                         <button
                           className="edit-button"
                           onClick={() => handleEdit(selectedItem)}
                         >
-                          EDIT
+                          Edit
                         </button>
                         <button
                           className="delete-button"
                           onClick={() => confirmDelete(selectedItem)}
                         >
-                          DELETE
+                          Delete
                         </button>
                       </>
                     ) : (
@@ -312,7 +312,7 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
                         className="apply-button"
                         onClick={() => setShowApplicationForm(true)}
                       >
-                        APPLY
+                        Apply
                       </button>
                     )}
                   </div>
