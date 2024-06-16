@@ -461,7 +461,7 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
         title="Confirm Deletion"
       >
         <p>Are you sure you want to delete this job?</p>
-        <div className="modal-footer">
+        <div className="delete-modal">
           <button className="delete-button" onClick={handleDelete}>
             Delete
           </button>

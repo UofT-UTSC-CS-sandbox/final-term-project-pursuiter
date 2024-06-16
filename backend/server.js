@@ -415,4 +415,5 @@ app.post("/favorites/remove", async (req, res) => {
   }
 });
 
+export default app;
 export { app, connectToMongo };
