@@ -500,8 +500,18 @@ const fetchJobsForRecruiter = async (userId, setItems) => {
 
 const fetchJobsForApplicant = async (userId, setItems) => {
   try {
-    const response = await DashboardController.fetchJobs();
-    setItems(response);
+    const jobsResponse = await DashboardController.fetchJobs();
+    const applicationsResponse = await DashboardController.fetchUserApplications(userId);
+    const appliedJobIds = new Set();
+    applicationsResponse.forEach(application => {
+      if (application.jobID) {
+        appliedJobIds.add(application.jobID);
+      } else {
+        console.error("Application does not contain jobID:", application);
+      }
+    });
+    const availableJobs = jobsResponse.filter(job => !appliedJobIds.has(job._id));
+    setItems(availableJobs);
   } catch (error) {
     console.error("Error fetching jobs:", error);
   }

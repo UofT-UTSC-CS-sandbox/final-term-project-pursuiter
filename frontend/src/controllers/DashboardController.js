@@ -111,6 +111,16 @@ const DashboardController = {
     }
   },
 
+  fetchUserApplications: async (userId) => {
+    try {
+      const response = await axios.get(`${API_URL}/applications/user/${userId}`);
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching user applications:", error);
+      throw error;
+    }
+  },
+
   // Fetch job details
   fetchJobDetails: async (jobId) => {
     try {
