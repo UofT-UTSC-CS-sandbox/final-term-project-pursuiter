@@ -229,6 +229,18 @@
   border-color: #1e1e1e;
 }
 
+.disabled-button {
+  background-color: #e0e0e0;
+  color: #1e1e1e;
+  border-color: #cdcdcd;
+}
+
+.disabled-button:hover {
+  background-color: #e0e0e0;
+  color: #1e1e1e;
+  border-color: #1e1e1e;
+}
+
 .favorite-icon {
   position: absolute;
   top: 10px;

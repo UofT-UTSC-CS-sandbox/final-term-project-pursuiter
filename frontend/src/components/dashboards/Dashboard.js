@@ -30,6 +30,7 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
   });
   const [applications, setApplications] = useState([]);
   const [resumeFile, setResumeFile] = useState(null);
+  const [resumeState, setResumeState] = useState("Upload");
   const { user, logoutUser } = useContext(UserContext);
 
   const [showConfirmation, setShowConfirmation] = useState(false);
@@ -186,6 +187,7 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
     reader.onload = () => {
       if (fileType === "resume") {
         setResumeFile(reader.result);
+        setResumeState("Attached");
       }
     };
     reader.readAsDataURL(file);
@@ -194,24 +196,29 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
   // Handle job application submission
   const handleApplicationSubmit = async (e) => {
     e.preventDefault();
-
-    const applicationToSubmit = {
-      applicantID: user.userId,
-      jobID: selectedItem._id,
-      resumeData: resumeFile,
-    };
-
-    try {
-      const response =
-        await DashboardController.applyForJob(applicationToSubmit);
-      setApplications((prevApplications) => [response, ...prevApplications]);
-      setShowApplicationForm(false);
-      setShowConfirmation(true);
-      setTimeout(() => {
+    if (resumeFile === null) {
+      setResumeState("Missing");
+    }      
+    else{
+      const applicationToSubmit = {
+        applicantID: user.userId,
+        jobID: selectedItem._id,
+        resumeData: resumeFile,
+      };
+  
+      try {
+        const response =
+          await DashboardController.applyForJob(applicationToSubmit);
+        setApplications((prevApplications) => [response, ...prevApplications]);
+        setShowApplicationForm(false);
+        setShowConfirmation(true);
+        setResumeState("Upload");        
+        setTimeout(() => {
         window.location.reload();
-      }, 100);
+        }, 100);
     } catch (error) {
-      console.error("Error submitting application:", error);
+        console.error("Error submitting application:", error);
+      }
     }
   };
 
@@ -438,18 +445,38 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
         title={editMode ? "Edit Application" : "New Application"}
       >
         <form className="new-item-form" onSubmit={handleApplicationSubmit}>
-          <p>Upload Resume: </p>
+          <p style={{ color: (resumeState === "Missing") ? "#800020" : "#1e1e1e" }}>
+          {
+            (() => {
+              switch (resumeState) {
+                case "Missing":
+                  return "Resume is required for this application";
+                case "Attached":
+                  return "Resume attached";
+                default:
+                  return "Upload resume: ";
+              }
+            })()
+          }
+          </p>          
           <input
             type="file"
             accept=".pdf"
             onChange={(event) => handleFileChange(event, "resume")}
           />
-          <button type="submit">
+          <button 
+            type="submit"
+            className={(resumeState === "Attached") ? "" : "disabled-button"}
+          >
             {editMode ? "Update Application" : "Submit"}
           </button>
           <button
             className="cancel-button"
-            onClick={() => setShowApplicationForm(false)}
+            onClick={() => {
+              setShowApplicationForm(false);
+              setResumeState("Upload");
+              setResumeFile(null);
+            }}
           >
             Cancel
           </button>
