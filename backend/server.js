@@ -315,6 +315,19 @@ app.get("/jobs/:id/applicants", async (req, res) => {
   }
 });
 
+app.get('/applications/user/:userId', async (req, res) => {
+  const userId = req.params.userId;
+  try {
+    const applications = await db.collection('applications').find({ applicantID: userId }).toArray();
+    if (applications.length === 0) {
+      return res.status(404).json({ message: "No applications found for this user" });
+    }
+    res.json(applications);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
 // Fetch applications for a job
 app.get("/applications/:jobId", async (req, res) => {
   const jobId = req.params.jobId;
