@@ -4,11 +4,13 @@
  * General Styles
  *************************************/
 
+.users-page-container {
+  display: flex;
+}
+
 .users-container {
-  margin: 20px;
   display: flex;
   flex-direction: column;
-  max-width: 70%;
 }
 
 .users-container.account-page {
@@ -119,7 +121,7 @@
 .users-container button {
   margin-bottom: 20px;
   white-space: nowrap;
-
+  box-shadow: 0px 4px 4px 0px #1e1e1e40;
   width: fit-content;
 }
 

@@ -1,5 +1,6 @@
 import React from "react";
-import "./Dashboard.css";
+import "./Modal.css";
+// import "./UserInformation.css";
 
 function Modal({ show, onClose, children }) {
   if (!show) {

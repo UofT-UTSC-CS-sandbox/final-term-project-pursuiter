@@ -69,6 +69,7 @@ const UserController = {
     companyName,
     userType,
     userId,
+    masterResume
   }) => {
     try {
       const response = await fetch(`${API_URL}/updateUser`, {
@@ -85,6 +86,7 @@ const UserController = {
           companyName,
           userType,
           userId,
+          masterResume
         }),
       });
       if (!response.ok) {

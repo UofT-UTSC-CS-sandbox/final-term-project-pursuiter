@@ -2,7 +2,7 @@ import React, { useState, useEffect, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import { UserContext } from "../../contexts/UserContext";
 import { FaStar } from "react-icons/fa";
-import Modal from "./Modal";
+import Modal from "../modal/Modal";
 import DashboardController from "../../controllers/DashboardController";
 import "./Dashboard.css";
 
