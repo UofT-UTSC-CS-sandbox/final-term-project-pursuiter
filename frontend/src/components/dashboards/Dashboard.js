@@ -38,9 +38,11 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
   const [resumeRecommendation, setResumeRecommendation] = useState("Loading...");
   const [qualified, setQualified] = useState(false);
   const { user, logoutUser } = useContext(UserContext);
-
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [showApplicationForm, setShowApplicationForm] = useState(false);
+  const [aiFeedback, setAiFeedback] = useState("");
+  const [isGenerateButtonDisabled, setIsGenerateButtonDisabled] = useState(true);
+  const [isGenerateButtonClicked, setIsGenerateButtonClicked] = useState(false);
 
   // Fetch jobs and favorited jobs
   useEffect(() => {
@@ -673,8 +675,14 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
       </Modal>
       <Modal
         show={showApplicationForm}
-        onClose={() => setShowApplicationForm(false)}
-        title={editMode ? "Edit Application" : "New Application"}
+        onClose={() => {
+          setShowApplicationForm(false);
+          setAiFeedback("");
+          setIsGenerateButtonDisabled(true);
+          setIsGenerateButtonClicked(false);
+          setResumeFile(null);
+        }}
+        title="New Application"
       >
         <form className="new-item-form" onSubmit={handleApplicationSubmit}>
           <p>Upload resume: </p>        

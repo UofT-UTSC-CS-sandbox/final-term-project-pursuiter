@@ -361,6 +361,25 @@
   color: gold;
 }
 
+.generate-feedback-button {
+  margin-left: 10px;
+  border-radius: 10px;
+  height: 30px;
+}
+
+.generate-feedback-button:disabled {
+  background-color: grey;
+  color: white;
+  cursor: not-allowed;
+  border-color: grey;
+}
+
+.generate-feedback-button:disabled:hover {
+  background-color: grey;
+  color: white;
+  border-color: grey;
+}
+
 /************************************
  * Fonts
  *************************************/
@@ -376,7 +395,7 @@
  * Responsive Styling
  *************************************/
 
-@media (max-width: 600px) {
+ @media (max-width: 600px) {
   .dashboard-content {
     padding: 10px;
   }
@@ -415,6 +434,15 @@
 
   .new-item-button {
     width: 100%;
+  }
+
+  .modal-content {
+    max-width: 90%;
+    padding: 15px;
+  }
+
+  .ai-feedback-box {
+    height: 100px;
   }
 }
 
@@ -458,6 +486,15 @@
   .new-item-button {
     width: 100%;
   }
+
+  .modal-content {
+    max-width: 90%;
+    padding: 15px;
+  }
+
+  .ai-feedback-box {
+    height: 120px;
+  }
 }
 
 @media (max-width: 1200px) {
@@ -472,6 +509,15 @@
 
   .new-item-button {
     width: 25%;
+  }
+
+  .modal-content {
+    max-width: 80%;
+    padding: 20px;
+  }
+
+  .ai-feedback-box {
+    height: 130px;
   }
 }
 
@@ -630,3 +676,8 @@
   flex-grow: 1;
 }
 
+
+  .ai-feedback-box {
+    height: 150px;
+  }
+}
