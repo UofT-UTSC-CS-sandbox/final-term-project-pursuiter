@@ -4,6 +4,7 @@ import bcrypt from "bcrypt"; // Password hashing library
 import cors from "cors"; // Cross-origin resource sharing middleware
 import mongoose from "mongoose"; // Mongoose library
 import dotenv from "dotenv"; // Dotenv library
+import GeminiService from './geminiService.js'; // Import the GeminiService
 
 const env = process.env.NODE_ENV || "development";
 dotenv.config({ path: `.env.${env}` });
@@ -61,6 +62,27 @@ async function startServer() {
 }
 
 startServer();
+
+/************************************
+ * Gemini API Endpoints
+ *************************************/
+
+// Generate a response from Gemini
+app.post("/generateResponse", async (req, res) => {
+  const { prompt } = req.body;
+
+  if (!prompt) {
+    return res.status(500).json({ message: "Prompt is required" });
+  }
+
+  try {
+    const response = await GeminiService.generateResponse(prompt);
+    res.status(200).json({ response });
+  } catch (error) {
+    console.error("Error generating response");
+    res.status(500).json({ message: error.message });
+  }
+});
 
 /************************************
  * User API Endpoints
