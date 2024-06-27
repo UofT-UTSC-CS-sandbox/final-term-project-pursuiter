@@ -79,8 +79,8 @@ app.post("/generateResponse", async (req, res) => {
     const response = await GeminiService.generateResponse(prompt);
     res.status(200).json({ response });
   } catch (error) {
-    console.error("Error generating response:", error);
-    res.status(500).json({ message: "Error generating response" });
+    console.error("Error generating response");
+    res.status(500).json({ message: error.message });
   }
 });
 

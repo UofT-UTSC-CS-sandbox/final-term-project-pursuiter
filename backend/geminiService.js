@@ -9,7 +9,7 @@
 
 
 import dotenv from 'dotenv';
-import { GoogleGenerativeAI } from "@google/generative-ai";
+import { GoogleGenerativeAI, GoogleGenerativeAIFetchError } from "@google/generative-ai";
 
 const env = process.env.NODE_ENV || "development";
 dotenv.config({ path: `.env.${env}` });
@@ -46,7 +46,11 @@ const GeminiService = {
       const result = await chatSession.sendMessage(prompt);
       return result.response.text();
     } catch (error) {
-      console.error("Error in generateResponse:", error);
+      if (error instanceof GoogleGenerativeAIFetchError) {
+        console.error("Error fetching from Google Generative AI:", error.statusText);
+      } else {
+        console.error("Error in generateResponse:", error.message);
+      }
       throw new Error("Failed to generate response");
     }
   },
