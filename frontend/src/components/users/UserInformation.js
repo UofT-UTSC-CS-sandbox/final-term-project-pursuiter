@@ -54,7 +54,13 @@ function UserInformation() {
 
   return (
     <div className="users-page-container">
-      <div className="users-container users-info-container">
+      <style>{`body { background-color:#E7E7E7;}`}</style>
+      <div className="users-container account-page"> 
+      <div className="header">
+        <h1>Account</h1>
+      </div>
+      <div className="aesthetic-bar-users"></div>
+        <div className="users-info-container">
         <form onSubmit={handleSubmit}>
           <div className="users-header users-info-header">
             <h1>Personal Information</h1>
@@ -115,6 +121,14 @@ function UserInformation() {
             </div>
           )}
         </form>
+
+        <form onSubmit={handleSubmit}>
+          <div className="users-header users-info-header">
+            <h1>Master Resume</h1>
+            <button type="submit">Add File</button>
+          </div>
+        </form>
+        </div>
       </div>
     </div>
   );
