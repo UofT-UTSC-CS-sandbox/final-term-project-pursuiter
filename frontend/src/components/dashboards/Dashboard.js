@@ -365,17 +365,24 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
                         </button>
                       </>
                     ) : (
-                      <button
-                        className="resume-submit-button"
-                        disabled={qualified !== true}                          
-                        onClick={() => {
-                          if (qualified) {
-                            setShowApplicationForm(true);
-                          }
-                        }}
-                      >
-                        Apply
-                      </button>
+                      <div className="tooltip-apply-container">
+                        <button
+                          className="resume-submit-button"
+                          disabled={qualified !== true}                          
+                          onClick={() => {
+                            if (qualified) {
+                              setShowApplicationForm(true);
+                            }
+                          }}
+                        >
+                          Apply
+                        </button>
+                        {(qualified !== true) && (
+                          <span className="tooltip-apply">
+                            Master resume does not contain the required keywords for this posting
+                          </span>
+                        )}                        
+                      </div>
                     )}
                   </div>
                 </div>

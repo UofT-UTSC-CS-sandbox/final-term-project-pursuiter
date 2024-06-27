@@ -209,6 +209,106 @@
 }
 
 /************************************
+ * Tooltip
+ *************************************/
+
+ .tooltip-container {
+  position: relative;
+  display: inline-block;
+}
+
+.tooltip {
+  visibility: hidden;
+  width: 220px;
+  background-color: #1e1e1e;
+  color: #fff;
+  text-align: center;
+  border-radius: 6px;
+  padding: 5px;
+  position: absolute;
+  z-index: 1;
+  bottom: 125%;
+  left: 50%;
+  margin-left: -110px;
+  opacity: 0;
+  transition: opacity 0.3s;
+  font-weight: normal;
+  font-size: 16px;
+}
+
+.tooltip::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  margin-left: -5px;
+  border-width: 5px;
+  border-style: solid;
+  border-color: #1e1e1e transparent transparent transparent;
+}
+
+.tooltip-container:hover .tooltip {
+  visibility: visible;
+  opacity: 1;
+}
+
+.tooltip-icon {
+  margin-left: 5px;
+  cursor: pointer;
+  font-size: 16px;
+  color: #1e1e1e;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  width: 18px; 
+  height: 18px; 
+  border: 1px solid #1e1e1e;
+  border-radius: 50%;
+  background-color: #fff; 
+  font-weight: bold;
+}
+
+.tooltip-apply-container {
+  position: relative;
+  display: inline-block;
+}
+
+.tooltip-apply {
+  visibility: hidden;
+  width: 220px;
+  background-color: #1e1e1e;
+  color: #fff;
+  text-align: center;
+  border-radius: 6px;
+  padding: 5px;
+  position: absolute;
+  z-index: 1;
+  top: 35%;
+  right: 125%;
+  margin-top: -16px;
+  opacity: 0;
+  transition: opacity 0.3s;
+  font-weight: normal;
+  font-size: 16px;
+}
+
+.tooltip-apply::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  right: 0;
+  margin-top: -5px;
+  border-width: 5px;
+  border-style: solid;
+  border-color: transparent #1e1e1e transparent transparent;
+}
+
+.tooltip-apply-container:hover .tooltip-apply {
+  visibility: visible;
+  opacity: 1;
+}
+
+/************************************
  * Buttons and Icons
  *************************************/
 
@@ -224,18 +324,6 @@
 }
 
 .cancel-button:hover {
-  background-color: #e0e0e0;
-  color: #1e1e1e;
-  border-color: #1e1e1e;
-}
-
-.disabled-button {
-  background-color: #e0e0e0;
-  color: #1e1e1e;
-  border-color: #cdcdcd;
-}
-
-.disabled-button:hover {
   background-color: #e0e0e0;
   color: #1e1e1e;
   border-color: #1e1e1e;
