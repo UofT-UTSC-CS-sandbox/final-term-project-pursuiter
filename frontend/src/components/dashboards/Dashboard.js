@@ -6,6 +6,8 @@ import Modal from "../modal/Modal";
 
 import DashboardController from "../../controllers/DashboardController";
 import "./Dashboard.css";
+import * as pdfjsLib from "pdfjs-dist/webpack";
+import { all } from "axios";
 
 const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
   const navigate = useNavigate();
@@ -31,6 +33,7 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
   const [applications, setApplications] = useState([]);
   const [resumeFile, setResumeFile] = useState(null);
   const [resumeState, setResumeState] = useState("Upload");
+  const [qualified, setQualified] = useState(false);
   const { user, logoutUser } = useContext(UserContext);
 
   const [showConfirmation, setShowConfirmation] = useState(false);
@@ -222,6 +225,41 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
     }
   };
 
+  // Handle the checking for qualifications in the master resume
+  const handleQualificationsCheck = async (keywords, resume) => {
+    const keywordsArray = keywords.toLowerCase().split(",").map(keyword => keyword.trim());
+    
+    const base64String = resume.split(",")[1];
+    const pdfData = atob(base64String);
+
+    const pdfArray = new Uint8Array(pdfData.length);
+    for (let i = 0; i < pdfData.length; i++) {
+      pdfArray[i] = pdfData.charCodeAt(i);
+    }
+
+    const loadingTask = pdfjsLib.getDocument({ data: pdfArray });
+    const pdfDocument = await loadingTask.promise;
+
+    let fullText = "";
+    for (let pageNum = 1; pageNum <= pdfDocument.numPages; pageNum++) {
+      const page = await pdfDocument.getPage(pageNum);
+      const textContent = await page.getTextContent();
+      const pageText = textContent.items.map(item => item.str).join(" ");
+      fullText += pageText + " ";
+    }
+
+    fullText = fullText.toLowerCase();
+
+    const allKeywordsFound = keywordsArray.every(keyword => fullText.includes(keyword));
+
+    if(allKeywordsFound){
+      setQualified(true);
+    }
+    else{
+      setQualified(false);
+    }
+  };   
+
   const allItems = items.filter(
     (item) => !favoritedItems.some((fav) => fav._id === item._id),
   );
@@ -267,7 +305,10 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
               <div
                 key={index}
                 className="dashboard-item"
-                onClick={() => setSelectedItem(item)}
+                onClick={() => {
+                  setSelectedItem(item);
+                  handleQualificationsCheck(item.hiddenKeywords, "data:application/pdf;base64,JVBERi0xLjMKMyAwIG9iago8PC9UeXBlIC9QYWdlCi9QYXJlbnQgMSAwIFIKL1Jlc291cmNlcyAyIDAgUgovQ29udGVudHMgNCAwIFI+PgplbmRvYmoKNCAwIG9iago8PC9GaWx0ZXIgL0ZsYXRlRGVjb2RlIC9MZW5ndGggNDY1Pj4Kc3RyZWFtCnicbZJLb9swEITv+RV7TICYJakHRZ9a22mBAAWMxkUfyIWmVjYNmRQoKo7/fSnJBlwoB12ImW9HO8vh+Y6STMDpbrGBT18ZME4ohU0FT5v+iRc5YQkImREhYFPC/bPbW1g5fIDN4SriBREURC5IygfR01GZeg6HqCWlw8/4ro5NjUS7460vo4QxEIkkdISv987iHF7vGU9eHyDN8pkoJL3xDBnpfxkTRpiEvOBEFuP09wa9QatvQ15UWUryZFC9uCqclEdY4RvWLlpABfiyWMLSHRtlz1MzzwmX4xaU7ZQ/A6ecwgzWHlu0YeLIpCAyHRw/sG2cbc3W1CYYbOcwVeeS5HRQz66pjN3BCbegmqY2WgUTGdC1/fP6HOK6QNkSVgdld+4DYsoIzy7EpatrtXU+QnqoCXvQ3rXtrOqs7sGqhoDq2EJwUGJlLA5wpfcmhoHGuwPqADun6vaDWfF05DX9L2+GKbpGZR8hnoMN8VPbGh8HKFaV0bGjANqV055SQUlyabPsxv+eitJ4rON2FzFkXJcHV8GLHroHY4cmuxCbvbxNESwh+VjpT2ve0LcmnHvI7z9/J+KkyEgyzvvmVdmpgOUcvqv+DJi8yv8BjhzvWwplbmRzdHJlYW0KZW5kb2JqCjEgMCBvYmoKPDwvVHlwZSAvUGFnZXMKL0tpZHMgWzMgMCBSIF0KL0NvdW50IDEKL01lZGlhQm94IFswIDAgNTk1LjI4IDg0MS44OV0KPj4KZW5kb2JqCjUgMCBvYmoKPDwvVHlwZSAvRm9udAovQmFzZUZvbnQgL0hlbHZldGljYQovU3VidHlwZSAvVHlwZTEKL0VuY29kaW5nIC9XaW5BbnNpRW5jb2RpbmcKPj4KZW5kb2JqCjIgMCBvYmoKPDwKL1Byb2NTZXQgWy9QREYgL1RleHQgL0ltYWdlQiAvSW1hZ2VDIC9JbWFnZUldCi9Gb250IDw8Ci9GMSA1IDAgUgo+PgovWE9iamVjdCA8PAo+Pgo+PgplbmRvYmoKNiAwIG9iago8PAovUHJvZHVjZXIgKFB5RlBERiAxLjcuMiBodHRwOi8vcHlmcGRmLmdvb2dsZWNvZGUuY29tLykKL0NyZWF0aW9uRGF0ZSAoRDoyMDI0MDYxNDA0NTI1NSkKPj4KZW5kb2JqCjcgMCBvYmoKPDwKL1R5cGUgL0NhdGFsb2cKL1BhZ2VzIDEgMCBSCi9PcGVuQWN0aW9uIFszIDAgUiAvRml0SCBudWxsXQovUGFnZUxheW91dCAvT25lQ29sdW1uCj4+CmVuZG9iagp4cmVmCjAgOAowMDAwMDAwMDAwIDY1NTM1IGYgCjAwMDAwMDA2MjIgMDAwMDAgbiAKMDAwMDAwMDgwNSAwMDAwMCBuIAowMDAwMDAwMDA5IDAwMDAwIG4gCjAwMDAwMDAwODcgMDAwMDAgbiAKMDAwMDAwMDcwOSAwMDAwMCBuIAowMDAwMDAwOTA5IDAwMDAwIG4gCjAwMDAwMDEwMTggMDAwMDAgbiAKdHJhaWxlcgo8PAovU2l6ZSA4Ci9Sb290IDcgMCBSCi9JbmZvIDYgMCBSCj4+CnN0YXJ0eHJlZgoxMTIxCiUlRU9GCg==");
+                }}
               >
                 <div className="dashboard-title">{item.title}</div>
                 <div className="dashboard-company">{item.company}</div>
@@ -319,8 +360,14 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
                       </>
                     ) : (
                       <button
-                        className="apply-button"
-                        onClick={() => setShowApplicationForm(true)}
+                        className={(qualified === true) ? "apply-button" : "disabled-button"}
+                        onClick={() => {
+                          if (qualified) {
+                            setShowApplicationForm(true);
+                          } else {
+                            alert("Master resume doesn't contain the required keywords for this posting");
+                          }
+                        }}
                       >
                         Apply
                       </button>
