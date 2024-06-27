@@ -241,6 +241,19 @@
   border-color: #1e1e1e;
 }
 
+.resume-submit-button:disabled {
+  background-color: #e0e0e0;
+  color: #1e1e1e;
+  border-color: #cdcdcd;
+  cursor: not-allowed;
+}
+
+.resume-submit-button:disabled:hover {
+  background-color: #e0e0e0;
+  color: #1e1e1e;
+  border-color: #cdcdcd;
+}
+
 .favorite-icon {
   position: absolute;
   top: 10px;

@@ -7,7 +7,6 @@ import Modal from "../modal/Modal";
 import DashboardController from "../../controllers/DashboardController";
 import "./Dashboard.css";
 import * as pdfjsLib from "pdfjs-dist/webpack";
-import { all } from "axios";
 
 const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
   const navigate = useNavigate();
@@ -32,7 +31,7 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
   });
   const [applications, setApplications] = useState([]);
   const [resumeFile, setResumeFile] = useState(null);
-  const [resumeState, setResumeState] = useState("Upload");
+  const [resumeState, setResumeState] = useState("Missing");
   const [qualified, setQualified] = useState(false);
   const { user, logoutUser } = useContext(UserContext);
 
@@ -215,7 +214,7 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
         setApplications((prevApplications) => [response, ...prevApplications]);
         setShowApplicationForm(false);
         setShowConfirmation(true);
-        setResumeState("Upload");        
+        setResumeState("Missing");        
         setTimeout(() => {
         window.location.reload();
         }, 100);
@@ -225,21 +224,19 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
     }
   };
 
-  // Handle the checking for qualifications in the master resume
-  const handleQualificationsCheck = async (keywords, resume) => {
-    const keywordsArray = keywords.toLowerCase().split(",").map(keyword => keyword.trim());
-    
-    const base64String = resume.split(",")[1];
+  //Turn pdf base64 string into text
+  const TurnPdfToString = async (pdf) => {
+    const base64String = pdf.split(",")[1];
     const pdfData = atob(base64String);
-
+  
     const pdfArray = new Uint8Array(pdfData.length);
     for (let i = 0; i < pdfData.length; i++) {
       pdfArray[i] = pdfData.charCodeAt(i);
     }
-
+  
     const loadingTask = pdfjsLib.getDocument({ data: pdfArray });
     const pdfDocument = await loadingTask.promise;
-
+  
     let fullText = "";
     for (let pageNum = 1; pageNum <= pdfDocument.numPages; pageNum++) {
       const page = await pdfDocument.getPage(pageNum);
@@ -247,6 +244,15 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
       const pageText = textContent.items.map(item => item.str).join(" ");
       fullText += pageText + " ";
     }
+  
+    return fullText.trim();
+  } 
+
+  // Handle the checking for qualifications in the master resume
+  const handleQualificationsCheck = async (keywords, resume) => {
+    const keywordsArray = keywords.toLowerCase().split(",").map(keyword => keyword.trim());
+    
+    let fullText = await TurnPdfToString(resume);
 
     fullText = fullText.toLowerCase();
 
@@ -360,12 +366,11 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
                       </>
                     ) : (
                       <button
-                        className={(qualified === true) ? "apply-button" : "disabled-button"}
+                        className="resume-submit-button"
+                        disabled={qualified !== true}                          
                         onClick={() => {
                           if (qualified) {
                             setShowApplicationForm(true);
-                          } else {
-                            alert("Master resume doesn't contain the required keywords for this posting");
                           }
                         }}
                       >
@@ -492,20 +497,7 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
         title={editMode ? "Edit Application" : "New Application"}
       >
         <form className="new-item-form" onSubmit={handleApplicationSubmit}>
-          <p style={{ color: (resumeState === "Missing") ? "#800020" : "#1e1e1e" }}>
-          {
-            (() => {
-              switch (resumeState) {
-                case "Missing":
-                  return "Resume is required for this application";
-                case "Attached":
-                  return "Resume attached";
-                default:
-                  return "Upload resume: ";
-              }
-            })()
-          }
-          </p>          
+          <p>Upload resume: </p>        
           <input
             type="file"
             accept=".pdf"
@@ -513,7 +505,8 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
           />
           <button 
             type="submit"
-            className={(resumeState === "Attached") ? "" : "disabled-button"}
+            className="resume-submit-button"
+            disabled={resumeState !== "Attached"}            
           >
             {editMode ? "Update Application" : "Submit"}
           </button>
@@ -521,7 +514,7 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
             className="cancel-button"
             onClick={() => {
               setShowApplicationForm(false);
-              setResumeState("Upload");
+              setResumeState("Missing");
               setResumeFile(null);
             }}
           >
