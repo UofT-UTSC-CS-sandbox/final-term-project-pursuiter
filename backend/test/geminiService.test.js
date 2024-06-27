@@ -62,6 +62,8 @@ describe("Gemini Service", () => {
     it("should handle errors from the GeminiService", async () => {
       const prompt = "Tell me a joke";
 
+      console.log("\nExpecting error now:")
+
       // Simulate an error thrown by the service
       stub = sinon.stub(GeminiService, "generateResponse").rejects(new Error("Failed to generate response"));
 
