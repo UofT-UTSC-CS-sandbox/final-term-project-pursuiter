@@ -61,6 +61,16 @@ const UserController = {
     }
   },
 
+  // Fetch User Information
+fetchUserInformation: async (userId) => {
+  const response = await fetch(`${API_URL}/user/${userId}`);
+  if (!response.ok) {
+    throw new Error("Error fetching user information");
+  }
+  const userData = await response.json();
+  return userData;
+},
+
   // Update User Information
   updateUser: async ({
     email,

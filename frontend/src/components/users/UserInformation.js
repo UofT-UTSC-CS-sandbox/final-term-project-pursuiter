@@ -9,7 +9,6 @@ import UserController from "../../controllers/UserController";
 function UserInformation() {
   const navigate = useNavigate();
   const { user, logoutUser, updateUser } = useContext(UserContext);
-  // const {updateMasterResume } = useContext(UserContext);
   // const [activeMenu, setActiveMenu] = useState("Personal Details");
 
   const [fullName, setFullName] = useState("");
@@ -18,72 +17,78 @@ function UserInformation() {
   const [newEmail, setNewEmail] = useState("");
   const [positions, setPositions] = useState("");
   const [companyName, setCompanyName] = useState("");
-  const [masterResume, setMasterResume] = useState("");
-  const [selectedResume, setSelectedResume] = useState("");
-
+  const [selectedResume, setSelectedResume] = useState(null);
+  const [resumeFile, setResumeFile] = useState(null);
   const [userType, setUserType] = useState("");
   const [userId, setUserId] = useState("");
-
   const [showFileForm, setShowFileForm] = useState(false);
   const [editMode, setEditMode] = useState(false);
-
+  const [showConfirmation, setShowConfirmation] = useState(false);
 
   useEffect(() => {
     if (user) {
-      setFullName(user.fullName || "");
-      setAddress(user.address || "");
-      setEmail(user.email || "");
-      setNewEmail(user.email || "");
-      setPositions(user.positions || "");
-      setCompanyName(user.companyName || "");
-      setUserType(user.userType || "");
-      setUserId(user._id || "");
-      // setMasterResume(user.masterResume);
-      // setSelectedResume(user.masterResume);
+      UserController.fetchUserInformation(user.userId)
+        .then((userInfo) => {
+          setFullName(userInfo.fullName || "");
+          setAddress(userInfo.address || "");
+          setNewEmail(userInfo.email || "");
+          setPositions(userInfo.positions || "");
+          setCompanyName(userInfo.companyName || "");
+          setUserType(userInfo.userType || "");
+          setSelectedResume(userInfo.masterResume || null);
+        })
+        .catch((error) => {
+          console.error("Error fetching user information:", error);
+        });
     }
   }, [user]);
 
-  // Handle update info form submission
-  const handleSubmit = async (event) => {
-    event.preventDefault();
-    setShowFileForm(false);
-
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const updatedUser = {
+      email: user.email,
+      newEmail,
+      fullName,
+      address,
+      positions,
+      companyName,
+      userType,
+      userId: user.userId,
+      masterResume: resumeFile,
+    };
     try {
-      const updatingUser = await updateUser({
-        email,
-        newEmail,
-        fullName,
-        address,
-        positions,
-        companyName,
-        userType,
-        userId,
-        masterResume,
-      });
-      setSelectedResume(masterResume);
-      alert("Updated successfully!");
+      const updatedUserInfo = await UserController.updateUser(updatedUser);
+      setFullName(updatedUserInfo.fullName);
+      setAddress(updatedUserInfo.address);
+      setNewEmail(updatedUserInfo.email);
+      setPositions(updatedUserInfo.positions);
+      setCompanyName(updatedUserInfo.companyName);
+      setUserType(updatedUserInfo.userType);
+      setSelectedResume(updatedUserInfo.masterResume);
+      setShowFileForm(false);
+      setShowConfirmation(true);
+      setTimeout(() => {
+        window.location.reload();
+      }, 100);
     } catch (error) {
-      console.error("Update failed:", error);
-      alert(error.message);
+      console.error("Error updating user information:", error);
+      alert("Failed to update user information.");
     }
   };
 
-  // Handle file change for master resume
-  const handleMasterResumeChange = (event, fileType) => {
+  const handleMasterResumeChange = (event) => {
     const file = event.target.files[0];
     const reader = new FileReader();
     reader.onload = () => {
-      if (fileType === "resume") {
-        setMasterResume(reader.result);
-      }
+      setResumeFile(reader.result);
     };
     reader.readAsDataURL(file);
   };
-
+  
   return (
     <div className="users-page-container">
       <style>{`body { background-color:#E7E7E7;}`}</style>
-      <div className="users-container account-page"> 
+      <div className="users-container account-page">
         <div className="header"><h1>Account</h1></div>
         <div className="aesthetic-bar-users"></div>
         <div className="users-info-container">
@@ -92,17 +97,17 @@ function UserInformation() {
               <h1>Personal Information</h1>
               <button type="submit">Save</button>
             </div>
-            <div className="users-from-group users-info-form-group">
+            <div className="users-form-group users-info-form-group">
               <label>Name:</label>
               <input
                 type="text"
-                name="name"
+                name="fullName"
                 value={fullName}
                 onChange={(e) => setFullName(e.target.value)}
                 required
               />
             </div>
-            <div className="users-from-group users-info-form-group">
+            <div className="users-form-group users-info-form-group">
               <label>Address:</label>
               <input
                 type="text"
@@ -112,7 +117,7 @@ function UserInformation() {
                 required
               />
             </div>
-            <div className="users-from-group users-info-form-group">
+            <div className="users-form-group users-info-form-group">
               <label>Email:</label>
               <input
                 type="email"
@@ -123,7 +128,7 @@ function UserInformation() {
               />
             </div>
             {userType === "applicant" ? (
-              <div className="users-from-group users-info-form-group">
+              <div className="users-form-group users-info-form-group">
                 <label>Positions Wanted:</label>
                 <input
                   type="text"
@@ -135,7 +140,7 @@ function UserInformation() {
                 />
               </div>
             ) : (
-              <div className="users-from-group users-info-form-group">
+              <div className="users-form-group users-info-form-group">
                 <label>Company:</label>
                 <input
                   type="text"
@@ -149,36 +154,31 @@ function UserInformation() {
           </form>
           
           {userType === "applicant" && (
-              <div>
-                  <div className="users-header users-info-header">
-                      <h1>Master Resume</h1>
-                      <button onClick={() => { 
-                                              
-                                              setShowFileForm(true)
-                                              }
-                                              }>Add File</button>
-                  </div>
-                  <div className="users-header users-info-header"> 
-                      {selectedResume ? (
-                          <iframe
-                              src={selectedResume}
-                              className="resume-iframe"
-                              title="Resume"
-                          ></iframe>
-                      ) : (
-                          "Resume not available"
-                      )}
-                  </div>
+            <div>
+              <div className="users-header users-info-header">
+                <h1>Master Resume</h1>
+                <button onClick={() => setShowFileForm(true)}>Add File</button>
               </div>
+              <div className="users-header users-info-header"> 
+                {selectedResume ? (
+                  <iframe
+                    src={selectedResume}
+                    className="resume-iframe"
+                    title="Resume"
+                  ></iframe>
+                ) : (
+                  "Resume not available"
+                )}
+              </div>
+            </div>
           )}
         </div> 
       </div>
-
       <Modal
         show={showFileForm}
         onClose={() => setShowFileForm(false)}
         title={editMode ? "Edit File" : "New File"}
-        >
+      >
         <form className="new-item-form" onSubmit={handleSubmit}>
           <p>Upload Resume: </p>
           <input
@@ -197,9 +197,11 @@ function UserInformation() {
           </button>
         </form>
       </Modal>
-      
+      <Modal show={showConfirmation} onClose={() => setShowConfirmation(false)}>
+        <p>User information updated successfully!</p>
+      </Modal>
     </div>
   );
-}
+};
 
 export default UserInformation;

@@ -206,7 +206,9 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
       setApplications((prevApplications) => [response, ...prevApplications]);
       setShowApplicationForm(false);
       setShowConfirmation(true);
-      window.location.reload();
+      setTimeout(() => {
+        window.location.reload();
+      }, 100);
     } catch (error) {
       console.error("Error submitting application:", error);
     }

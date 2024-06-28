@@ -121,13 +121,40 @@ app.post("/login", async (req, res) => {
         positions: user.positions,
         userId: user._id,
         favorites: user.favorites || [],
-        masterResume: user.masterResume,
       });
     } else {
       res.status(401).json({ message: "Invalid credentials" });
     }
   } catch (error) {
     res.status(500).json({ message: "Error logging in" });
+  }
+});
+
+// Fetch user information
+app.get("/user/:id", async (req, res) => {
+  const userId = req.params.id;
+  if (!ObjectId.isValid(userId)) {
+    return res.status(400).json({ message: "Invalid user ID" });
+  }
+  try {
+    const user = await db.collection("users").findOne({ _id: new ObjectId(userId) });
+    if (user) {
+      res.json({
+        userType: user.userType,
+        email: user.email,
+        fullName: user.fullName,
+        companyName: user.companyName,
+        address: user.address,
+        positions: user.positions,
+        userId: user._id,
+        favorites: user.favorites || [],
+        masterResume: user.masterResume,
+      });
+    } else {
+      res.status(404).json({ message: "User not found" });
+    }
+  } catch (error) {
+    res.status(500).json({ message: "Error fetching user information" });
   }
 });
 
@@ -182,35 +209,6 @@ app.put("/updateUser", async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Error updating user" });
-  }
-});
-
-app.get("/users/:userId/masterResume", async (req, res) => {
-  const { userId } = req.params;
-  try {
-    const user = await db.collection("users").findOne({ _id: new ObjectId(userId) });
-    if (!user || !user.masterResume) {
-      return res.status(404).json({ message: "User or master resume not found" });
-    }
-
-    // Extract the base64 part of the masterResume
-    const base64Data = user.masterResume.split("base64,")[1];
-    if (!base64Data) {
-      return res.status(400).json({ message: "Invalid master resume format" });
-    }
-
-    // Convert base64 string to buffer
-    const resumeBuffer = Buffer.from(base64Data, 'base64');
-
-    // Set the appropriate headers for PDF content
-    res.setHeader('Content-Type', 'application/pdf');
-    res.setHeader('Content-Disposition', 'inline; filename="masterResume.pdf"');
-
-    // Send the PDF buffer to the client
-    res.send(resumeBuffer);
-  } catch (error) {
-    console.error("Error fetching master resume:", error);
-    res.status(500).json({ message: "Error fetching master resume" });
   }
 });
 
