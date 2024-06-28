@@ -9,7 +9,6 @@ import UserController from "../../controllers/UserController";
 function UserInformation() {
   const navigate = useNavigate();
   const { user, logoutUser, updateUser } = useContext(UserContext);
-  // const [activeMenu, setActiveMenu] = useState("Personal Details");
 
   const [fullName, setFullName] = useState("");
   const [address, setAddress] = useState("");
