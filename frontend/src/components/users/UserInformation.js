@@ -18,7 +18,7 @@ function UserInformation() {
   const [newEmail, setNewEmail] = useState("");
   const [positions, setPositions] = useState("");
   const [companyName, setCompanyName] = useState("");
-  const [masterResume, setMasterResume] = useState(user.masterResume);
+  const [masterResume, setMasterResume] = useState("");
   const [selectedResume, setSelectedResume] = useState("");
 
   const [userType, setUserType] = useState("");
@@ -42,30 +42,6 @@ function UserInformation() {
       // setSelectedResume(user.masterResume);
     }
   }, [user]);
-
-  window.onload = function() {
-    // Assuming you have a way to get the current user's ID
-    const apiUrl = `/users/${userId}/masterResume`;
-  
-    fetch(apiUrl)
-      .then(response => {
-        if (!response.ok) {
-          throw new Error('Network response was not ok');
-        }
-        return response.json();
-      })
-      .then(data => {
-        // Assuming the masterResume is directly in the response
-        setSelectedResume(data.masterResume);
-  
-        // Now you can use the masterResume variable as needed
-        console.log(masterResume);
-      })
-      .catch(error => {
-        console.error('There was a problem with your fetch operation:', error);
-      });
-  };
-
 
   // Handle update info form submission
   const handleSubmit = async (event) => {
@@ -177,8 +153,7 @@ function UserInformation() {
                   <div className="users-header users-info-header">
                       <h1>Master Resume</h1>
                       <button onClick={() => { 
-                                              // setSelectedResume(fullName);
-                                                // alert(selectedResume);
+                                              
                                               setShowFileForm(true)
                                               }
                                               }>Add File</button>
