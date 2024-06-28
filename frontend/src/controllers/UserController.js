@@ -31,6 +31,7 @@ const UserController = {
     companyName,
     address,
     positions,
+    masterResume,
   }) => {
     try {
       const response = await fetch(`${API_URL}/signup`, {
@@ -46,6 +47,7 @@ const UserController = {
           companyName,
           address,
           positions,
+          masterResume,
         }),
       });
       if (!response.ok) {
@@ -69,7 +71,7 @@ const UserController = {
     companyName,
     userType,
     userId,
-    masterResume
+    masterResume,
   }) => {
     try {
       const response = await fetch(`${API_URL}/updateUser`, {
@@ -86,7 +88,7 @@ const UserController = {
           companyName,
           userType,
           userId,
-          masterResume
+          masterResume,
         }),
       });
       if (!response.ok) {

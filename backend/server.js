@@ -76,6 +76,7 @@ app.post("/signup", async (req, res) => {
     companyName,
     address,
     positions,
+    masterResume,
   } = req.body;
   try {
     const existingUser = await db.collection("users").findOne({ email });
@@ -92,6 +93,7 @@ app.post("/signup", async (req, res) => {
       address,
       positions,
       favorites: [],
+      masterResume,
     };
     const result = await db.collection("users").insertOne(newUser);
     res
@@ -119,6 +121,7 @@ app.post("/login", async (req, res) => {
         positions: user.positions,
         userId: user._id,
         favorites: user.favorites || [],
+        masterResume: user.masterResume,
       });
     } else {
       res.status(401).json({ message: "Invalid credentials" });
@@ -165,7 +168,13 @@ app.put("/updateUser", async (req, res) => {
       await db.collection("users").updateOne({ email }, { $set: updatedUser });
       res.json({
         message: "Update successful",
-        ...updatedUser
+        fullName: updatedUser.fullName,
+        address: updatedUser.address,
+        email: updatedUser.email,
+        positions: updatedUser.positions,
+        companyName: updatedUser.companyName,
+        userType: updatedUser.userType,
+        masterResume: updatedUser.masterResume,
       });
     } else {
       res.status(404).json({ message: "User not found" });
@@ -173,6 +182,35 @@ app.put("/updateUser", async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Error updating user" });
+  }
+});
+
+app.get("/users/:userId/masterResume", async (req, res) => {
+  const { userId } = req.params;
+  try {
+    const user = await db.collection("users").findOne({ _id: new ObjectId(userId) });
+    if (!user || !user.masterResume) {
+      return res.status(404).json({ message: "User or master resume not found" });
+    }
+
+    // Extract the base64 part of the masterResume
+    const base64Data = user.masterResume.split("base64,")[1];
+    if (!base64Data) {
+      return res.status(400).json({ message: "Invalid master resume format" });
+    }
+
+    // Convert base64 string to buffer
+    const resumeBuffer = Buffer.from(base64Data, 'base64');
+
+    // Set the appropriate headers for PDF content
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', 'inline; filename="masterResume.pdf"');
+
+    // Send the PDF buffer to the client
+    res.send(resumeBuffer);
+  } catch (error) {
+    console.error("Error fetching master resume:", error);
+    res.status(500).json({ message: "Error fetching master resume" });
   }
 });
 

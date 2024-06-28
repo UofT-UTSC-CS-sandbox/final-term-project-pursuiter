@@ -4,12 +4,13 @@ import React, { useState, useContext, useEffect } from "react";
 import { UserContext } from "../../contexts/UserContext";
 import { useNavigate } from "react-router-dom";
 import Modal from "../modal/Modal";
+import UserController from "../../controllers/UserController";
 
 function UserInformation() {
   const navigate = useNavigate();
   const { user, logoutUser, updateUser } = useContext(UserContext);
-  const {updateMasterResume } = useContext(UserContext);
-  const [activeMenu, setActiveMenu] = useState("Personal Details");
+  // const {updateMasterResume } = useContext(UserContext);
+  // const [activeMenu, setActiveMenu] = useState("Personal Details");
 
   const [fullName, setFullName] = useState("");
   const [address, setAddress] = useState("");
@@ -17,12 +18,15 @@ function UserInformation() {
   const [newEmail, setNewEmail] = useState("");
   const [positions, setPositions] = useState("");
   const [companyName, setCompanyName] = useState("");
+  const [masterResume, setMasterResume] = useState(user.masterResume);
+  const [selectedResume, setSelectedResume] = useState("");
+
   const [userType, setUserType] = useState("");
   const [userId, setUserId] = useState("");
 
   const [showFileForm, setShowFileForm] = useState(false);
   const [editMode, setEditMode] = useState(false);
-  const [masterResume, setMasterResume] = useState(null);
+
 
   useEffect(() => {
     if (user) {
@@ -34,12 +38,40 @@ function UserInformation() {
       setCompanyName(user.companyName || "");
       setUserType(user.userType || "");
       setUserId(user._id || "");
+      // setMasterResume(user.masterResume);
+      // setSelectedResume(user.masterResume);
     }
   }, [user]);
+
+  window.onload = function() {
+    // Assuming you have a way to get the current user's ID
+    const apiUrl = `/users/${userId}/masterResume`;
+  
+    fetch(apiUrl)
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        return response.json();
+      })
+      .then(data => {
+        // Assuming the masterResume is directly in the response
+        setSelectedResume(data.masterResume);
+  
+        // Now you can use the masterResume variable as needed
+        console.log(masterResume);
+      })
+      .catch(error => {
+        console.error('There was a problem with your fetch operation:', error);
+      });
+  };
+
 
   // Handle update info form submission
   const handleSubmit = async (event) => {
     event.preventDefault();
+    setShowFileForm(false);
+
     try {
       const updatingUser = await updateUser({
         email,
@@ -52,6 +84,7 @@ function UserInformation() {
         userId,
         masterResume,
       });
+      setSelectedResume(masterResume);
       alert("Updated successfully!");
     } catch (error) {
       console.error("Update failed:", error);
@@ -138,10 +171,31 @@ function UserInformation() {
               </div>
             )}
           </form>
-          <div className="users-header users-info-header">
-            <h1>Master Resume</h1>
-            <button onClick={() => setShowFileForm(true)}>Add File</button>
-          </div>
+          
+          {userType === "applicant" && (
+              <div>
+                  <div className="users-header users-info-header">
+                      <h1>Master Resume</h1>
+                      <button onClick={() => { 
+                                              // setSelectedResume(fullName);
+                                                // alert(selectedResume);
+                                              setShowFileForm(true)
+                                              }
+                                              }>Add File</button>
+                  </div>
+                  <div className="users-header users-info-header"> 
+                      {selectedResume ? (
+                          <iframe
+                              src={selectedResume}
+                              className="resume-iframe"
+                              title="Resume"
+                          ></iframe>
+                      ) : (
+                          "Resume not available"
+                      )}
+                  </div>
+              </div>
+          )}
         </div> 
       </div>
 

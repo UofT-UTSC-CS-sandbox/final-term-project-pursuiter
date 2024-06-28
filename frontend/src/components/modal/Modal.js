@@ -1,6 +1,5 @@
 import React from "react";
 import "./Modal.css";
-// import "./UserInformation.css";
 
 function Modal({ show, onClose, children }) {
   if (!show) {

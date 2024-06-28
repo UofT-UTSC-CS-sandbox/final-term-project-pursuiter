@@ -6,9 +6,11 @@
 
 .users-page-container {
   display: flex;
+  flex-direction: column;
 }
 
 .users-container {
+  margin: 20px;
   display: flex;
   flex-direction: column;
 }
