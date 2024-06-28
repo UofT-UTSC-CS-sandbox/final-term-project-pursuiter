@@ -86,10 +86,9 @@ function UserInformation() {
   };
   
   return (
+    <div className="users-information-wrapper">
     <div className="users-page-container">
-      <style>{`body { background-color:#E7E7E7;}`}</style>
       <div className="users-container account-page">
-        <div className="header"><h1>Account</h1></div>
         <div className="aesthetic-bar-users"></div>
         <div className="users-info-container">
           <form onSubmit={handleSubmit}>
@@ -200,6 +199,7 @@ function UserInformation() {
       <Modal show={showConfirmation} onClose={() => setShowConfirmation(false)}>
         <p>User information updated successfully!</p>
       </Modal>
+    </div>
     </div>
   );
 };

@@ -15,6 +15,11 @@
   flex-direction: column;
 }
 
+.users-information-wrapper {
+  background-color:#E7E7E7;
+  min-height: 94vh;
+}
+
 .users-container.account-page {
   margin: 20px auto;
 }
