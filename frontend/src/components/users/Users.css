@@ -1,0 +1,223 @@
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap");
+
+/************************************
+ * General Styles
+ *************************************/
+
+.users-container {
+  margin: 20px;
+  display: flex;
+  flex-direction: column;
+}
+
+.users-info-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 0 auto;
+}
+
+/************************************
+ * Headers
+ *************************************/
+
+.logo {
+  margin: 20px;
+  font-size: 64px;
+  font-weight: 800;
+  line-height: 96px;
+}
+
+.logo::before {
+  content: "";
+  display: inline-block;
+  background-color: #1e1e1e;
+  margin-right: 10px;
+  width: 48px;
+  height: 48px;
+}
+
+.users-info-header {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  margin: 20px 0px;
+}
+
+/************************************
+ * Content and Form
+ *************************************/
+
+.users-container form {
+  max-width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.users-info-container form {
+  max-width: 100%;
+}
+
+.users-info-form-group {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.users-info-container label {
+  width: 200px;
+  margin-bottom: 20px;
+}
+
+.users-container input {
+  width: 70vh;
+  height: 40px;
+  border: 1px solid #1e1e1e;
+  background: #fff;
+  box-shadow: 0px 4px 4px 0px #1e1e1e40;
+  margin-bottom: 20px;
+}
+
+.users-info-container input {
+  width: 70vh;
+  height: 25px;
+}
+
+/************************************
+ * Buttons
+ *************************************/
+
+.users-container button {
+  margin-bottom: 20px;
+  white-space: nowrap;
+
+  width: fit-content;
+}
+
+.users-info-container button {
+  margin-bottom: 0px;
+}
+
+/************************************
+ * Links
+ *************************************/
+
+.inline-link a {
+  color: #8b0000;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.inline-link a:hover {
+  text-decoration: underline;
+}
+
+/************************************
+ * Fonts
+ *************************************/
+
+.users-info-container h1 {
+  font-size: 20px;
+  font-weight: 600;
+  line-height: 30px;
+}
+
+/************************************
+ * Responsive Styles
+ *************************************/
+
+@media (max-width: 480px) {
+  .logo {
+    font-size: 48px;
+    line-height: 72px;
+  }
+
+  .logo::before {
+    width: 32px;
+    height: 32px;
+  }
+
+  .users-info-container label {
+    width: 100%;
+    margin-bottom: 10px;
+  }
+
+  .users-container input,
+  .users-info-container input {
+    width: 100%;
+    height: 35px;
+  }
+
+  .users-info-container h1 {
+    font-size: 18px;
+    line-height: 27px;
+  }
+}
+
+@media (max-width: 768px) {
+  .users-container {
+    margin: 15px;
+  }
+
+  .users-info-container {
+    padding: 0 15px;
+  }
+
+  .logo {
+    font-size: 56px;
+    line-height: 84px;
+    margin: 15px;
+  }
+
+  .logo::before {
+    width: 42px;
+    height: 42px;
+  }
+
+  .users-info-header {
+    margin: 15px 0;
+  }
+
+  .users-info-container label {
+    width: 100%;
+    margin-bottom: 15px;
+  }
+
+  .users-container input,
+  .users-info-container input {
+    width: 100%;
+    height: 35px;
+  }
+
+  .users-info-container h1 {
+    font-size: 19px;
+    line-height: 29px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .users-info-container {
+    padding: 0 20px;
+  }
+
+  .users-info-header {
+    flex-direction: row;
+    margin: 40px 0;
+  }
+
+  .users-info-form-group {
+    flex-direction: row;
+  }
+
+  .users-info-container label {
+    width: 200px;
+  }
+
+  .users-container input,
+  .users-info-container input {
+    max-width: 80%;
+  }
+}

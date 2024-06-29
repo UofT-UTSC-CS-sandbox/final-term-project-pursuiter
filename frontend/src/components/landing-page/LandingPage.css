@@ -1,0 +1,133 @@
+/************************************
+ * General Styles
+ *************************************/
+
+.landing-page-container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  flex: 1;
+  flex-direction: row;
+}
+
+/************************************
+ * Content
+ *************************************/
+
+.column-left,
+.column-right {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  padding: 50px;
+  align-items: center;
+}
+
+.column-left {
+  background-color: #fff;
+  color: #000;
+  justify-content: flex-start;
+}
+
+.column-right {
+  background-color: #1e1e1e;
+  color: #fff;
+  justify-content: flex-end;
+}
+
+/************************************
+ * Fonts
+ *************************************/
+
+.left-paragraph,
+.right-paragraph {
+  max-width: 80%;
+  text-align: center;
+  margin: 10px;
+}
+
+.left-paragraph {
+  color: #000;
+}
+
+.right-paragraph {
+  color: #fff;
+}
+
+/************************************
+ * Buttons
+ *************************************/
+
+.column-right button:hover {
+  background-color: #1e1e1e;
+  color: #fff;
+  border-color: #fff;
+}
+
+/************************************
+ * Responsive Styling
+ *************************************/
+
+@media (max-width: 600px) {
+  .landing-page-container {
+    flex-direction: column;
+  }
+
+  .column-left,
+  .column-right {
+    padding: 10px;
+  }
+
+  .left-paragraph,
+  .right-paragraph {
+    max-width: 90%;
+    font-size: 14px;
+  }
+
+  .column-left {
+    justify-content: center;
+  }
+
+  .column-right {
+    justify-content: center;
+  }
+}
+
+@media (max-width: 768px) {
+  .landing-page-container {
+    flex-direction: column;
+  }
+
+  .column-left,
+  .column-right {
+    padding: 15px;
+  }
+
+  .left-paragraph,
+  .right-paragraph {
+    max-width: 85%;
+    font-size: 16px;
+  }
+
+  .column-left {
+    justify-content: center;
+  }
+
+  .column-right {
+    justify-content: center;
+  }
+}
+
+@media (max-width: 1200px) {
+  .left-paragraph,
+  .right-paragraph {
+    font-size: 18px;
+  }
+}
+
+@media (min-width: 1201px) {
+  .left-paragraph,
+  .right-paragraph {
+    font-size: 20px;
+  }
+}

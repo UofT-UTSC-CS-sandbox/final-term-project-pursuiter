@@ -1,44 +1,102 @@
-const API_URL = 'http://localhost:4000';
+const API_URL = "http://localhost:4000";
 
-async function loginUser(username, password) {
+const UserController = {
+  // Login User
+  loginUser: async (email, password) => {
     try {
-        const response = await fetch(`${API_URL}/login`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ username, password }),
-        });
-        if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(errorData.message || 'Failed to login');
-        }
-        return response.json();
+      const response = await fetch(`${API_URL}/login`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email, password }),
+      });
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Failed to login");
+      }
+      const user = await response.json();
+      return user;
     } catch (error) {
-        throw error;
+      throw error;
     }
-}
+  },
 
-async function signupUser(username, password, userType) {
+  // Signup User
+  signupUser: async ({
+    userType,
+    email,
+    password,
+    fullName,
+    companyName,
+    address,
+    positions,
+  }) => {
     try {
-        const response = await fetch(`${API_URL}/signup`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ username, password, userType }),
-        });
-        if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(errorData.message || 'Failed to signup');
-        }
-        return response.json();
+      const response = await fetch(`${API_URL}/signup`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          userType,
+          email,
+          password,
+          fullName,
+          companyName,
+          address,
+          positions,
+        }),
+      });
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Failed to signup");
+      }
+      const user = await response.json();
+      return user;
     } catch (error) {
-        throw error;
+      throw error;
     }
-}
+  },
 
-export default {
-    loginUser,
-    signupUser,
+  // Update User Information
+  updateUser: async ({
+    email,
+    newEmail,
+    fullName,
+    address,
+    positions,
+    companyName,
+    userType,
+    userId,
+  }) => {
+    try {
+      const response = await fetch(`${API_URL}/updateUser`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email,
+          newEmail,
+          fullName,
+          address,
+          positions,
+          companyName,
+          userType,
+          userId,
+        }),
+      });
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Failed to update");
+      }
+      const user = await response.json();
+      return user;
+    } catch (error) {
+      throw error;
+    }
+  },
 };
+
+export default UserController;
