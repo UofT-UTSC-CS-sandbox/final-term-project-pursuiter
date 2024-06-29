@@ -24,6 +24,7 @@ function UserInformation() {
   const [editMode, setEditMode] = useState(false);
   const [showConfirmation, setShowConfirmation] = useState(false);
 
+  // fetch user information
   useEffect(() => {
     if (user) {
       UserController.fetchUserInformation(user.userId)
@@ -42,6 +43,7 @@ function UserInformation() {
     }
   }, [user]);
 
+  // handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
     const updatedUser = {
@@ -75,6 +77,7 @@ function UserInformation() {
     }
   };
 
+  // handle master resume change
   const handleMasterResumeChange = (event) => {
     const file = event.target.files[0];
     const reader = new FileReader();
