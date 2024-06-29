@@ -56,4 +56,15 @@ describe("User Management", () => {
     expect(res.body).to.have.property("address", "New Address");
     expect(res.body).to.have.property("positions", "New Position");
   });
+
+  it("should update the master resume", async () => {
+    const res = await request(app).put("/updateUser").send({
+      email: "user1@example.com",
+      masterResume: "resume1",
+      newMasterResume: "newresume1",
+    });
+
+    expect(res.status).to.equal(200);
+    expect(res.body).to.have.property("message", "Update successful");
+  });
 });
