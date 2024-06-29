@@ -2,7 +2,7 @@ import request from "supertest";
 import { expect } from "chai";
 import { app } from "../server.js";
 import mongoose from "mongoose";
-import "./setup.js"; // Import the common setup
+import "./setup.js";
 
 describe("User Management", () => {
   let user1, user2;
@@ -56,7 +56,7 @@ describe("User Management", () => {
     expect(res.body).to.have.property("address", "New Address");
     expect(res.body).to.have.property("positions", "New Position");
   });
-
+  
   it("should update the master resume", async () => {
     const res = await request(app).put("/updateUser").send({
       email: "user1@example.com",
