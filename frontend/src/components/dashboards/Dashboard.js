@@ -260,6 +260,11 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
 
   // Handle the checking for qualifications in the master resume
   const handleQualificationsCheck = async (keywords, resume) => {
+    if(masterResume === null){
+      setQualified(false);
+      return;
+    }
+
     const keywordsArray = keywords.toLowerCase().split(",").map(keyword => keyword.trim());
     
     let fullText = await TurnPdfToString(resume);
