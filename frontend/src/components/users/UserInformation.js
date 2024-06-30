@@ -24,6 +24,7 @@ function UserInformation() {
   const [showFileForm, setShowFileForm] = useState(false);
   const [editMode, setEditMode] = useState(false);
   const [showConfirmation, setShowConfirmation] = useState(false);
+  const [isFileSelected, setIsFileSelected] = useState(false);
 
   // fetch user information
   useEffect(() => {
@@ -46,6 +47,12 @@ function UserInformation() {
 
   // handle form submission
   const handleSubmit = async (e) => {
+    if (!isFileSelected) {
+      e.preventDefault();
+      alert('Please select a file before submitting.');
+      return;
+    }
+   
     e.preventDefault();
     const updatedUser = {
       email: user.email,
@@ -81,6 +88,7 @@ function UserInformation() {
   // handle master resume change
   const handleMasterResumeChange = (event) => {
     const file = event.target.files[0];
+    setIsFileSelected(!!file);
     const reader = new FileReader();
     reader.onload = () => {
       setResumeFile(reader.result);
@@ -159,7 +167,9 @@ function UserInformation() {
             <div>
               <div className="users-header users-info-header">
                 <h1>Master Resume</h1>
-                <button onClick={() => setShowFileForm(true)}>Add File</button>
+                <button onClick={() => {setShowFileForm(true);
+                                        setIsFileSelected(false);
+                                       }}>Add File</button>
               </div>
               <div className="users-header users-info-header"> 
                 {selectedResume ? (
@@ -188,7 +198,9 @@ function UserInformation() {
             accept=".pdf"
             onChange={(event) => handleMasterResumeChange(event, "resume")}
           />
-          <button type="submit">
+          <button type="submit" 
+                  className={isFileSelected ? "button-file-selected" : "button-file-not-selected"}
+          >
             {editMode ? "Update File" : "Submit"}
           </button>
           <button

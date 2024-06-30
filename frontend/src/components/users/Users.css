@@ -137,6 +137,18 @@
   margin-bottom: 0px;
 }
 
+.button-file-not-selected {
+  background-color: #E0E0E0;
+  color: #fff;
+  border-color: #CDCDCD;
+}
+
+.button-file-not-selected:hover {
+  background-color: #E0E0E0;
+  color: #fff;
+  border-color: #CDCDCD;
+}
+
 /************************************
  * Links
  *************************************/
