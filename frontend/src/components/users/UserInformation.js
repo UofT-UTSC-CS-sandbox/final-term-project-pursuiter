@@ -9,7 +9,6 @@ import UserController from "../../controllers/UserController";
 function UserInformation() {
   const navigate = useNavigate();
   const { user, logoutUser, updateUser } = useContext(UserContext);
-  const [activeMenu, setActiveMenu] = useState("Personal Details");
 
   const [fullName, setFullName] = useState("");
   const [address, setAddress] = useState("");
@@ -20,7 +19,6 @@ function UserInformation() {
   const [selectedResume, setSelectedResume] = useState(null);
   const [resumeFile, setResumeFile] = useState(null);
   const [userType, setUserType] = useState("");
-  const [userId, setUserId] = useState("");
   const [showFileForm, setShowFileForm] = useState(false);
   const [editMode, setEditMode] = useState(false);
   const [showConfirmation, setShowConfirmation] = useState(false);
@@ -38,6 +36,7 @@ function UserInformation() {
           setCompanyName(userInfo.companyName || "");
           setUserType(userInfo.userType || "");
           setSelectedResume(userInfo.masterResume || null);
+          setIsFileSelected(true);
         })
         .catch((error) => {
           console.error("Error fetching user information:", error);
@@ -88,7 +87,7 @@ function UserInformation() {
   // handle master resume change
   const handleMasterResumeChange = (event) => {
     const file = event.target.files[0];
-    setIsFileSelected(!!file);
+    setIsFileSelected(file);
     const reader = new FileReader();
     reader.onload = () => {
       setResumeFile(reader.result);
@@ -205,7 +204,9 @@ function UserInformation() {
           </button>
           <button
             className="cancel-button"
-            onClick={() => setShowFileForm(false)}
+            onClick={() => {setShowFileForm(false);
+                            setIsFileSelected(true);
+                    }}
           >
             Cancel
           </button>
