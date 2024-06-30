@@ -414,10 +414,17 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
                     <h2>Type:</h2>
                     <p>{selectedItem.type}</p>
                   </div>
-                  <div className="dashboard-detail-section">
-                    <h2>Hidden Keywords:</h2>{" "}
-                    <p>{selectedItem.hiddenKeywords}</p>
-                  </div>
+                  {role === "recruiter" ? (
+                      <>
+                        <div className="dashboard-detail-section">
+                          <h2>Hidden Keywords:</h2>{" "}
+                          <p>{selectedItem.hiddenKeywords}</p>
+                        </div>
+                      </>
+                    ) : (
+                      <>
+                      </>
+                  )}
                   <div className="dashboard-detail-section">
                     <h2>Description:</h2>
                     <p>{selectedItem.description}</p>
