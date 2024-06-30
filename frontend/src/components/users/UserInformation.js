@@ -197,15 +197,14 @@ function UserInformation() {
             accept=".pdf"
             onChange={(event) => handleMasterResumeChange(event, "resume")}
           />
-          <button type="submit" 
-                  className={isFileSelected ? "button-file-selected" : "button-file-not-selected"}
-          >
+          <button type="submit" className="submit-button" disabled={!isFileSelected}>
             {editMode ? "Update File" : "Submit"}
           </button>
           <button
             className="cancel-button"
             onClick={() => {setShowFileForm(false);
                             setIsFileSelected(true);
+                            setResumeFile(null);
                     }}
           >
             Cancel

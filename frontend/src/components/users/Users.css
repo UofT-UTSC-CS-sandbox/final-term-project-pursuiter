@@ -137,16 +137,11 @@
   margin-bottom: 0px;
 }
 
-.button-file-not-selected {
+.submit-button:disabled{
   background-color: #E0E0E0;
   color: #fff;
   border-color: #CDCDCD;
-}
-
-.button-file-not-selected:hover {
-  background-color: #E0E0E0;
-  color: #fff;
-  border-color: #CDCDCD;
+  cursor:not-allowed;
 }
 
 /************************************
