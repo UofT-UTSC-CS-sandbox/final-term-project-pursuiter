@@ -3,9 +3,11 @@ import { useNavigate } from "react-router-dom";
 import { UserContext } from "../../contexts/UserContext";
 import { FaStar } from "react-icons/fa";
 import Modal from "../modal/Modal";
+import UserController from "../../controllers/UserController";
 
 import DashboardController from "../../controllers/DashboardController";
 import "./Dashboard.css";
+import * as pdfjsLib from "pdfjs-dist/webpack";
 
 const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
   const navigate = useNavigate();
@@ -30,6 +32,9 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
   });
   const [applications, setApplications] = useState([]);
   const [resumeFile, setResumeFile] = useState(null);
+  const [resumeState, setResumeState] = useState("Missing");
+  const [masterResume, setMasterResume] = useState(null);
+  const [qualified, setQualified] = useState(false);
   const { user, logoutUser } = useContext(UserContext);
 
   const [showConfirmation, setShowConfirmation] = useState(false);
@@ -40,6 +45,14 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
     if (user) {
       fetchFavoritedJobs(user.userId, setFavoritedItems);
       fetchJobs(user.userId, setItems);
+
+      UserController.fetchUserInformation(user.userId)
+      .then((userInfo) => {
+        setMasterResume(userInfo.masterResume || null);
+      })
+      .catch((error) => {
+        console.error("Error fetching user information:", error);
+      });      
     }
   }, [user, fetchFavoritedJobs, fetchJobs]);
 
@@ -186,6 +199,7 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
     reader.onload = () => {
       if (fileType === "resume") {
         setResumeFile(reader.result);
+        setResumeState("Attached");
       }
     };
     reader.readAsDataURL(file);
@@ -194,26 +208,78 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
   // Handle job application submission
   const handleApplicationSubmit = async (e) => {
     e.preventDefault();
-
-    const applicationToSubmit = {
-      applicantID: user.userId,
-      jobID: selectedItem._id,
-      resumeData: resumeFile,
-    };
-
-    try {
-      const response =
-        await DashboardController.applyForJob(applicationToSubmit);
-      setApplications((prevApplications) => [response, ...prevApplications]);
-      setShowApplicationForm(false);
-      setShowConfirmation(true);
-      setTimeout(() => {
+    if (resumeFile === null) {
+      setResumeState("Missing");
+    }      
+    else{
+      const applicationToSubmit = {
+        applicantID: user.userId,
+        jobID: selectedItem._id,
+        resumeData: resumeFile,
+      };
+  
+      try {
+        const response =
+          await DashboardController.applyForJob(applicationToSubmit);
+        setApplications((prevApplications) => [response, ...prevApplications]);
+        setShowApplicationForm(false);
+        setShowConfirmation(true);
+        setResumeState("Missing");        
+        setTimeout(() => {
         window.location.reload();
-      }, 100);
+        }, 100);
     } catch (error) {
-      console.error("Error submitting application:", error);
+        console.error("Error submitting application:", error);
+      }
     }
   };
+
+  //Turn pdf base64 string into text
+  const TurnPdfToString = async (pdf) => {
+    const base64String = pdf.split(",")[1];
+    const pdfData = atob(base64String);
+  
+    const pdfArray = new Uint8Array(pdfData.length);
+    for (let i = 0; i < pdfData.length; i++) {
+      pdfArray[i] = pdfData.charCodeAt(i);
+    }
+  
+    const loadingTask = pdfjsLib.getDocument({ data: pdfArray });
+    const pdfDocument = await loadingTask.promise;
+  
+    let fullText = "";
+    for (let pageNum = 1; pageNum <= pdfDocument.numPages; pageNum++) {
+      const page = await pdfDocument.getPage(pageNum);
+      const textContent = await page.getTextContent();
+      const pageText = textContent.items.map(item => item.str).join(" ");
+      fullText += pageText + " ";
+    }
+  
+    return fullText.trim();
+  } 
+
+  // Handle the checking for qualifications in the master resume
+  const handleQualificationsCheck = async (keywords, resume) => {
+    if(masterResume === null){
+      setQualified(false);
+      return;
+    }
+
+    const keywordsArray = keywords.toLowerCase().split(",").map(keyword => keyword.trim());
+    
+    let fullText = await TurnPdfToString(resume);
+
+    fullText = fullText.toLowerCase();
+
+    const allKeywordsFound = keywordsArray.every(keyword => fullText.includes(keyword));
+
+    if(allKeywordsFound){
+      setQualified(true);
+    }
+    else{
+      setQualified(false);
+    }
+  };   
 
   const allItems = items.filter(
     (item) => !favoritedItems.some((fav) => fav._id === item._id),
@@ -260,7 +326,10 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
               <div
                 key={index}
                 className="dashboard-item"
-                onClick={() => setSelectedItem(item)}
+                onClick={() => {
+                  setSelectedItem(item);
+                  handleQualificationsCheck(item.hiddenKeywords, masterResume);
+                }}
               >
                 <div className="dashboard-title">{item.title}</div>
                 <div className="dashboard-company">{item.company}</div>
@@ -311,12 +380,24 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
                         </button>
                       </>
                     ) : (
-                      <button
-                        className="apply-button"
-                        onClick={() => setShowApplicationForm(true)}
-                      >
-                        Apply
-                      </button>
+                      <div className="tooltip-apply-container">
+                        <button
+                          className="resume-submit-button"
+                          disabled={qualified !== true}                          
+                          onClick={() => {
+                            if (qualified) {
+                              setShowApplicationForm(true);
+                            }
+                          }}
+                        >
+                          Apply
+                        </button>
+                        {(qualified !== true) && (
+                          <span className="tooltip-apply">
+                            Master resume does not contain the required keywords for this posting
+                          </span>
+                        )}                        
+                      </div>
                     )}
                   </div>
                 </div>
@@ -333,10 +414,17 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
                     <h2>Type:</h2>
                     <p>{selectedItem.type}</p>
                   </div>
-                  <div className="dashboard-detail-section">
-                    <h2>Hidden Keywords:</h2>{" "}
-                    <p>{selectedItem.hiddenKeywords}</p>
-                  </div>
+                  {role === "recruiter" ? (
+                      <>
+                        <div className="dashboard-detail-section">
+                          <h2>Hidden Keywords:</h2>{" "}
+                          <p>{selectedItem.hiddenKeywords}</p>
+                        </div>
+                      </>
+                    ) : (
+                      <>
+                      </>
+                  )}
                   <div className="dashboard-detail-section">
                     <h2>Description:</h2>
                     <p>{selectedItem.description}</p>
@@ -438,18 +526,26 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
         title={editMode ? "Edit Application" : "New Application"}
       >
         <form className="new-item-form" onSubmit={handleApplicationSubmit}>
-          <p>Upload Resume: </p>
+          <p>Upload resume: </p>        
           <input
             type="file"
             accept=".pdf"
             onChange={(event) => handleFileChange(event, "resume")}
           />
-          <button type="submit">
+          <button 
+            type="submit"
+            className="resume-submit-button"
+            disabled={resumeState !== "Attached"}            
+          >
             {editMode ? "Update Application" : "Submit"}
           </button>
           <button
             className="cancel-button"
-            onClick={() => setShowApplicationForm(false)}
+            onClick={() => {
+              setShowApplicationForm(false);
+              setResumeState("Missing");
+              setResumeFile(null);
+            }}
           >
             Cancel
           </button>
