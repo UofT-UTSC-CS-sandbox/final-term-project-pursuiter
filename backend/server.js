@@ -98,6 +98,7 @@ app.post("/signup", async (req, res) => {
     companyName,
     address,
     positions,
+    masterResume,
   } = req.body;
   try {
     const existingUser = await db.collection("users").findOne({ email });
@@ -114,6 +115,7 @@ app.post("/signup", async (req, res) => {
       address,
       positions,
       favorites: [],
+      masterResume,
     };
     const result = await db.collection("users").insertOne(newUser);
     res
@@ -150,6 +152,34 @@ app.post("/login", async (req, res) => {
   }
 });
 
+// Fetch user information
+app.get("/user/:id", async (req, res) => {
+  const userId = req.params.id;
+  if (!ObjectId.isValid(userId)) {
+    return res.status(400).json({ message: "Invalid user ID" });
+  }
+  try {
+    const user = await db.collection("users").findOne({ _id: new ObjectId(userId) });
+    if (user) {
+      res.json({
+        userType: user.userType,
+        email: user.email,
+        fullName: user.fullName,
+        companyName: user.companyName,
+        address: user.address,
+        positions: user.positions,
+        userId: user._id,
+        favorites: user.favorites || [],
+        masterResume: user.masterResume,
+      });
+    } else {
+      res.status(404).json({ message: "User not found" });
+    }
+  } catch (error) {
+    res.status(500).json({ message: "Error fetching user information" });
+  }
+});
+
 // Update user information
 app.put("/updateUser", async (req, res) => {
   const {
@@ -160,6 +190,7 @@ app.put("/updateUser", async (req, res) => {
     positions,
     companyName,
     userType,
+    masterResume
   } = req.body;
   try {
     const user = await db.collection("users").findOne({ email });
@@ -182,6 +213,7 @@ app.put("/updateUser", async (req, res) => {
       if (positions) updatedUser.positions = positions;
       if (companyName) updatedUser.companyName = companyName;
       if (userType) updatedUser.userType = userType;
+      if (masterResume) updatedUser.masterResume = masterResume;
       await db.collection("users").updateOne({ email }, { $set: updatedUser });
       res.json({
         message: "Update successful",
@@ -191,6 +223,7 @@ app.put("/updateUser", async (req, res) => {
         positions: updatedUser.positions,
         companyName: updatedUser.companyName,
         userType: updatedUser.userType,
+        masterResume: updatedUser.masterResume,
       });
     } else {
       res.status(404).json({ message: "User not found" });

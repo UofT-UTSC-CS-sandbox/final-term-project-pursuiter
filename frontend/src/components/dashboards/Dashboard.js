@@ -2,7 +2,8 @@ import React, { useState, useEffect, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import { UserContext } from "../../contexts/UserContext";
 import { FaStar } from "react-icons/fa";
-import Modal from "./Modal";
+import Modal from "../modal/Modal";
+
 import DashboardController from "../../controllers/DashboardController";
 import "./Dashboard.css";
 
@@ -206,7 +207,9 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
       setApplications((prevApplications) => [response, ...prevApplications]);
       setShowApplicationForm(false);
       setShowConfirmation(true);
-      window.location.reload();
+      setTimeout(() => {
+        window.location.reload();
+      }, 100);
     } catch (error) {
       console.error("Error submitting application:", error);
     }

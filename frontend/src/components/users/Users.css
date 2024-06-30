@@ -4,17 +4,33 @@
  * General Styles
  *************************************/
 
+.users-page-container {
+  display: flex;
+  flex-direction: column;
+}
+
 .users-container {
   margin: 20px;
   display: flex;
   flex-direction: column;
 }
 
+.users-information-wrapper {
+  background-color:#E7E7E7;
+  min-height: 94vh;
+}
+
+.users-container.account-page {
+  margin: 20px auto;
+  margin-top: 20px;
+}
+
 .users-info-container {
-  display: flex;
   flex-direction: column;
   align-items: center;
-  margin: 0 auto;
+  background-color:#F3F3F3;
+  border-bottom-left-radius: 10px;
+  border-bottom-right-radius: 10px;
 }
 
 /************************************
@@ -42,7 +58,25 @@
   flex-direction: column;
   justify-content: space-between;
   align-items: center;
-  margin: 20px 0px;
+  padding-left: 20px;
+  padding-right: 20px;
+}
+
+.aesthetic-bar-users {
+  height: 40px;
+  background-color: #202020;
+  border-top-left-radius: 10px;
+  border-top-right-radius: 10px;
+  box-sizing: border-box;
+}
+
+.header h1 {
+  font-size: 20px;
+  font-weight: 600;
+  line-height: 30px;
+  margin-left: 40px;
+  margin-top: 20px;
+  margin-bottom: 5px;
 }
 
 /************************************
@@ -65,6 +99,8 @@
   flex-direction: column;
   justify-content: space-between;
   align-items: center;
+  padding-left: 20px;
+  padding-right: 20px;
 }
 
 .users-info-container label {
@@ -93,12 +129,19 @@
 .users-container button {
   margin-bottom: 20px;
   white-space: nowrap;
-
+  box-shadow: 0px 4px 4px 0px #1e1e1e40;
   width: fit-content;
 }
 
 .users-info-container button {
   margin-bottom: 0px;
+}
+
+.submit-button:disabled{
+  background-color: #E0E0E0;
+  color: #fff;
+  border-color: #CDCDCD;
+  cursor:not-allowed;
 }
 
 /************************************
