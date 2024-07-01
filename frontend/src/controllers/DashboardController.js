@@ -110,7 +110,7 @@ const DashboardController = {
       throw error;
     }
   },
-
+  // Fetch user applications
   fetchUserApplications: async (userId) => {
     try {
       const response = await axios.get(`${API_URL}/applications/user/${userId}`);
@@ -131,6 +131,33 @@ const DashboardController = {
       throw error;
     }
   },
+
+  // Make Gemini API request
+  fetchGeminiResponse: async (Prompt) => {
+    try {
+      const response = await axios.post(`${API_URL}/generateResponse`, {
+        prompt: Prompt
+      });
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching Gemini data:", error);
+      throw error;
+    }
+  },
+
+  // Fetch application details
+  fetchApplicationDetails: async (applicantId, jobId) => {
+    try {
+      const response = await axios.get(
+        `${API_URL}/applications/details/${applicantId}/${jobId}`);
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching application details:", error);
+      throw error;
+    }
+  }
+
+
 };
 
 export default DashboardController;
