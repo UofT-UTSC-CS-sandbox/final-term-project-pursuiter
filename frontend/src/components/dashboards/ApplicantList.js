@@ -23,11 +23,20 @@ function ApplicantList() {
     const fetchApplicants = async () => {
       try {
         const response = await DashboardController.fetchApplicants(jobId);
-        setApplicants(response);
+        const applicantsWithScores = await Promise.all(response.map(async applicant => {
+        const applicationDetails = await DashboardController.fetchApplicationDetails(applicant._id, jobId);
+        return {
+          ...applicant,
+          totalScore: applicationDetails ? applicationDetails.totalScore : 0
+        };
+      }));
+      applicantsWithScores.sort((a, b) => b.totalScore - a.totalScore);
+      setApplicants(applicantsWithScores);
       } catch (error) {
         console.error("Error fetching applicants:", error);
       }
     };
+    
 
     const fetchJobDetails = async () => {
       try {
@@ -86,7 +95,7 @@ function ApplicantList() {
     } else if (width <= 60) {
       return "orange";
     } else if (width <= 70) {
-      return "yellow";
+      return "#ffc34d";
     } else {
       return "green";
     }
@@ -95,7 +104,7 @@ function ApplicantList() {
   // Determine the color of the score
   const getColorForScore = (score) => {
     if (score === 5) return "green";
-    if (score >= 3 && score <= 4) return "#FFA500";
+    if (score >= 3 && score <= 4) return "#ffc34d";
     if (score === 2) return "orange";
     return "red";
   };
@@ -164,8 +173,15 @@ function ApplicantList() {
                   className="dashboard-item"
                   onClick={() => handleSelectApplicant(applicant)}
                 >
-                  <div className="dashboard-title">{applicant.fullName}</div>
+                  <div className="dashboard-title">
+                    {applicant.fullName}
+                  </div>
                   <div className="dashboard-company">{applicant.email}</div>
+                  {applicant.totalScore !== undefined && (
+                    <div className="dashboard-total-score">
+                      Compatibility score: <strong>{applicant.totalScore}/10</strong>
+                    </div>
+                  )}
                   <div className="dashboard-apply-by">
                     <strong>Applied On:</strong> {applicant.applyDate}
                   </div>

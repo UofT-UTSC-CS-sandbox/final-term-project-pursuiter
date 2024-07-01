@@ -583,15 +583,15 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
             onChange={(event) => handleFileChange(event, "resume")}
           />
           {isSubmitting ? (
-       <div className="submitting-message">
-       Submitting application
-        <div className="loading-dots">
-          <span></span>
-          <span></span>
-          <span></span>
+          <div className="submitting-message">
+          Submitting application
+            <div className="loading-dots">
+              <span></span>
+              <span></span>
+              <span></span>
+            </div>
         </div>
-     </div>
-    ) : (
+        ) : (
           <button 
             type="submit"
             className="resume-submit-button"
