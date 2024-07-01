@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useEffect, useContext, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { UserContext } from "../../contexts/UserContext";
 import DashboardController from "../../controllers/DashboardController";
@@ -14,7 +14,9 @@ function ApplicantList() {
   const [jobDetails, setJobDetails] = useState({});
   const [favoritedApplicants, setFavoritedApplicants] = useState([]);
   const [selectedResume, setSelectedResume] = useState(null);
+  const [applicationDetails, setApplicationDetails] = useState(null);
   const { user, logoutUser } = useContext(UserContext);
+  const progressBarRef = useRef(null);
 
   // Fetch applicants and job details
   useEffect(() => {
@@ -58,10 +60,55 @@ function ApplicantList() {
   );
 
   // Handle select applicant
-  const handleSelectApplicant = (applicant) => {
+  const handleSelectApplicant = async (applicant) => {
     setSelectedApplicant(applicant);
     setSelectedResume(applicant.resumeData);
+    await fetchApplicationDetails(applicant._id, jobId);
   };
+
+  // Fetch application details
+  const fetchApplicationDetails = async (applicantId, jobId) => {
+    try {
+      const response = await DashboardController.fetchApplicationDetails(applicantId, jobId);
+      setApplicationDetails(response);
+    } catch (error) {
+      console.error("Error fetching application details:", error);
+    }
+  };
+
+  // Calculate the width of the bar
+  const progressBarWidth = applicationDetails ? (applicationDetails.totalScore / 10) * 100 : 0;
+
+  // Determine the color of the bar
+  const getProgressBarColor = (width) => {
+    if (width <= 30) {
+      return "red";
+    } else if (width <= 60) {
+      return "orange";
+    } else if (width <= 70) {
+      return "yellow";
+    } else {
+      return "green";
+    }
+  };
+
+  // Determine the color of the score
+  const getColorForScore = (score) => {
+    if (score === 5) return "green";
+    if (score >= 3 && score <= 4) return "#FFA500";
+    if (score === 2) return "orange";
+    return "red";
+  };
+
+  useEffect(() => {
+    if (selectedApplicant && progressBarRef.current) {
+      const progressBar = progressBarRef.current;
+      setTimeout(() => {
+        progressBar.style.width = `${progressBarWidth}%`;
+        progressBar.style.backgroundColor = getProgressBarColor(progressBarWidth);
+      }, 100);
+    }
+  }, [selectedApplicant, progressBarWidth]);
 
   return (
     <div className="dashboard-container">
@@ -153,9 +200,66 @@ function ApplicantList() {
                     <p>{selectedApplicant.email}</p>
                   </div>
                   <div className="dashboard-detail-section">
-                    <h2>AI Generated Compatibility:</h2>
-                    <p>To be implemented in another feature</p>
+                  <h2>AI Generated Compatibility:</h2>
+                  <div className="progress-bar-container">
+                      <div className="progress-bar">
+                        {applicationDetails && (
+                          <div
+                            ref={progressBarRef}
+                            className="progress-bar-fill"
+                            style={{
+                              width: 0,
+                              backgroundColor: getColorForScore(applicationDetails.totalScore),
+                            }}
+                          ></div>
+                        )}
+                      </div>
+                      <div className="progress-bar-score">
+                        {applicationDetails ? `${applicationDetails.totalScore}/10` : 'Loading...'}
+                      </div>
+                    </div>
                   </div>
+                  {applicationDetails && (
+                    <>
+                      <div className="dashboard-detail-section">
+                    <h2>
+                      Qualifications Score: 
+                      {applicationDetails && (
+                        <span
+                          className="score-number"
+                          style={{ color: getColorForScore(applicationDetails.qualificationsScore.score), marginLeft: '10px' }}
+                        >
+                          {applicationDetails.qualificationsScore.score}
+                        </span>
+                      )}
+                    </h2>
+                    {applicationDetails && (
+                      <div className="score-description">
+                        {applicationDetails.qualificationsScore.description}
+                      </div>
+                    )}
+                  </div>
+                  <div className="dashboard-detail-section">
+                    <h2>
+                      Job Description Score: 
+                      {applicationDetails && (
+                        <span
+                          className="score-number"
+                          style={{ color: getColorForScore(applicationDetails.jobDescriptionScore.score), marginLeft: '10px' }}
+                        >
+                          {applicationDetails.jobDescriptionScore.score}
+                        </span>
+                      )}
+                    </h2>
+                    {applicationDetails && (
+                      <div className="score-description">
+                        {applicationDetails.jobDescriptionScore.description}
+                      </div>
+                    )}
+                  </div>
+
+                    </>
+                  )}
                   <div className="dashboard-detail-section">
                     <h2>AI Generated Summary:</h2>
                     <p>To be implemented in another feature</p>

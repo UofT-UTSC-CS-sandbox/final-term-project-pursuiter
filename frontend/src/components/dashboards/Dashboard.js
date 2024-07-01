@@ -19,6 +19,7 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [itemToDelete, setItemToDelete] = useState(null);
   const [editMode, setEditMode] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [newItem, setNewItem] = useState({
     title: "",
     company: "",
@@ -178,20 +179,6 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
     navigate(`/applicants/${item._id}`);
   };
 
-  // Handle apply for job
-  const handleApply = async () => {
-    const application = {
-      jobID: selectedItem._id,
-      userID: user._id,
-    };
-
-    try {
-      await DashboardController.applyForJob(application);
-    } catch (error) {
-      console.error("Error applying for job:", error);
-    }
-  };
-
   // Handle file change in apply to job
   const handleFileChange = (event, fileType) => {
     const file = event.target.files[0];
@@ -210,30 +197,45 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
     e.preventDefault();
     if (resumeFile === null) {
       setResumeState("Missing");
-    }      
-    else{
-      const applicationToSubmit = {
-        applicantID: user.userId,
-        jobID: selectedItem._id,
-        resumeData: resumeFile,
-      };
-  
+    } else {
+      setIsSubmitting(true);
       try {
-        const response =
-          await DashboardController.applyForJob(applicationToSubmit);
+        const formattedData = await formatApplicationData(selectedItem.qualifications, selectedItem.description, resumeFile);
+        const scoreResponse = await DashboardController.fetchGeminiResponse(formattedData);
+        const cleanedResponse = scoreResponse.response.replace(/```json|```/g, '');
+        const responseJson = JSON.parse(cleanedResponse);  
+        const applicationToSubmit = {
+          applicantID: user.userId,
+          jobID: selectedItem._id,
+          resumeData: resumeFile,
+          totalScore: responseJson.totalScore,
+          qualificationsScore: {
+            score: responseJson.qualificationsScore.score,
+            description: responseJson.qualificationsScore.description
+          },
+          jobDescriptionScore: {
+            score: responseJson.jobDescriptionScore.score,
+            description: responseJson.jobDescriptionScore.description
+          }
+        };
+        const response = await DashboardController.applyForJob(applicationToSubmit);
         setApplications((prevApplications) => [response, ...prevApplications]);
         setShowApplicationForm(false);
         setShowConfirmation(true);
-        setResumeState("Missing");        
+        setResumeState("Missing");
         setTimeout(() => {
-        window.location.reload();
+          window.location.reload();
         }, 100);
-    } catch (error) {
+      } catch (error) {
         console.error("Error submitting application:", error);
+      } finally {
+        setIsSubmitting(false);
       }
     }
   };
-
+  
+  
+  
   //Turn pdf base64 string into text
   const TurnPdfToString = async (pdf) => {
     const base64String = pdf.split(",")[1];
@@ -256,7 +258,55 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
     }
   
     return fullText.trim();
-  } 
+  };
+
+  // Format the application data for the API call for the Compatibility Score
+  const formatApplicationData = async (qualifications, jobDescription, resumeFile) => {
+    const resumeText = await TurnPdfToString(resumeFile);
+    return `
+      Instructions:
+      - Evaluate the resume based on the criteria provided below.
+      - Return a detailed score for each criterion (keep it to a couple of words) along with a total score.
+      - Format the response as follows:
+      {
+        "totalScore": <total_score>,
+        "qualificationsScore": {
+          "score": <qualifications_score>,
+          "description": "<qualifications_description>"
+        },
+        "jobDescriptionScore": {
+          "score": <job_description_score>,
+          "description": "<job_description_description>"
+        }
+      }
+
+      Criteria:
+      Qualifications Match:
+      - 5 points: Applicant meets all the listed qualifications.
+      - 3-4 points: Applicant meets most (70%-99%) of the listed qualifications.
+      - 2 points: Applicant meets some (30%-69%) of the listed qualifications.
+      - 1 point: Applicant meets few (1%-29%) of the listed qualifications.
+      - 0 points: Applicant does not meet any of the listed qualifications.
+
+      Job Description Fit:
+      - 5 points: Applicant’s experience and skills closely match the job description.
+      - 3-4 points: Applicant’s experience and skills moderately match the job description.
+      - 2 points: Applicant’s experience and skills somewhat match the job description.
+      - 1 point: Applicant’s experience and skills minimally match the job description.
+      - 0 points: Applicant’s experience and skills do not match the job description.
+
+      Job Posting:
+      Qualifications:
+      ${qualifications}
+
+      Job Description:
+      ${jobDescription}
+
+      Resume:
+      ${resumeText}
+    `;
+  };
+
 
   // Handle the checking for qualifications in the master resume
   const handleQualificationsCheck = async (keywords, resume) => {
@@ -532,6 +582,16 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
             accept=".pdf"
             onChange={(event) => handleFileChange(event, "resume")}
           />
+          {isSubmitting ? (
+       <div className="submitting-message">
+       Submitting application
+        <div className="loading-dots">
+          <span></span>
+          <span></span>
+          <span></span>
+        </div>
+     </div>
+    ) : (
           <button 
             type="submit"
             className="resume-submit-button"
@@ -539,6 +599,7 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
           >
             {editMode ? "Update Application" : "Submit"}
           </button>
+    )}
           <button
             className="cancel-button"
             onClick={() => {
@@ -546,6 +607,7 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
               setResumeState("Missing");
               setResumeFile(null);
             }}
+            disabled={isSubmitting}
           >
             Cancel
           </button>

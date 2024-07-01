@@ -420,6 +420,25 @@ app.get("/applications/:jobId", async (req, res) => {
   }
 });
 
+// Fetch specific application details
+app.get("/applications/details/:applicantID/:jobID", async (req, res) => {
+  const { applicantID, jobID } = req.params;
+  try {
+    const application = await db.collection("applications").findOne({
+      jobID: jobID,
+      applicantID: applicantID,
+    });
+    if (!application) {
+      return res.status(404).json({ message: "Application not found" });
+    }
+
+    res.json(application);
+  } catch (error) {
+    console.error("Error fetching application details:", error);
+    res.status(500).json({ message: "Error fetching application details" });
+  }
+});
+
 /************************************
  * Favorites API Endpoints
  *************************************/
