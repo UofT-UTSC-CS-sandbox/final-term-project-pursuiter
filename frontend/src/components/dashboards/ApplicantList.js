@@ -41,7 +41,7 @@ function ApplicantList() {
     const fetchJobDetails = async () => {
       try {
         const response = await DashboardController.fetchJobDetails(jobId);
-        setJobDetails(response);
+        setJobDetails(response || {});
       } catch (error) {
         console.error("Error fetching job details:", error);
       }
@@ -216,10 +216,10 @@ function ApplicantList() {
                     <p>{selectedApplicant.email}</p>
                   </div>
                   <div className="dashboard-detail-section">
-                  <h2>AI Generated Compatibility:</h2>
-                  <div className="progress-bar-container">
-                      <div className="progress-bar">
-                        {applicationDetails && (
+                    <h2>AI Generated Compatibility:</h2>
+                    {applicationDetails && applicationDetails.totalScore !== undefined ? (
+                      <div className="progress-bar-container">
+                        <div className="progress-bar">
                           <div
                             ref={progressBarRef}
                             className="progress-bar-fill"
@@ -228,53 +228,48 @@ function ApplicantList() {
                               backgroundColor: getColorForScore(applicationDetails.totalScore),
                             }}
                           ></div>
-                        )}
+                        </div>
+                        <div className="progress-bar-score">
+                          {applicationDetails.totalScore}/10
+                        </div>
                       </div>
-                      <div className="progress-bar-score">
-                        {applicationDetails ? `${applicationDetails.totalScore}/10` : 'Loading...'}
-                      </div>
-                    </div>
+                    ) : null }
                   </div>
-                  {applicationDetails && (
+                  {applicationDetails && applicationDetails.qualificationsScore !== undefined && applicationDetails.jobDescriptionScore !== undefined ? (
                     <>
                       <div className="dashboard-detail-section">
-                    <h2>
-                      Qualifications Score: 
-                      {applicationDetails && (
-                        <span
-                          className="score-number"
-                          style={{ color: getColorForScore(applicationDetails.qualificationsScore.score), marginLeft: '10px' }}
-                        >
-                          {applicationDetails.qualificationsScore.score}
-                        </span>
-                      )}
-                    </h2>
-                    {applicationDetails && (
-                      <div className="score-description">
-                        {applicationDetails.qualificationsScore.description}
+                        <h2>
+                          Qualifications Score: 
+                          <span
+                            className="score-number"
+                            style={{ color: getColorForScore(applicationDetails.qualificationsScore.score), marginLeft: '10px' }}
+                          >
+                            {applicationDetails.qualificationsScore.score}
+                          </span>
+                        </h2>
+                        <div className="score-description">
+                          {applicationDetails.qualificationsScore.description}
+                        </div>
                       </div>
-                    )}
-                  </div>
-                  <div className="dashboard-detail-section">
-                    <h2>
-                      Job Description Score: 
-                      {applicationDetails && (
-                        <span
-                          className="score-number"
-                          style={{ color: getColorForScore(applicationDetails.jobDescriptionScore.score), marginLeft: '10px' }}
-                        >
-                          {applicationDetails.jobDescriptionScore.score}
-                        </span>
-                      )}
-                    </h2>
-                    {applicationDetails && (
-                      <div className="score-description">
-                        {applicationDetails.jobDescriptionScore.description}
+                      <div className="dashboard-detail-section">
+                        <h2>
+                          Job Description Score: 
+                          <span
+                            className="score-number"
+                            style={{ color: getColorForScore(applicationDetails.jobDescriptionScore.score), marginLeft: '10px' }}
+                          >
+                            {applicationDetails.jobDescriptionScore.score}
+                          </span>
+                        </h2>
+                        <div className="score-description">
+                          {applicationDetails.jobDescriptionScore.description}
+                        </div>
                       </div>
-                    )}
-                  </div>
-
                     </>
+                  ) : (
+                    <div className="dashboard-detail-section">
+                      <p>Scores not stored on the database</p>
+                    </div>
                   )}
                   <div className="dashboard-detail-section">
                     <h2>AI Generated Summary:</h2>
