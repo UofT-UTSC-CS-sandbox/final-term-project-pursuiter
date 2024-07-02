@@ -549,29 +549,37 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
                   {role === "recruiter" ? (
                       <>
                         <div className="dashboard-detail-section">
-                          <h2>Hidden Keywords:</h2>{" "}
+                          <h2>Hidden Keywords:</h2>
                           <p>{selectedItem.hiddenKeywords}</p>
                         </div>
                       </>
                     ) : (
                       <>
                        <div className="dashboard-detail-section">
-                          <h2>AI master resume analysis:</h2>{" "}
-                          {resumeRecommendation === "Loading..." ? (
+                          <h2>AI master resume analysis:</h2>
+                          {masterResume !== null ? (
                               <>    
-                                <div class="loading-dots-container">                  
-                                  <div className="loading-dots">
-                                    <span></span>
-                                    <span></span>
-                                    <span></span>
-                                  </div>
-                                </div>
+                                {resumeRecommendation === "Loading..." ? (
+                                    <>    
+                                      <div class="loading-dots-container">                  
+                                        <div className="loading-dots">
+                                          <span></span>
+                                          <span></span>
+                                          <span></span>
+                                        </div>
+                                      </div>
+                                    </>
+                                  ) : (
+                                    <>
+                                      <p>{resumeRecommendation}</p>                  
+                                    </>
+                                )}  
                               </>
                             ) : (
                               <>
-                                <p>{resumeRecommendation}</p>                  
+                                <p>Master resume has not been uploaded. Analysis will be available once you upload it from the account page.</p>                  
                               </>
-                          )}                            
+                          )}                                                      
                         </div>                      
                       </>
                   )}                  
