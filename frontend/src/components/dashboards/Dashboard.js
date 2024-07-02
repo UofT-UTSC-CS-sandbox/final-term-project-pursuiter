@@ -451,6 +451,7 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
                 className="dashboard-item"
                 onClick={() => {
                   setSelectedItem(item);
+                  setQualified(false);
                   setResumeRecommendation("Loading...");
                   handleQualificationsCheck(item.hiddenKeywords, masterResume, item.qualifications, item.description);
                 }}
