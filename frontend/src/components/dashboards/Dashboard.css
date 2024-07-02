@@ -117,7 +117,14 @@
   position: absolute;
   bottom: 10px;
   right: 10px;
-  font-size: 14px;
+}
+
+.dashboard-summary {
+  white-space: pre-wrap;
+}
+
+.dashboard-detail-section {
+  white-space: pre-wrap;  
 }
 
 .resume-iframe {
