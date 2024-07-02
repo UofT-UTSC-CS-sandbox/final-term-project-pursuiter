@@ -27,7 +27,8 @@ function ApplicantList() {
         const applicationDetails = await DashboardController.fetchApplicationDetails(applicant._id, jobId);
         return {
           ...applicant,
-          totalScore: applicationDetails ? applicationDetails.totalScore : 0
+          totalScore: applicationDetails ? applicationDetails.totalScore : 0,
+          applicantSummary: applicationDetails ? applicationDetails.applicantSummary : {},
         };
       }));
       applicantsWithScores.sort((a, b) => b.totalScore - a.totalScore);
@@ -37,7 +38,6 @@ function ApplicantList() {
       }
     };
     
-
     const fetchJobDetails = async () => {
       try {
         const response = await DashboardController.fetchJobDetails(jobId);
@@ -181,10 +181,12 @@ function ApplicantList() {
                     <div className="dashboard-total-score">
                       Compatibility score: <strong>{applicant.totalScore}/10</strong>
                     </div>
-                  )}
-                  <div className="dashboard-apply-by">
-                    <strong>Applied On:</strong> {applicant.applyDate}
-                  </div>
+                  )} <br/>
+                  {applicant.applicantSummary.shortSummary !== undefined && (
+                    <div className="dashboard-summary">
+                      {applicant.applicantSummary.shortSummary.replace(/\\n/g, '\n')} 
+                    </div>
+                  )} 
                   <div
                     className={`favorite-icon ${isFavorited(applicant) ? "favorited" : ""}`}
                     onClick={(e) => {
@@ -212,8 +214,7 @@ function ApplicantList() {
                 </div>
                 <div className="dashboard-detail-body">
                   <div className="dashboard-detail-section">
-                    <h2>Email:</h2>
-                    <p>{selectedApplicant.email}</p>
+                      <strong>Email:</strong> {selectedApplicant.email}
                   </div>
                   <div className="dashboard-detail-section">
                     <h2>AI Generated Compatibility:</h2>
@@ -271,10 +272,12 @@ function ApplicantList() {
                       <p>Scores not stored on the database</p>
                     </div>
                   )}
-                  <div className="dashboard-detail-section">
-                    <h2>AI Generated Summary:</h2>
-                    <p>To be implemented in another feature</p>
-                  </div>
+                  {applicationDetails && applicationDetails.applicantSummary.longSummary !== undefined ? (
+                    <div className="dashboard-detail-section">
+                      <h2>AI Generated Summary:</h2>
+                      <div>{applicationDetails.applicantSummary.longSummary.replace(/\\n/g, '\n')}</div>
+                    </div>
+                    ) : null }
                   <div className="dashboard-detail-section">
                     <h2>Status:</h2>
                     <p>To be implemented in another feature</p>

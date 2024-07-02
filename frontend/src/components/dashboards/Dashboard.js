@@ -200,22 +200,32 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
     } else {
       setIsSubmitting(true);
       try {
-        const formattedData = await formatApplicationData(selectedItem.qualifications, selectedItem.description, resumeFile);
-        const scoreResponse = await DashboardController.fetchGeminiResponse(formattedData);
-        const cleanedResponse = scoreResponse.response.replace(/```json|```/g, '');
-        const responseJson = JSON.parse(cleanedResponse);  
+        const scoreFormattedData = await formatScoreData(selectedItem.qualifications, selectedItem.description, resumeFile);
+        const scoreResponse = await DashboardController.fetchGeminiResponse(scoreFormattedData);
+        const scoreCleanedResponse = scoreResponse.response.replace(/```json|```/g, '');
+        const scoreResponseJson = JSON.parse(scoreCleanedResponse);  
+
+        const descFormattedData = await formatDescData(selectedItem.qualifications, selectedItem.description, resumeFile);
+        const descResponse = await DashboardController.fetchGeminiResponse(descFormattedData);
+        const descCleanedResponse = descResponse.response.replace(/```json|```/g, '');
+        const descResponseJson = JSON.parse(descCleanedResponse);  
+
         const applicationToSubmit = {
           applicantID: user.userId,
           jobID: selectedItem._id,
           resumeData: resumeFile,
-          totalScore: responseJson.totalScore,
+          totalScore: scoreResponseJson.totalScore,
           qualificationsScore: {
-            score: responseJson.qualificationsScore.score,
-            description: responseJson.qualificationsScore.description
+            score: scoreResponseJson.qualificationsScore.score,
+            description: scoreResponseJson.qualificationsScore.description
           },
           jobDescriptionScore: {
-            score: responseJson.jobDescriptionScore.score,
-            description: responseJson.jobDescriptionScore.description
+            score: scoreResponseJson.jobDescriptionScore.score,
+            description: scoreResponseJson.jobDescriptionScore.description
+          },
+          applicantSummary: {
+            longSummary: descResponseJson.applicantSummary.longSummary,
+            shortSummary: descResponseJson.applicantSummary.shortSummary
           }
         };
         const response = await DashboardController.applyForJob(applicationToSubmit);
@@ -261,7 +271,7 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
   };
 
   // Format the application data for the API call for the Compatibility Score
-  const formatApplicationData = async (qualifications, jobDescription, resumeFile) => {
+  const formatScoreData = async (qualifications, jobDescription, resumeFile) => {
     const resumeText = await TurnPdfToString(resumeFile);
     return `
       Instructions:
@@ -295,6 +305,42 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
       - 1 point: Applicant’s experience and skills minimally match the job description.
       - 0 points: Applicant’s experience and skills do not match the job description.
 
+      Job Posting:
+      Qualifications:
+      ${qualifications}
+
+      Job Description:
+      ${jobDescription}
+
+      Resume:
+      ${resumeText}
+    `;
+  };
+
+  // Format the application data for the API call for the Applicant Description
+  const formatDescData = async (qualifications, jobDescription, resumeFile) => {
+    const resumeText = await TurnPdfToString(resumeFile);
+    return `
+      Instructions:
+      - Evaluate the resume based on the job posting qualifications and job description below.
+      - For longSummary: Provide a concise description of the applicant, emphasizing the key skills and experiences that align with the 
+        job requirements. Highlight the most relevant qualifications that demonstrate the applicant's fit for the position.
+        Keep the description to a couple of sentences. Add spacing often, using a newline character. Include a
+        sentence at the bottom that summarizes how well the applicant aligns with the job posting. 
+      - For shortSummary: Provide a short summary of the applicant's qualifications and experience that align with the job posting.
+        It must be no longer than 12 words and in the following format. Use no more than three bullet points and separate each bullet
+        point with the newline character.
+        Example: '• 3 years with Python
+        • Great communication skills
+        • Contributed to open-source projects'
+      - Format the response as follows:
+      {
+        "applicantSummary": {
+          "longSummary": "<long_summary>",
+          "shortSummary": "<short_summary>"
+        }
+      }
+      
       Job Posting:
       Qualifications:
       ${qualifications}
@@ -663,6 +709,10 @@ const fetchJobsForApplicant = async (userId, setItems) => {
   try {
     const jobsResponse = await DashboardController.fetchJobs();
     const applicationsResponse = await DashboardController.fetchUserApplications(userId);
+    if(!applicationsResponse){
+      setItems(jobsResponse);
+      return;
+    }
     const appliedJobIds = new Set();
     applicationsResponse.forEach(application => {
       if (application.jobID) {
