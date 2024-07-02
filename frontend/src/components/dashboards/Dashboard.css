@@ -517,6 +517,11 @@
  * Submitting Message
  *************************************/
 
+.loading-dots-container {
+  position: relative;
+  top: 10px;
+}
+
 .submitting-message {
   display: flex;
   align-items: center;
