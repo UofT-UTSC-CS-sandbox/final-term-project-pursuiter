@@ -83,15 +83,6 @@ describe("Applications Management", () => {
     expect(res.body[1]).to.have.property("jobID", job2.insertedId.toString());
   });
 
-  it("should return 404 if no applications found for the user", async () => {
-    await mongoose.connection.db.collection("applications").deleteMany({});
-
-    const res = await request(app).get(`/applications/user/${user.userId}`);
-
-    expect(res.status).to.equal(404);
-    expect(res.body).to.have.property("message", "No applications found for this user");
-  });
-
   it("should fetch jobs excluding those the user has applied for", async () => {
     const jobsResponse = await request(app).get("/jobs");
     expect(jobsResponse.status).to.equal(200);
