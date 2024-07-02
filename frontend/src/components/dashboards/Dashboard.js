@@ -35,6 +35,7 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
   const [resumeFile, setResumeFile] = useState(null);
   const [resumeState, setResumeState] = useState("Missing");
   const [masterResume, setMasterResume] = useState(null);
+  const [resumeRecommendation, setResumeRecommendation] = useState("Loading...");
   const [qualified, setQualified] = useState(false);
   const { user, logoutUser } = useContext(UserContext);
 
@@ -353,9 +354,31 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
     `;
   };
 
+  // Format the master resume analysis data for the API call for the AI resume review
+  const formatMasterResumeData = async (qualifications, jobDescription, resumeText) => {
+    return `
+      Instructions:
+      - Evaluate the master resume based on how much the applicant matches the Qualifications and Job Description provided below.
+      - Return a detailed paragraph of text that provides a detailed analysis of the applicant's master resume, they need to know how well they match the posting,
+      things worth highlighting in the resume they submit crafted from the master resume, how likely are they to get an interview.
+      - use second person (words like you, your) as you are talking directly to the applicant.
+      - the response should not exceed 1500 characters.
+      - try to mention things specifically from the master resume in your response and link concepts to the job posting
+
+      Job Posting:
+      Qualifications:
+      ${qualifications}
+
+      Job Description:
+      ${jobDescription}
+
+      Master Resume:
+      ${resumeText}
+    `;
+  };
 
   // Handle the checking for qualifications in the master resume
-  const handleQualificationsCheck = async (keywords, resume) => {
+  const handleQualificationsCheck = async (keywords, resume, qualifications, jobDescription) => {
     if(masterResume === null){
       setQualified(false);
       return;
@@ -363,11 +386,15 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
 
     const keywordsArray = keywords.toLowerCase().split(",").map(keyword => keyword.trim());
     
-    let fullText = await TurnPdfToString(resume);
+    let resumeText = await TurnPdfToString(resume);
 
-    fullText = fullText.toLowerCase();
+    const formattedData = await formatMasterResumeData(qualifications, jobDescription, resumeText);
+    const resumeResponse = await DashboardController.fetchGeminiResponse(formattedData);   
+    setResumeRecommendation(resumeResponse.response);
 
-    const allKeywordsFound = keywordsArray.every(keyword => fullText.includes(keyword));
+    resumeText = resumeText.toLowerCase();
+
+    const allKeywordsFound = keywordsArray.every(keyword => resumeText.includes(keyword));
 
     if(allKeywordsFound){
       setQualified(true);
@@ -424,7 +451,9 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
                 className="dashboard-item"
                 onClick={() => {
                   setSelectedItem(item);
-                  handleQualificationsCheck(item.hiddenKeywords, masterResume);
+                  setQualified(false);
+                  setResumeRecommendation("Loading...");
+                  handleQualificationsCheck(item.hiddenKeywords, masterResume, item.qualifications, item.description);
                 }}
               >
                 <div className="dashboard-title">{item.title}</div>
@@ -510,17 +539,6 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
                     <h2>Type:</h2>
                     <p>{selectedItem.type}</p>
                   </div>
-                  {role === "recruiter" ? (
-                      <>
-                        <div className="dashboard-detail-section">
-                          <h2>Hidden Keywords:</h2>{" "}
-                          <p>{selectedItem.hiddenKeywords}</p>
-                        </div>
-                      </>
-                    ) : (
-                      <>
-                      </>
-                  )}
                   <div className="dashboard-detail-section">
                     <h2>Description:</h2>
                     <p>{selectedItem.description}</p>
@@ -529,6 +547,43 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
                     <h2>Qualifications:</h2>
                     <p>{selectedItem.qualifications}</p>
                   </div>
+                  {role === "recruiter" ? (
+                      <>
+                        <div className="dashboard-detail-section">
+                          <h2>Hidden Keywords:</h2>
+                          <p>{selectedItem.hiddenKeywords}</p>
+                        </div>
+                      </>
+                    ) : (
+                      <>
+                       <div className="dashboard-detail-section">
+                          <h2>AI master resume analysis:</h2>
+                          {masterResume !== null ? (
+                              <>    
+                                {resumeRecommendation === "Loading..." ? (
+                                    <>    
+                                      <div class="loading-dots-container">                  
+                                        <div className="loading-dots">
+                                          <span></span>
+                                          <span></span>
+                                          <span></span>
+                                        </div>
+                                      </div>
+                                    </>
+                                  ) : (
+                                    <>
+                                      <p>{resumeRecommendation}</p>                  
+                                    </>
+                                )}  
+                              </>
+                            ) : (
+                              <>
+                                <p>Master resume has not been uploaded. Analysis will be available once you upload it from the account page.</p>                  
+                              </>
+                          )}                                                      
+                        </div>                      
+                      </>
+                  )}                  
                 </div>
               </>
             ) : (
