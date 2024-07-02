@@ -359,9 +359,11 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
     return `
       Instructions:
       - Evaluate the master resume based on how much the applicant matches the Qualifications and Job Description provided below.
-      - Return a paragraph of text that provides a detailed analysis of the applicant's master resume, they need to know how well they match the posting,
+      - Return a detailed paragraph of text that provides a detailed analysis of the applicant's master resume, they need to know how well they match the posting,
       things worth highlighting in the resume they submit crafted from the master resume, how likely are they to get an interview.
       - use second person (words like you, your) as you are talking directly to the applicant.
+      - the response should not exceed 1500 characters.
+      - try to mention things specifically from the master resume in your response and link concepts to the job posting
 
       Job Posting:
       Qualifications:
