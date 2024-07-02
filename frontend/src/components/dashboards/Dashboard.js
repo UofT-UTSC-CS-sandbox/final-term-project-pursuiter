@@ -709,6 +709,10 @@ const fetchJobsForApplicant = async (userId, setItems) => {
   try {
     const jobsResponse = await DashboardController.fetchJobs();
     const applicationsResponse = await DashboardController.fetchUserApplications(userId);
+    if(!applicationsResponse){
+      setItems(jobsResponse);
+      return;
+    }
     const appliedJobIds = new Set();
     applicationsResponse.forEach(application => {
       if (application.jobID) {
