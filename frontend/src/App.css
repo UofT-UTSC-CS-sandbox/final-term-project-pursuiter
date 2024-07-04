@@ -130,6 +130,7 @@ button:disabled:hover {
   border-width: 5px;
   border-style: solid;
   border-color: transparent #1e1e1e transparent transparent;
+  display: none;
 }
 
 /************************************
