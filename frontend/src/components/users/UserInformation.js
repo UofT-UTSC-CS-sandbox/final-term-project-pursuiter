@@ -1,3 +1,4 @@
+import "../../App.css";
 import "./Users.css";
 
 import React, { useState, useContext, useEffect } from "react";
@@ -165,7 +166,15 @@ function UserInformation() {
           {userType === "applicant" && (
             <div>
               <div className="users-header users-info-header">
+                <div className="master-resume-header">
                 <h1>Master Resume</h1>
+                <span className="tooltip-container">
+                  <span className="tooltip-icon">?</span>
+                  <span className="tooltip tooltip-users">
+                    Your eligibility for job applications may be affected by this resume. Please ensure it is up-to-date and includes all your qualifications.
+                  </span>
+                </span>
+                </div>
                 <button onClick={() => {setShowFileForm(true);
                                         setIsFileSelected(false);
                                        }}>Add File</button>
