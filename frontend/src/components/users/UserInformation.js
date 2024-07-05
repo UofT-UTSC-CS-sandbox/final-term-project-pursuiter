@@ -49,10 +49,10 @@ function UserInformation() {
   const handleSubmit = async (e) => {
     if (!isFileSelected) {
       e.preventDefault();
-      alert('Please select a file before submitting.');
+      alert("Please select a file before submitting.");
       return;
     }
-   
+
     e.preventDefault();
     const updatedUser = {
       email: user.email,
@@ -95,138 +95,152 @@ function UserInformation() {
     };
     reader.readAsDataURL(file);
   };
-  
+
   return (
     <div className="users-information-wrapper">
-    <div className="users-page-container">
-      <div className="users-container account-page">
-        <div className="aesthetic-bar-users"></div>
-        <div className="users-info-container">
-          <form onSubmit={handleSubmit}>
-            <div className="users-header users-info-header">
-              <h1>Personal Information</h1>
-              <button type="submit">Save</button>
-            </div>
-            <div className="users-form-group users-info-form-group">
-              <label>Name:</label>
-              <input
-                type="text"
-                name="fullName"
-                value={fullName}
-                onChange={(e) => setFullName(e.target.value)}
-                required
-              />
-            </div>
-            <div className="users-form-group users-info-form-group">
-              <label>Address:</label>
-              <input
-                type="text"
-                name="address"
-                value={address}
-                onChange={(e) => setAddress(e.target.value)}
-                required
-              />
-            </div>
-            <div className="users-form-group users-info-form-group">
-              <label>Email:</label>
-              <input
-                type="email"
-                name="email"
-                value={newEmail}
-                onChange={(e) => setNewEmail(e.target.value)}
-                required
-              />
-            </div>
-            {userType === "applicant" ? (
+      <div className="users-page-container">
+        <div className="users-container account-page">
+          <div className="aesthetic-bar-users"></div>
+          <div className="users-info-container">
+            <form onSubmit={handleSubmit}>
+              <div className="users-header users-info-header">
+                <h1>Personal Information</h1>
+                <button type="submit">Save</button>
+              </div>
               <div className="users-form-group users-info-form-group">
-                <label>Positions Wanted:</label>
+                <label>Name:</label>
                 <input
                   type="text"
-                  name="positions"
-                  placeholder="Separate using commas. Eg: Software Engineer, Data Analyst"
-                  value={positions}
-                  onChange={(e) => setPositions(e.target.value)}
+                  name="fullName"
+                  value={fullName}
+                  onChange={(e) => setFullName(e.target.value)}
                   required
                 />
               </div>
-            ) : (
               <div className="users-form-group users-info-form-group">
-                <label>Company:</label>
+                <label>Address:</label>
                 <input
                   type="text"
-                  name="companyName"
-                  value={companyName}
-                  onChange={(e) => setCompanyName(e.target.value)}
+                  name="address"
+                  value={address}
+                  onChange={(e) => setAddress(e.target.value)}
                   required
                 />
+              </div>
+              <div className="users-form-group users-info-form-group">
+                <label>Email:</label>
+                <input
+                  type="email"
+                  name="email"
+                  value={newEmail}
+                  onChange={(e) => setNewEmail(e.target.value)}
+                  required
+                />
+              </div>
+              {userType === "applicant" ? (
+                <div className="users-form-group users-info-form-group">
+                  <label>Positions Wanted:</label>
+                  <input
+                    type="text"
+                    name="positions"
+                    placeholder="Separate using commas. Eg: Software Engineer, Data Analyst"
+                    value={positions}
+                    onChange={(e) => setPositions(e.target.value)}
+                    required
+                  />
+                </div>
+              ) : (
+                <div className="users-form-group users-info-form-group">
+                  <label>Company:</label>
+                  <input
+                    type="text"
+                    name="companyName"
+                    value={companyName}
+                    onChange={(e) => setCompanyName(e.target.value)}
+                    required
+                  />
+                </div>
+              )}
+            </form>
+
+            {userType === "applicant" && (
+              <div>
+                <div className="users-header users-info-header">
+                  <div className="master-resume-header">
+                    <h1>Master Resume</h1>
+                    <span className="tooltip-container">
+                      <span className="tooltip-icon">?</span>
+                      <span className="tooltip tooltip-users">
+                        Your eligibility for job applications may be affected by
+                        this resume. Please ensure it is up-to-date and includes
+                        all your qualifications.
+                      </span>
+                    </span>
+                  </div>
+                  <button
+                    onClick={() => {
+                      setShowFileForm(true);
+                      setIsFileSelected(false);
+                    }}
+                  >
+                    Add File
+                  </button>
+                </div>
+                <div className="users-header users-info-header">
+                  {selectedResume ? (
+                    <iframe
+                      src={selectedResume}
+                      className="resume-iframe"
+                      title="Resume"
+                    ></iframe>
+                  ) : (
+                    "Resume not available"
+                  )}
+                </div>
               </div>
             )}
+          </div>
+        </div>
+        <Modal
+          show={showFileForm}
+          onClose={() => setShowFileForm(false)}
+          title={editMode ? "Edit File" : "New File"}
+        >
+          <form className="new-item-form" onSubmit={handleSubmit}>
+            <p>Upload Resume: </p>
+            <input
+              type="file"
+              accept=".pdf"
+              onChange={(event) => handleMasterResumeChange(event, "resume")}
+            />
+            <button
+              type="submit"
+              className="submit-button"
+              disabled={!isFileSelected}
+            >
+              {editMode ? "Update File" : "Submit"}
+            </button>
+            <button
+              className="cancel-button"
+              onClick={() => {
+                setShowFileForm(false);
+                setIsFileSelected(true);
+                setResumeFile(null);
+              }}
+            >
+              Cancel
+            </button>
           </form>
-          
-          {userType === "applicant" && (
-            <div>
-              <div className="users-header users-info-header">
-                <div className="master-resume-header">
-                <h1>Master Resume</h1>
-                <span className="tooltip-container">
-                  <span className="tooltip-icon">?</span>
-                  <span className="tooltip tooltip-users">
-                    Your eligibility for job applications may be affected by this resume. Please ensure it is up-to-date and includes all your qualifications.
-                  </span>
-                </span>
-                </div>
-                <button onClick={() => {setShowFileForm(true);
-                                        setIsFileSelected(false);
-                                       }}>Add File</button>
-              </div>
-              <div className="users-header users-info-header"> 
-                {selectedResume ? (
-                  <iframe
-                    src={selectedResume}
-                    className="resume-iframe"
-                    title="Resume"
-                  ></iframe>
-                ) : (
-                  "Resume not available"
-                )}
-              </div>
-            </div>
-          )}
-        </div> 
+        </Modal>
+        <Modal
+          show={showConfirmation}
+          onClose={() => setShowConfirmation(false)}
+        >
+          <p>User information updated successfully!</p>
+        </Modal>
       </div>
-      <Modal
-        show={showFileForm}
-        onClose={() => setShowFileForm(false)}
-        title={editMode ? "Edit File" : "New File"}
-      >
-        <form className="new-item-form" onSubmit={handleSubmit}>
-          <p>Upload Resume: </p>
-          <input
-            type="file"
-            accept=".pdf"
-            onChange={(event) => handleMasterResumeChange(event, "resume")}
-          />
-          <button type="submit" className="submit-button" disabled={!isFileSelected}>
-            {editMode ? "Update File" : "Submit"}
-          </button>
-          <button
-            className="cancel-button"
-            onClick={() => {setShowFileForm(false);
-                            setIsFileSelected(true);
-                            setResumeFile(null);
-                    }}
-          >
-            Cancel
-          </button>
-        </form>
-      </Modal>
-      <Modal show={showConfirmation} onClose={() => setShowConfirmation(false)}>
-        <p>User information updated successfully!</p>
-      </Modal>
-    </div>
     </div>
   );
-};
-
+}
 
 export default UserInformation;

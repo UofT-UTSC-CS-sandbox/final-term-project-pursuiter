@@ -6,17 +6,17 @@ Acceptance criteria: Given that words are entered into the search bar, when the 
 
 Priority: 3 - Low
 
-   a. Subtask - Implement Search Bar in Frontend
-   
-   Develop the search bar component in the frontend, allowing users to enter search terms.
+a. Subtask - Implement Search Bar in Frontend
 
-   Priority: 3 - Low
+Develop the search bar component in the frontend, allowing users to enter search terms.
 
-   b. Subtask - Develop Search API Endpoint
+Priority: 3 - Low
 
-   Create an API endpoint that handles search queries and returns job listings that match the search terms. Integrate the search bar with the backend API, ensuring the frontend displays the search results correctly.
+b. Subtask - Develop Search API Endpoint
 
-   Priority: 3 - Low
+Create an API endpoint that handles search queries and returns job listings that match the search terms. Integrate the search bar with the backend API, ensuring the frontend displays the search results correctly.
+
+Priority: 3 - Low
 
 2. User story - Employer applications search
 
@@ -27,17 +27,17 @@ then the employer will be able to view all the applicants that have the matching
 
 Priority: 3 - Low
 
-   a. Subtask - Implement Search Bar in Frontend
-   
-   Develop the search bar component in the frontend, allowing users to enter search terms.
+a. Subtask - Implement Search Bar in Frontend
 
-   Priority: 3 - Low
+Develop the search bar component in the frontend, allowing users to enter search terms.
 
-   b. Subtask - Develop Search API Endpoint
+Priority: 3 - Low
 
-   Create an API endpoint that handles search queries and returns applicants that match the search terms. Integrate the search bar with the backend API, ensuring the frontend displays the search results correctly.
+b. Subtask - Develop Search API Endpoint
 
-   Priority: 3 - Low
+Create an API endpoint that handles search queries and returns applicants that match the search terms. Integrate the search bar with the backend API, ensuring the frontend displays the search results correctly.
+
+Priority: 3 - Low
 
 3. User Story - Job seeker search filter
 
@@ -47,17 +47,17 @@ Acceptance criteria: Given that filters are set, when looking at the list of job
 
 Priority: 3 - Low
 
-   a. Subtask - Develop Filter UI in Frontend
+a. Subtask - Develop Filter UI in Frontend
 
-   Create the filter section in the frontend, allowing users to select various filter options.
+Create the filter section in the frontend, allowing users to select various filter options.
 
-   Priority: 3 - Low
+Priority: 3 - Low
 
-   b. Subtask - Implement Filter Logic in Backend
+b. Subtask - Implement Filter Logic in Backend
 
-   Develop the logic in the backend to handle filter options and return job listings that match the selected filters. Connect the frontend filter options with the backend logic, ensuring the job listings are filtered according to the selected criteria.
+Develop the logic in the backend to handle filter options and return job listings that match the selected filters. Connect the frontend filter options with the backend logic, ensuring the job listings are filtered according to the selected criteria.
 
-   Priority: 3 - Low
+Priority: 3 - Low
 
 4. User Story - Employer applications filtering
 
@@ -68,17 +68,17 @@ then the employer will be able to view all the applicants that have the matching
 
 Priority: 3 - Low
 
-   a. Subtask - Develop Filter UI in Frontend
+a. Subtask - Develop Filter UI in Frontend
 
-   Create the filter section in the frontend, allowing users to select various filter options.
+Create the filter section in the frontend, allowing users to select various filter options.
 
-   Priority: 3 - Low
+Priority: 3 - Low
 
-   b. Subtask - Implement Filter Logic in Backend
+b. Subtask - Implement Filter Logic in Backend
 
-   Develop the logic in the backend to handle filter options and return job listings that match the selected filters. Connect the frontend filter options with the backend logic, ensuring the job listings are filtered according to the selected criteria.
+Develop the logic in the backend to handle filter options and return job listings that match the selected filters. Connect the frontend filter options with the backend logic, ensuring the job listings are filtered according to the selected criteria.
 
-   Priority: 3 - Low
+Priority: 3 - Low
 
 5. User Story - Job seeker application tracking
 
@@ -88,17 +88,17 @@ Acceptance criteria: Given that the job seeker applied to a job, when updates by
 
 Priority: 2 - Medium
 
-   a. Subtask - Develop Backend Logic for Application Status Updates
+a. Subtask - Develop Backend Logic for Application Status Updates
 
-   Implement the backend logic to track and update the statuses of job applications based on employer updates.
+Implement the backend logic to track and update the statuses of job applications based on employer updates.
 
-   Priority: 2 - Medium
+Priority: 2 - Medium
 
-   b. Subtask - Integrate Status Updates into User’s Application Section
+b. Subtask - Integrate Status Updates into User’s Application Section
 
-   Ensure that updates from the backend are reflected in the job seeker’s “Applications” section in the frontend.
+Ensure that updates from the backend are reflected in the job seeker’s “Applications” section in the frontend.
 
-   Priority: 2 - Medium
+Priority: 2 - Medium
 
 6. User Story - Employer edit applicant status
 
@@ -108,20 +108,20 @@ Acceptance criteria: Given that the application status is specified by the emplo
 
 Priority: 3 - Low
 
-   a. Subtask - Develop Backend Logic for Editing Application Status
+a. Subtask - Develop Backend Logic for Editing Application Status
 
-   Implement the backend logic to allow employers to edit the status of job applications.
+Implement the backend logic to allow employers to edit the status of job applications.
 
-   Priority: 3 - Low
+Priority: 3 - Low
 
-   b. Subtask - Integrate Status Updates into Frontend
+b. Subtask - Integrate Status Updates into Frontend
 
-   Ensure that the updated status is reflected in both the employer’s and applicant’s view in the frontend.
+Ensure that the updated status is reflected in both the employer’s and applicant’s view in the frontend.
 
-   Priority: 3 - Low
+Priority: 3 - Low
 
 7. Task - Implement the Applied-To tab
-  
+
 After a successful application to a job, the user should be able to go to a separate tab of applied jobs and be able to see the list of applied jobs there.
 
 Priority: 2 - Medium
@@ -140,7 +140,7 @@ Priority: 1 - High
 
 10. Bug - Modal overlay does not cover navbar
 
-The modal does not cover the navbar section of the screen. So, when scrolling down, any content that is now in place of the navbar is not covered by the modal overlay. 
+The modal does not cover the navbar section of the screen. So, when scrolling down, any content that is now in place of the navbar is not covered by the modal overlay.
 
 Priority: 3 - Low
 
@@ -158,23 +158,23 @@ Acceptance criteria: Given that the user opts to sign up or log in via OAuth, wh
 
 Priority: 3 - Low
 
-   a. Subtask - Integrate OAuth SDK
-   
-   Integrate the OAuth SDK (such as Google, Facebook, etc.) into the backend to enable OAuth authentication.
+a. Subtask - Integrate OAuth SDK
 
-   Priority: 3 - Low
+Integrate the OAuth SDK (such as Google, Facebook, etc.) into the backend to enable OAuth authentication.
 
-   b. Subtask - Develop OAuth Signup/Login API Endpoint
+Priority: 3 - Low
 
-   Create an API endpoint to handle OAuth signup and login requests, ensuring the user is authenticated and their session is managed appropriately.
+b. Subtask - Develop OAuth Signup/Login API Endpoint
 
-   Priority: 3 - Low
+Create an API endpoint to handle OAuth signup and login requests, ensuring the user is authenticated and their session is managed appropriately.
 
-   c. Subtask - Frontend Implementation
+Priority: 3 - Low
 
-   Add the OAuth signup/login buttons to the frontend and ensure they correctly initiate the OAuth flow and handle responses.
+c. Subtask - Frontend Implementation
 
-   Priority: 3 - Low
+Add the OAuth signup/login buttons to the frontend and ensure they correctly initiate the OAuth flow and handle responses.
+
+Priority: 3 - Low
 
 13. User Story - Organization Accounts
 
@@ -184,23 +184,23 @@ Acceptance criteria: Given that a user accesses the organization account, when t
 
 Priority: 2 - Medium
 
-   a. Subtask - Store Posted-By/Edited-By Information
-   
-   Implement functionality to store the information about who posted and edited each job posting in the database.
+a. Subtask - Store Posted-By/Edited-By Information
 
-   Priority: 2 - Medium
+Implement functionality to store the information about who posted and edited each job posting in the database.
 
-   b. Subtask - Display All Jobs for Company
-   
-   Implement the functionality to display all job postings associated with the company in the organization's account view.
+Priority: 2 - Medium
 
-   Priority: 2 - Medium
+b. Subtask - Display All Jobs for Company
 
-   c. Subtask - Show Posted-By/Edited-By Information
+Implement the functionality to display all job postings associated with the company in the organization's account view.
 
-   Develop the logic to display who posted and edited each job posting in the job listings for the organization's account.
+Priority: 2 - Medium
 
-   Priority: 2 - Medium
+c. Subtask - Show Posted-By/Edited-By Information
+
+Develop the logic to display who posted and edited each job posting in the job listings for the organization's account.
+
+Priority: 2 - Medium
 
 14. User Story - Dashboard pagination
 
@@ -210,17 +210,17 @@ Acceptance criteria: Given that there are many job listings, when the user views
 
 Priority: 2 - Medium
 
-   a. Subtask - Implement Pagination in Frontend
-   
-   Develop the pagination controls in the frontend to allow users to navigate through different pages of job listings.
+a. Subtask - Implement Pagination in Frontend
 
-   Priority: 2 - Medium
+Develop the pagination controls in the frontend to allow users to navigate through different pages of job listings.
 
-   b. Subtask - Implement Pagination Logic in Backend
+Priority: 2 - Medium
 
-   Develop the backend logic to handle pagination requests, returning the appropriate subset of job listings for each page.
+b. Subtask - Implement Pagination Logic in Backend
 
-   Priority: 2 - Medium
+Develop the backend logic to handle pagination requests, returning the appropriate subset of job listings for each page.
+
+Priority: 2 - Medium
 
 15. User Story - Applicant List pagination
 
@@ -230,17 +230,17 @@ Acceptance criteria: Given that there are many applicants, when the user views t
 
 Priority: 2 - Medium
 
-   a. Subtask - Implement Pagination in Frontend
-   
-   Develop the pagination controls in the frontend to allow users to navigate through different pages of applicants.
+a. Subtask - Implement Pagination in Frontend
 
-   Priority: 2 - Medium
+Develop the pagination controls in the frontend to allow users to navigate through different pages of applicants.
 
-   b. Subtask - Implement Pagination Logic in Backend
+Priority: 2 - Medium
 
-   Develop the backend logic to handle pagination requests, returning the appropriate subset of applicants for each page.
+b. Subtask - Implement Pagination Logic in Backend
 
-   Priority: 2 - Medium
+Develop the backend logic to handle pagination requests, returning the appropriate subset of applicants for each page.
+
+Priority: 2 - Medium
 
 16. Task - Reformat the personal info, login, and landing page frontend to abide by Figma
 

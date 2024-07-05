@@ -144,11 +144,11 @@
   margin-bottom: 0px;
 }
 
-.submit-button:disabled{
-  background-color: #E0E0E0;
+.submit-button:disabled {
+  background-color: #e0e0e0;
   color: #fff;
-  border-color: #CDCDCD;
-  cursor:not-allowed;
+  border-color: #cdcdcd;
+  cursor: not-allowed;
 }
 
 /************************************

@@ -124,7 +124,7 @@
 }
 
 .dashboard-detail-section {
-  white-space: pre-wrap;  
+  white-space: pre-wrap;
 }
 
 .resume-iframe {
@@ -363,7 +363,7 @@
 /************************************
  * Progress Bar
  *************************************/
- .progress-bar-container {
+.progress-bar-container {
   display: flex;
   align-items: center;
   margin-top: 20px;
@@ -381,7 +381,9 @@
 .progress-bar-fill {
   height: 100%;
   border-radius: 25px;
-  transition: width 2s, background-color 2s;
+  transition:
+    width 2s,
+    background-color 2s;
   width: 0;
 }
 
@@ -391,12 +393,11 @@
   color: #000;
 }
 
-
 /************************************
  * AI Feedback Section
  *************************************/
 
- .ai-feedback-section {
+.ai-feedback-section {
   margin-top: 20px;
   display: flex;
   flex-direction: column;
@@ -452,16 +453,15 @@
   flex-grow: 1;
 }
 
-
 .ai-feedback-box {
-    height: 150px;
+  height: 150px;
 }
 
 /************************************
  * Responsive Styling
  *************************************/
 
- @media (max-width: 600px) {
+@media (max-width: 600px) {
   .dashboard-content {
     padding: 10px;
   }

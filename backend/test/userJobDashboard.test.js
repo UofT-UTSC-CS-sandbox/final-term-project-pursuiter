@@ -28,7 +28,7 @@ describe("Applications Management", () => {
       hiddenKeywords: "keyword1, keyword2",
       description: "Sample job description 1",
       qualifications: "Sample qualifications 1",
-      recruiterID: "recruiter1"
+      recruiterID: "recruiter1",
     });
 
     job2 = await mongoose.connection.db.collection("jobs").insertOne({
@@ -40,7 +40,7 @@ describe("Applications Management", () => {
       hiddenKeywords: "keyword3, keyword4",
       description: "Sample job description 2",
       qualifications: "Sample qualifications 2",
-      recruiterID: "recruiter2"
+      recruiterID: "recruiter2",
     });
 
     job3 = await mongoose.connection.db.collection("jobs").insertOne({
@@ -52,21 +52,25 @@ describe("Applications Management", () => {
       hiddenKeywords: "keyword5, keyword6",
       description: "Sample job description 3",
       qualifications: "Sample qualifications 3",
-      recruiterID: "recruiter3"
+      recruiterID: "recruiter3",
     });
 
-    application1 = await mongoose.connection.db.collection("applications").insertOne({
-      applicantID: user.userId,
-      jobID: job1.insertedId.toString(),
-      appliedDate: "2024-06-14",
-      resumeData: "data:application/pdf;base64,samplebase64data"
-    });
+    application1 = await mongoose.connection.db
+      .collection("applications")
+      .insertOne({
+        applicantID: user.userId,
+        jobID: job1.insertedId.toString(),
+        appliedDate: "2024-06-14",
+        resumeData: "data:application/pdf;base64,samplebase64data",
+      });
 
-    application2 = await mongoose.connection.db.collection("applications").insertOne({
-      applicantID: user.userId,
-      jobID: job2.insertedId.toString(),
-      resumeData: null
-    });
+    application2 = await mongoose.connection.db
+      .collection("applications")
+      .insertOne({
+        applicantID: user.userId,
+        jobID: job2.insertedId.toString(),
+        resumeData: null,
+      });
   });
 
   it("should fetch all applications for a user", async () => {
@@ -78,7 +82,10 @@ describe("Applications Management", () => {
     expect(res.body[0]).to.have.property("applicantID", user.userId);
     expect(res.body[0]).to.have.property("jobID", job1.insertedId.toString());
     expect(res.body[0]).to.have.property("appliedDate", "2024-06-14");
-    expect(res.body[0]).to.have.property("resumeData", "data:application/pdf;base64,samplebase64data");
+    expect(res.body[0]).to.have.property(
+      "resumeData",
+      "data:application/pdf;base64,samplebase64data",
+    );
     expect(res.body[1]).to.have.property("applicantID", user.userId);
     expect(res.body[1]).to.have.property("jobID", job2.insertedId.toString());
   });
@@ -88,13 +95,22 @@ describe("Applications Management", () => {
     expect(jobsResponse.status).to.equal(200);
     const jobs = jobsResponse.body;
 
-    const userJobsResponse = await request(app).get(`/applications/user/${user.userId}`);
+    const userJobsResponse = await request(app).get(
+      `/applications/user/${user.userId}`,
+    );
     expect(userJobsResponse.status).to.equal(200);
-    const appliedJobIds = new Set(userJobsResponse.body.map(app => app.jobID));
+    const appliedJobIds = new Set(
+      userJobsResponse.body.map((app) => app.jobID),
+    );
 
-    const availableJobs = jobs.filter(job => !appliedJobIds.has(job._id.toString()));
-    
+    const availableJobs = jobs.filter(
+      (job) => !appliedJobIds.has(job._id.toString()),
+    );
+
     expect(availableJobs.length).to.equal(1);
-    expect(availableJobs[0]).to.have.property("_id", job3.insertedId.toString());
+    expect(availableJobs[0]).to.have.property(
+      "_id",
+      job3.insertedId.toString(),
+    );
   });
 });
