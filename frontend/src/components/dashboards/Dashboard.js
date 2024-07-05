@@ -35,13 +35,15 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
   const [resumeFile, setResumeFile] = useState(null);
   const [resumeState, setResumeState] = useState("Missing");
   const [masterResume, setMasterResume] = useState(null);
-  const [MasterResumeRecommendation, setMasterResumeRecommendation] = useState("Loading...");
+  const [MasterResumeRecommendation, setMasterResumeRecommendation] =
+    useState("Loading...");
   const [qualified, setQualified] = useState(false);
   const { user, logoutUser } = useContext(UserContext);
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [showApplicationForm, setShowApplicationForm] = useState(false);
   const [ResumeRecommendation, setResumeRecommendation] = useState("");
-  const [isGenerateButtonDisabled, setIsGenerateButtonDisabled] = useState(true);
+  const [isGenerateButtonDisabled, setIsGenerateButtonDisabled] =
+    useState(true);
   const [isGenerateButtonClicked, setIsGenerateButtonClicked] = useState(false);
   const [submissionStatus, setSubmissionStatus] = useState("");
   const [isQualificationsLoading, setIsQualificationsLoading] = useState(false);
@@ -53,12 +55,12 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
       fetchJobs(user.userId, setItems);
 
       UserController.fetchUserInformation(user.userId)
-      .then((userInfo) => {
-        setMasterResume(userInfo.masterResume || null);
-      })
-      .catch((error) => {
-        console.error("Error fetching user information:", error);
-      });      
+        .then((userInfo) => {
+          setMasterResume(userInfo.masterResume || null);
+        })
+        .catch((error) => {
+          console.error("Error fetching user information:", error);
+        });
     }
   }, [user, fetchFavoritedJobs, fetchJobs]);
 
@@ -210,16 +212,32 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
       setShowConfirmation(true);
       setShowApplicationForm(false);
       try {
-        const scoreFormattedData = await formatScoreData(selectedItem.qualifications, selectedItem.description, resumeFile);
-        const scoreResponse = await DashboardController.fetchGeminiResponse(scoreFormattedData);
-        const scoreCleanedResponse = scoreResponse.response.replace(/```json|```/g, '');
-        const scoreResponseJson = JSON.parse(scoreCleanedResponse);  
-  
-        const descFormattedData = await formatDescData(selectedItem.qualifications, selectedItem.description, resumeFile);
-        const descResponse = await DashboardController.fetchGeminiResponse(descFormattedData);
-        const descCleanedResponse = descResponse.response.replace(/```json|```/g, '');
-        const descResponseJson = JSON.parse(descCleanedResponse);  
-  
+        const scoreFormattedData = await formatScoreData(
+          selectedItem.qualifications,
+          selectedItem.description,
+          resumeFile,
+        );
+        const scoreResponse =
+          await DashboardController.fetchGeminiResponse(scoreFormattedData);
+        const scoreCleanedResponse = scoreResponse.response.replace(
+          /```json|```/g,
+          "",
+        );
+        const scoreResponseJson = JSON.parse(scoreCleanedResponse);
+
+        const descFormattedData = await formatDescData(
+          selectedItem.qualifications,
+          selectedItem.description,
+          resumeFile,
+        );
+        const descResponse =
+          await DashboardController.fetchGeminiResponse(descFormattedData);
+        const descCleanedResponse = descResponse.response.replace(
+          /```json|```/g,
+          "",
+        );
+        const descResponseJson = JSON.parse(descCleanedResponse);
+
         const applicationToSubmit = {
           applicantID: user.userId,
           jobID: selectedItem._id,
@@ -227,18 +245,19 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
           totalScore: scoreResponseJson.totalScore,
           qualificationsScore: {
             score: scoreResponseJson.qualificationsScore.score,
-            description: scoreResponseJson.qualificationsScore.description
+            description: scoreResponseJson.qualificationsScore.description,
           },
           jobDescriptionScore: {
             score: scoreResponseJson.jobDescriptionScore.score,
-            description: scoreResponseJson.jobDescriptionScore.description
+            description: scoreResponseJson.jobDescriptionScore.description,
           },
           applicantSummary: {
             longSummary: descResponseJson.applicantSummary.longSummary,
-            shortSummary: descResponseJson.applicantSummary.shortSummary
-          }
+            shortSummary: descResponseJson.applicantSummary.shortSummary,
+          },
         };
-        const response = await DashboardController.applyForJob(applicationToSubmit);
+        const response =
+          await DashboardController.applyForJob(applicationToSubmit);
         setApplications((prevApplications) => [response, ...prevApplications]);
         setShowApplicationForm(false);
         setResumeState("Missing");
@@ -253,36 +272,38 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
         setIsSubmitting(false);
       }
     }
-  };  
-  
-  
-  
+  };
+
   //Turn pdf base64 string into text
   const TurnPdfToString = async (pdf) => {
     const base64String = pdf.split(",")[1];
     const pdfData = atob(base64String);
-  
+
     const pdfArray = new Uint8Array(pdfData.length);
     for (let i = 0; i < pdfData.length; i++) {
       pdfArray[i] = pdfData.charCodeAt(i);
     }
-  
+
     const loadingTask = pdfjsLib.getDocument({ data: pdfArray });
     const pdfDocument = await loadingTask.promise;
-  
+
     let fullText = "";
     for (let pageNum = 1; pageNum <= pdfDocument.numPages; pageNum++) {
       const page = await pdfDocument.getPage(pageNum);
       const textContent = await page.getTextContent();
-      const pageText = textContent.items.map(item => item.str).join(" ");
+      const pageText = textContent.items.map((item) => item.str).join(" ");
       fullText += pageText + " ";
     }
-  
+
     return fullText.trim();
   };
 
   // Format the application data for the API call for the Compatibility Score
-  const formatScoreData = async (qualifications, jobDescription, resumeFile) => {
+  const formatScoreData = async (
+    qualifications,
+    jobDescription,
+    resumeFile,
+  ) => {
     const resumeText = await TurnPdfToString(resumeFile);
     return `
       Instructions:
@@ -365,7 +386,11 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
   };
 
   // Format the resume analysis data for the API call for the AI resume review
-  const formatResumeData = async (qualifications, jobDescription, resumeText) => {
+  const formatResumeData = async (
+    qualifications,
+    jobDescription,
+    resumeText,
+  ) => {
     return `
       Instructions:
       - Evaluate the master resume based on how much the applicant matches the Qualifications and Job Description provided below.
@@ -388,37 +413,49 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
   };
 
   // Handle the checking for qualifications in the master resume
-  const handleQualificationsCheck = async (keywords, resume, qualifications, jobDescription) => {
-
+  const handleQualificationsCheck = async (
+    keywords,
+    resume,
+    qualifications,
+    jobDescription,
+  ) => {
     setIsQualificationsLoading(true);
 
-    if(masterResume === null){
+    if (masterResume === null) {
       setQualified(false);
       setIsQualificationsLoading(false);
       return;
     }
 
-    const keywordsArray = keywords.toLowerCase().split(",").map(keyword => keyword.trim());
-    
+    const keywordsArray = keywords
+      .toLowerCase()
+      .split(",")
+      .map((keyword) => keyword.trim());
+
     let resumeText = await TurnPdfToString(resume);
 
-    const formattedData = await formatResumeData(qualifications, jobDescription, resumeText);
-    const resumeResponse = await DashboardController.fetchGeminiResponse(formattedData);   
+    const formattedData = await formatResumeData(
+      qualifications,
+      jobDescription,
+      resumeText,
+    );
+    const resumeResponse =
+      await DashboardController.fetchGeminiResponse(formattedData);
     setMasterResumeRecommendation(resumeResponse.response);
 
     resumeText = resumeText.toLowerCase();
 
-    const allKeywordsFound = keywordsArray.every(keyword => resumeText.includes(keyword));
+    const allKeywordsFound = keywordsArray.every((keyword) =>
+      resumeText.includes(keyword),
+    );
 
-    if(allKeywordsFound){
+    if (allKeywordsFound) {
       setQualified(true);
-    }
-    else{
+    } else {
       setQualified(false);
-      
     }
     setIsQualificationsLoading(false);
-  };   
+  };
 
   const allItems = items.filter(
     (item) => !favoritedItems.some((fav) => fav._id === item._id),
@@ -469,7 +506,12 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
                   setSelectedItem(item);
                   setQualified(false);
                   setMasterResumeRecommendation("Loading...");
-                  handleQualificationsCheck(item.hiddenKeywords, masterResume, item.qualifications, item.description);
+                  handleQualificationsCheck(
+                    item.hiddenKeywords,
+                    masterResume,
+                    item.qualifications,
+                    item.description,
+                  );
                 }}
               >
                 <div className="dashboard-title">{item.title}</div>
@@ -524,7 +566,9 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
                       <div className="tooltip-container">
                         <button
                           className="resume-submit-button"
-                          disabled={qualified !== true || isQualificationsLoading}
+                          disabled={
+                            qualified !== true || isQualificationsLoading
+                          }
                           onClick={() => {
                             if (qualified) {
                               setShowApplicationForm(true);
@@ -543,9 +587,10 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
                             "Apply"
                           )}
                         </button>
-                        {(qualified !== true && !isQualificationsLoading) && (
+                        {qualified !== true && !isQualificationsLoading && (
                           <span className="tooltip tooltip-apply">
-                            Master resume does not contain the required keywords for this posting
+                            Master resume does not contain the required keywords
+                            for this posting
                           </span>
                         )}
                       </div>
@@ -574,42 +619,46 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
                     <p>{selectedItem.qualifications}</p>
                   </div>
                   {role === "recruiter" ? (
-                      <>
-                        <div className="dashboard-detail-section">
-                          <h2>Hidden Keywords:</h2>
-                          <p>{selectedItem.hiddenKeywords}</p>
-                        </div>
-                      </>
-                    ) : (
-                      <>
-                       <div className="dashboard-detail-section">
-                          <h2>AI master resume analysis:</h2>
-                          {masterResume !== null ? (
-                              <>    
-                                {MasterResumeRecommendation === "Loading..." ? (
-                                    <>    
-                                      <div class="loading-dots-container">                  
-                                        <div className="loading-dots">
-                                          <span></span>
-                                          <span></span>
-                                          <span></span>
-                                        </div>
-                                      </div>
-                                    </>
-                                  ) : (
-                                    <>
-                                      <p>{MasterResumeRecommendation}</p>                  
-                                    </>
-                                )}  
+                    <>
+                      <div className="dashboard-detail-section">
+                        <h2>Hidden Keywords:</h2>
+                        <p>{selectedItem.hiddenKeywords}</p>
+                      </div>
+                    </>
+                  ) : (
+                    <>
+                      <div className="dashboard-detail-section">
+                        <h2>AI master resume analysis:</h2>
+                        {masterResume !== null ? (
+                          <>
+                            {MasterResumeRecommendation === "Loading..." ? (
+                              <>
+                                <div class="loading-dots-container">
+                                  <div className="loading-dots">
+                                    <span></span>
+                                    <span></span>
+                                    <span></span>
+                                  </div>
+                                </div>
                               </>
                             ) : (
                               <>
-                                <p>Master resume has not been uploaded. Analysis will be available once you upload it from the account page.</p>                  
+                                <p>{MasterResumeRecommendation}</p>
                               </>
-                          )}                                                      
-                        </div>                      
-                      </>
-                  )}                  
+                            )}
+                          </>
+                        ) : (
+                          <>
+                            <p>
+                              Master resume has not been uploaded. Analysis will
+                              be available once you upload it from the account
+                              page.
+                            </p>
+                          </>
+                        )}
+                      </div>
+                    </>
+                  )}
                 </div>
               </>
             ) : (
@@ -710,7 +759,7 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
         title="New Application"
       >
         <form className="new-item-form" onSubmit={handleApplicationSubmit}>
-          <p>Upload resume: </p>        
+          <p>Upload resume: </p>
           <input
             type="file"
             accept=".pdf"
@@ -741,9 +790,12 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
                       const formattedData = await formatResumeData(
                         selectedItem.qualifications,
                         selectedItem.description,
-                        resumeText
+                        resumeText,
                       );
-                      const response = await DashboardController.fetchGeminiResponse(formattedData);
+                      const response =
+                        await DashboardController.fetchGeminiResponse(
+                          formattedData,
+                        );
                       setResumeRecommendation(response.response);
                     } catch (error) {
                       console.error("Error generating feedback:", error);
@@ -774,11 +826,13 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
               )}
             </div>
           </div>
-          <button 
+          <button
             type="submit"
             className="resume-submit-button"
-            disabled={resumeState !== "Attached"}            
-          > Submit
+            disabled={resumeState !== "Attached"}
+          >
+            {" "}
+            Submit
           </button>
           <button
             className="cancel-button"
@@ -882,20 +936,23 @@ const fetchJobsForRecruiter = async (userId, setItems) => {
 const fetchJobsForApplicant = async (userId, setItems) => {
   try {
     const jobsResponse = await DashboardController.fetchJobs();
-    const applicationsResponse = await DashboardController.fetchUserApplications(userId);
-    if(!applicationsResponse){
+    const applicationsResponse =
+      await DashboardController.fetchUserApplications(userId);
+    if (!applicationsResponse) {
       setItems(jobsResponse);
       return;
     }
     const appliedJobIds = new Set();
-    applicationsResponse.forEach(application => {
+    applicationsResponse.forEach((application) => {
       if (application.jobID) {
         appliedJobIds.add(application.jobID);
       } else {
         console.error("Application does not contain jobID:", application);
       }
     });
-    const availableJobs = jobsResponse.filter(job => !appliedJobIds.has(job._id));
+    const availableJobs = jobsResponse.filter(
+      (job) => !appliedJobIds.has(job._id),
+    );
     setItems(availableJobs);
   } catch (error) {
     console.error("Error fetching jobs:", error);

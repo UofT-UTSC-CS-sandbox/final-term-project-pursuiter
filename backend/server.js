@@ -4,7 +4,7 @@ import bcrypt from "bcrypt"; // Password hashing library
 import cors from "cors"; // Cross-origin resource sharing middleware
 import mongoose from "mongoose"; // Mongoose library
 import dotenv from "dotenv"; // Dotenv library
-import GeminiService from './geminiService.js'; // Import the GeminiService
+import GeminiService from "./geminiService.js"; // Import the GeminiService
 
 const env = process.env.NODE_ENV || "development";
 dotenv.config({ path: `.env.${env}` });
@@ -175,7 +175,9 @@ app.get("/user/:id", async (req, res) => {
     return res.status(400).json({ message: "Invalid user ID" });
   }
   try {
-    const user = await db.collection("users").findOne({ _id: new ObjectId(userId) });
+    const user = await db
+      .collection("users")
+      .findOne({ _id: new ObjectId(userId) });
     if (user) {
       res.json({
         userType: user.userType,
@@ -210,7 +212,7 @@ app.put("/updateUser", async (req, res) => {
     positions,
     companyName,
     userType,
-    masterResume
+    masterResume,
   } = req.body;
   try {
     const user = await db.collection("users").findOne({ email });
@@ -487,10 +489,13 @@ app.get("/applications/details/:applicantID/:jobID", async (req, res) => {
  * @description Fetch all applications for a specific user
  * @access private
  */
-app.get('/applications/user/:userId', async (req, res) => {
+app.get("/applications/user/:userId", async (req, res) => {
   const userId = req.params.userId;
   try {
-    const applications = await db.collection('applications').find({ applicantID: userId }).toArray();
+    const applications = await db
+      .collection("applications")
+      .find({ applicantID: userId })
+      .toArray();
     res.json(applications);
   } catch (error) {
     res.status(500).json({ error: error.message });

@@ -31,9 +31,7 @@ describe("Gemini Service", () => {
 
       const prompt = "Tell me a joke";
 
-      const res = await request(app)
-        .post("/generateResponse")
-        .send({ prompt });
+      const res = await request(app).post("/generateResponse").send({ prompt });
 
       if (res.status !== 200) {
         isValidApiKey = false;
@@ -62,18 +60,21 @@ describe("Gemini Service", () => {
     it("should handle errors from the GeminiService", async () => {
       const prompt = "Tell me a joke";
 
-      console.log("\nExpecting error now:")
+      console.log("\nExpecting error now:");
 
       // Simulate an error thrown by the service
-      stub = sinon.stub(GeminiService, "generateResponse").rejects(new Error("Failed to generate response"));
+      stub = sinon
+        .stub(GeminiService, "generateResponse")
+        .rejects(new Error("Failed to generate response"));
 
-      const res = await request(app)
-        .post("/generateResponse")
-        .send({ prompt });
+      const res = await request(app).post("/generateResponse").send({ prompt });
 
       // Expecting a 500 status code
       expect(res.status).to.equal(500);
-      expect(res.body).to.have.property("message", "Failed to generate response");
+      expect(res.body).to.have.property(
+        "message",
+        "Failed to generate response",
+      );
     });
   });
 });

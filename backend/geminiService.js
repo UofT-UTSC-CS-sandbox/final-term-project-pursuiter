@@ -7,9 +7,11 @@
  * https://ai.google.dev/gemini-api/docs/get-started/node
  */
 
-
-import dotenv from 'dotenv';
-import { GoogleGenerativeAI, GoogleGenerativeAIFetchError } from "@google/generative-ai";
+import dotenv from "dotenv";
+import {
+  GoogleGenerativeAI,
+  GoogleGenerativeAIFetchError,
+} from "@google/generative-ai";
 
 const env = process.env.NODE_ENV || "development";
 dotenv.config({ path: `.env.${env}` });
@@ -30,7 +32,6 @@ const generationConfig = {
 };
 
 const GeminiService = {
-    
   // Generate a response
   generateResponse: async (prompt) => {
     if (!prompt) {
@@ -47,7 +48,10 @@ const GeminiService = {
       return result.response.text();
     } catch (error) {
       if (error instanceof GoogleGenerativeAIFetchError) {
-        console.error("Error fetching from Google Generative AI:", error.statusText);
+        console.error(
+          "Error fetching from Google Generative AI:",
+          error.statusText,
+        );
       } else {
         console.error("Error in generateResponse:", error.message);
       }

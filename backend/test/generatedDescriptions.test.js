@@ -32,30 +32,42 @@ describe("AI Generated Applicant Descriptions", () => {
     jobId = jobRes.body.insertedId;
 
     // Add an application for the job
-    const applicationRes = await request(app).post("/applications/add").send({
-      jobID: jobId,
-      applicantID: applicantId,
-      resumeData: "base64ResumeString",
-      totalScore: 8,
-      qualificationsScore: {
-        score: 4,
-        description: "Meets most qualifications",
-      },
-      jobDescriptionScore: {
-        score: 4,
-        description: "Matches job description well",
-      },
-      applicantSummary: {
-        longSummary: "This applicant is a software engineer with 5 years of experience in developing and maintaining software applications.",
-        shortSummary: "• 5 years experience in software engineering\n• Developed and maintained software applications",
-      },
-    });
+    const applicationRes = await request(app)
+      .post("/applications/add")
+      .send({
+        jobID: jobId,
+        applicantID: applicantId,
+        resumeData: "base64ResumeString",
+        totalScore: 8,
+        qualificationsScore: {
+          score: 4,
+          description: "Meets most qualifications",
+        },
+        jobDescriptionScore: {
+          score: 4,
+          description: "Matches job description well",
+        },
+        applicantSummary: {
+          longSummary:
+            "This applicant is a software engineer with 5 years of experience in developing and maintaining software applications.",
+          shortSummary:
+            "• 5 years experience in software engineering\n• Developed and maintained software applications",
+        },
+      });
   });
 
   it("should fetch the application descriptions", async () => {
-    const res = await request(app).get(`/applications/details/${applicantId}/${jobId}`);
+    const res = await request(app).get(
+      `/applications/details/${applicantId}/${jobId}`,
+    );
     expect(res.status).to.equal(200);
-    expect(res.body.applicantSummary).to.have.property("longSummary", "This applicant is a software engineer with 5 years of experience in developing and maintaining software applications.");
-    expect(res.body.applicantSummary).to.have.property("shortSummary", "• 5 years experience in software engineering\n• Developed and maintained software applications");
+    expect(res.body.applicantSummary).to.have.property(
+      "longSummary",
+      "This applicant is a software engineer with 5 years of experience in developing and maintaining software applications.",
+    );
+    expect(res.body.applicantSummary).to.have.property(
+      "shortSummary",
+      "• 5 years experience in software engineering\n• Developed and maintained software applications",
+    );
   });
 });

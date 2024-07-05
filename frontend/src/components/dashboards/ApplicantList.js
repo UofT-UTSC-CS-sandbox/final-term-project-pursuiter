@@ -23,21 +23,31 @@ function ApplicantList() {
     const fetchApplicants = async () => {
       try {
         const response = await DashboardController.fetchApplicants(jobId);
-        const applicantsWithScores = await Promise.all(response.map(async applicant => {
-        const applicationDetails = await DashboardController.fetchApplicationDetails(applicant._id, jobId);
-        return {
-          ...applicant,
-          totalScore: applicationDetails ? applicationDetails.totalScore : 0,
-          applicantSummary: applicationDetails ? applicationDetails.applicantSummary : {},
-        };
-      }));
-      applicantsWithScores.sort((a, b) => b.totalScore - a.totalScore);
-      setApplicants(applicantsWithScores);
+        const applicantsWithScores = await Promise.all(
+          response.map(async (applicant) => {
+            const applicationDetails =
+              await DashboardController.fetchApplicationDetails(
+                applicant._id,
+                jobId,
+              );
+            return {
+              ...applicant,
+              totalScore: applicationDetails
+                ? applicationDetails.totalScore
+                : 0,
+              applicantSummary: applicationDetails
+                ? applicationDetails.applicantSummary
+                : {},
+            };
+          }),
+        );
+        applicantsWithScores.sort((a, b) => b.totalScore - a.totalScore);
+        setApplicants(applicantsWithScores);
       } catch (error) {
         console.error("Error fetching applicants:", error);
       }
     };
-    
+
     const fetchJobDetails = async () => {
       try {
         const response = await DashboardController.fetchJobDetails(jobId);
@@ -78,7 +88,10 @@ function ApplicantList() {
   // Fetch application details
   const fetchApplicationDetails = async (applicantId, jobId) => {
     try {
-      const response = await DashboardController.fetchApplicationDetails(applicantId, jobId);
+      const response = await DashboardController.fetchApplicationDetails(
+        applicantId,
+        jobId,
+      );
       setApplicationDetails(response);
     } catch (error) {
       console.error("Error fetching application details:", error);
@@ -86,7 +99,9 @@ function ApplicantList() {
   };
 
   // Calculate the width of the bar
-  const progressBarWidth = applicationDetails ? (applicationDetails.totalScore / 10) * 100 : 0;
+  const progressBarWidth = applicationDetails
+    ? (applicationDetails.totalScore / 10) * 100
+    : 0;
 
   // Determine the color of the bar
   const getProgressBarColor = (width) => {
@@ -114,7 +129,8 @@ function ApplicantList() {
       const progressBar = progressBarRef.current;
       setTimeout(() => {
         progressBar.style.width = `${progressBarWidth}%`;
-        progressBar.style.backgroundColor = getProgressBarColor(progressBarWidth);
+        progressBar.style.backgroundColor =
+          getProgressBarColor(progressBarWidth);
       }, 100);
     }
   }, [selectedApplicant, progressBarWidth]);
@@ -173,20 +189,23 @@ function ApplicantList() {
                   className="dashboard-item"
                   onClick={() => handleSelectApplicant(applicant)}
                 >
-                  <div className="dashboard-title">
-                    {applicant.fullName}
-                  </div>
+                  <div className="dashboard-title">{applicant.fullName}</div>
                   <div className="dashboard-company">{applicant.email}</div>
                   {applicant.totalScore !== undefined && (
                     <div className="dashboard-total-score">
-                      Compatibility score: <strong>{applicant.totalScore}/10</strong>
+                      Compatibility score:{" "}
+                      <strong>{applicant.totalScore}/10</strong>
                     </div>
-                  )} <br/>
+                  )}{" "}
+                  <br />
                   {applicant.applicantSummary.shortSummary !== undefined && (
                     <div className="dashboard-summary">
-                      {applicant.applicantSummary.shortSummary.replace(/\\n/g, '\n')} 
+                      {applicant.applicantSummary.shortSummary.replace(
+                        /\\n/g,
+                        "\n",
+                      )}
                     </div>
-                  )} 
+                  )}
                   <div
                     className={`favorite-icon ${isFavorited(applicant) ? "favorited" : ""}`}
                     onClick={(e) => {
@@ -214,11 +233,12 @@ function ApplicantList() {
                 </div>
                 <div className="dashboard-detail-body">
                   <div className="dashboard-detail-section">
-                      <strong>Email:</strong> {selectedApplicant.email}
+                    <strong>Email:</strong> {selectedApplicant.email}
                   </div>
                   <div className="dashboard-detail-section">
                     <h2>AI Generated Compatibility:</h2>
-                    {applicationDetails && applicationDetails.totalScore !== undefined ? (
+                    {applicationDetails &&
+                    applicationDetails.totalScore !== undefined ? (
                       <div className="progress-bar-container">
                         <div className="progress-bar">
                           <div
@@ -226,7 +246,9 @@ function ApplicantList() {
                             className="progress-bar-fill"
                             style={{
                               width: 0,
-                              backgroundColor: getColorForScore(applicationDetails.totalScore),
+                              backgroundColor: getColorForScore(
+                                applicationDetails.totalScore,
+                              ),
                             }}
                           ></div>
                         </div>
@@ -234,16 +256,23 @@ function ApplicantList() {
                           {applicationDetails.totalScore}/10
                         </div>
                       </div>
-                    ) : null }
+                    ) : null}
                   </div>
-                  {applicationDetails && applicationDetails.qualificationsScore !== undefined && applicationDetails.jobDescriptionScore !== undefined ? (
+                  {applicationDetails &&
+                  applicationDetails.qualificationsScore !== undefined &&
+                  applicationDetails.jobDescriptionScore !== undefined ? (
                     <>
                       <div className="dashboard-detail-section">
                         <h2>
-                          Qualifications Score: 
+                          Qualifications Score:
                           <span
                             className="score-number"
-                            style={{ color: getColorForScore(applicationDetails.qualificationsScore.score), marginLeft: '10px' }}
+                            style={{
+                              color: getColorForScore(
+                                applicationDetails.qualificationsScore.score,
+                              ),
+                              marginLeft: "10px",
+                            }}
                           >
                             {applicationDetails.qualificationsScore.score}
                           </span>
@@ -254,10 +283,15 @@ function ApplicantList() {
                       </div>
                       <div className="dashboard-detail-section">
                         <h2>
-                          Job Description Score: 
+                          Job Description Score:
                           <span
                             className="score-number"
-                            style={{ color: getColorForScore(applicationDetails.jobDescriptionScore.score), marginLeft: '10px' }}
+                            style={{
+                              color: getColorForScore(
+                                applicationDetails.jobDescriptionScore.score,
+                              ),
+                              marginLeft: "10px",
+                            }}
                           >
                             {applicationDetails.jobDescriptionScore.score}
                           </span>
@@ -272,12 +306,19 @@ function ApplicantList() {
                       <p>Scores not stored on the database</p>
                     </div>
                   )}
-                  {applicationDetails && applicationDetails.applicantSummary.longSummary !== undefined ? (
+                  {applicationDetails &&
+                  applicationDetails.applicantSummary.longSummary !==
+                    undefined ? (
                     <div className="dashboard-detail-section">
                       <h2>AI Generated Summary:</h2>
-                      <p>{applicationDetails.applicantSummary.longSummary.replace(/\\n/g, '\n')}</p>
+                      <p>
+                        {applicationDetails.applicantSummary.longSummary.replace(
+                          /\\n/g,
+                          "\n",
+                        )}
+                      </p>
                     </div>
-                    ) : null }
+                  ) : null}
                   <div className="dashboard-detail-section">
                     <h2>Status:</h2>
                     <p>To be implemented in another feature</p>

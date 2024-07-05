@@ -113,7 +113,9 @@ const DashboardController = {
   // Fetch user applications
   fetchUserApplications: async (userId) => {
     try {
-      const response = await axios.get(`${API_URL}/applications/user/${userId}`);
+      const response = await axios.get(
+        `${API_URL}/applications/user/${userId}`,
+      );
       return response.data;
     } catch (error) {
       console.error("Error fetching user applications:", error);
@@ -136,7 +138,7 @@ const DashboardController = {
   fetchGeminiResponse: async (Prompt) => {
     try {
       const response = await axios.post(`${API_URL}/generateResponse`, {
-        prompt: Prompt
+        prompt: Prompt,
       });
       return response.data;
     } catch (error) {
@@ -149,15 +151,14 @@ const DashboardController = {
   fetchApplicationDetails: async (applicantId, jobId) => {
     try {
       const response = await axios.get(
-        `${API_URL}/applications/details/${applicantId}/${jobId}`);
+        `${API_URL}/applications/details/${applicantId}/${jobId}`,
+      );
       return response.data;
     } catch (error) {
       console.error("Error fetching application details:", error);
       throw error;
     }
-  }
-
-
+  },
 };
 
 export default DashboardController;
