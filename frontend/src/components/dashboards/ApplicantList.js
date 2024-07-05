@@ -248,9 +248,9 @@ function ApplicantList() {
                             {applicationDetails.qualificationsScore.score}
                           </span>
                         </h2>
-                        <div className="score-description">
+                        <p className="score-description">
                           {applicationDetails.qualificationsScore.description}
-                        </div>
+                        </p>
                       </div>
                       <div className="dashboard-detail-section">
                         <h2>
@@ -262,9 +262,9 @@ function ApplicantList() {
                             {applicationDetails.jobDescriptionScore.score}
                           </span>
                         </h2>
-                        <div className="score-description">
+                        <p className="score-description">
                           {applicationDetails.jobDescriptionScore.description}
-                        </div>
+                        </p>
                       </div>
                     </>
                   ) : (
@@ -275,7 +275,7 @@ function ApplicantList() {
                   {applicationDetails && applicationDetails.applicantSummary.longSummary !== undefined ? (
                     <div className="dashboard-detail-section">
                       <h2>AI Generated Summary:</h2>
-                      <div>{applicationDetails.applicantSummary.longSummary.replace(/\\n/g, '\n')}</div>
+                      <p>{applicationDetails.applicantSummary.longSummary.replace(/\\n/g, '\n')}</p>
                     </div>
                     ) : null }
                   <div className="dashboard-detail-section">

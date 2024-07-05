@@ -67,7 +67,11 @@ startServer();
  * Gemini API Endpoints
  *************************************/
 
-// Generate a response from Gemini
+/**
+ * @route POST /generateResponse
+ * @description Generate a response to a prompt
+ * @access private
+ */
 app.post("/generateResponse", async (req, res) => {
   const { prompt } = req.body;
 
@@ -88,7 +92,11 @@ app.post("/generateResponse", async (req, res) => {
  * User API Endpoints
  *************************************/
 
-// Signup
+/**
+ * @route POST /signup
+ * @description Register a new user
+ * @access public
+ */
 app.post("/signup", async (req, res) => {
   const {
     userType,
@@ -127,7 +135,11 @@ app.post("/signup", async (req, res) => {
   }
 });
 
-// Login
+/**
+ * @route POST /login
+ * @description Login a user
+ * @access public
+ */
 app.post("/login", async (req, res) => {
   const { email, password } = req.body;
   try {
@@ -152,7 +164,11 @@ app.post("/login", async (req, res) => {
   }
 });
 
-// Fetch user information
+/**
+ * @route GET /user/:id
+ * @description Fetch user information
+ * @access private
+ */
 app.get("/user/:id", async (req, res) => {
   const userId = req.params.id;
   if (!ObjectId.isValid(userId)) {
@@ -180,7 +196,11 @@ app.get("/user/:id", async (req, res) => {
   }
 });
 
-// Update user information
+/**
+ * @route PUT /updateUser
+ * @description Update user information
+ * @access private
+ */
 app.put("/updateUser", async (req, res) => {
   const {
     email,
@@ -238,7 +258,11 @@ app.put("/updateUser", async (req, res) => {
  * Job API Endpoints
  *************************************/
 
-// Fetch all jobs
+/**
+ * @route GET /jobs
+ * @description Fetch all jobs
+ * @access private
+ */
 app.get("/jobs", async (req, res) => {
   try {
     const jobs = await db.collection("jobs").find().toArray();
@@ -248,7 +272,11 @@ app.get("/jobs", async (req, res) => {
   }
 });
 
-// Fetch job details
+/**
+ * @route GET /jobs/:id
+ * @description Fetch job details
+ * @access private
+ */
 app.get("/jobs/:id", async (req, res) => {
   const jobId = req.params.id;
   try {
@@ -265,7 +293,11 @@ app.get("/jobs/:id", async (req, res) => {
   }
 });
 
-// Post a job
+/**
+ * @route POST /jobs/add
+ * @description Add a new job
+ * @access private
+ */
 app.post("/jobs/add", async (req, res) => {
   const job = req.body;
 
@@ -283,7 +315,11 @@ app.post("/jobs/add", async (req, res) => {
   }
 });
 
-// Edit a job
+/**
+ * @route PUT /jobs/:id
+ * @description Update a job
+ * @access private
+ */
 app.put("/jobs/:id", async (req, res) => {
   const jobId = req.params.id;
   const job = req.body;
@@ -307,7 +343,11 @@ app.put("/jobs/:id", async (req, res) => {
   }
 });
 
-// Delete a job
+/**
+ * @route DELETE /jobs/:id
+ * @description Delete a job
+ * @access private
+ */
 app.delete("/jobs/:id", async (req, res) => {
   const jobId = req.params.id;
   try {
@@ -329,7 +369,11 @@ app.delete("/jobs/:id", async (req, res) => {
  * Application API Endpoints
  *************************************/
 
-// Add an application
+/**
+ * @route POST /applications/add
+ * @description Add a new application
+ * @access private
+ */
 app.post("/applications/add", async (req, res) => {
   const application = req.body;
 
@@ -350,7 +394,11 @@ app.post("/applications/add", async (req, res) => {
   }
 });
 
-// Fetch user details of applicants for a job
+/**
+ * @route GET /applications/:jobId
+ * @description Fetch user details of applicants for a job
+ * @access private
+ */
 app.get("/jobs/:id/applicants", async (req, res) => {
   const jobId = req.params.id;
   try {
@@ -370,17 +418,11 @@ app.get("/jobs/:id/applicants", async (req, res) => {
   }
 });
 
-app.get('/applications/user/:userId', async (req, res) => {
-  const userId = req.params.userId;
-  try {
-    const applications = await db.collection('applications').find({ applicantID: userId }).toArray();
-    res.json(applications);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
-
-// Fetch applications for a job
+/**
+ * @route GET /applications/:jobId
+ * @description Fetch applications for a job
+ * @access private
+ */
 app.get("/applications/:jobId", async (req, res) => {
   const jobId = req.params.jobId;
   try {
@@ -417,7 +459,11 @@ app.get("/applications/:jobId", async (req, res) => {
   }
 });
 
-// Fetch specific application details
+/**
+ * @route GET /applications/details/:applicantID/:jobID
+ * @description Fetch specific application details
+ * @access private
+ */
 app.get("/applications/details/:applicantID/:jobID", async (req, res) => {
   const { applicantID, jobID } = req.params;
   try {
@@ -436,11 +482,30 @@ app.get("/applications/details/:applicantID/:jobID", async (req, res) => {
   }
 });
 
+/**
+ * @route GET /applications/user/:userId
+ * @description Fetch all applications for a specific user
+ * @access private
+ */
+app.get('/applications/user/:userId', async (req, res) => {
+  const userId = req.params.userId;
+  try {
+    const applications = await db.collection('applications').find({ applicantID: userId }).toArray();
+    res.json(applications);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
 /************************************
  * Favorites API Endpoints
  *************************************/
 
-// Fetch user's favorite jobs
+/**
+ * @route GET /favorites/:userId
+ * @description Fetch favorite jobs for a user
+ * @access private
+ */
 app.get("/favorites/:userId", async (req, res) => {
   const userId = req.params.userId;
 
@@ -463,7 +528,11 @@ app.get("/favorites/:userId", async (req, res) => {
   }
 });
 
-// Add a job to favorites
+/**
+ * @route POST /favorites/add
+ * @description Add a job to favorites
+ * @access private
+ */
 app.post("/favorites/add", async (req, res) => {
   const { userId, jobId } = req.body;
 
@@ -481,7 +550,11 @@ app.post("/favorites/add", async (req, res) => {
   }
 });
 
-// Remove a job from favorites
+/**
+ * @route POST /favorites/remove
+ * @description Remove a job from favorites
+ * @access private
+ */
 app.post("/favorites/remove", async (req, res) => {
   const { userId, jobId } = req.body;
 

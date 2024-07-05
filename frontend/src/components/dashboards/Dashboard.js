@@ -35,12 +35,16 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
   const [resumeFile, setResumeFile] = useState(null);
   const [resumeState, setResumeState] = useState("Missing");
   const [masterResume, setMasterResume] = useState(null);
-  const [resumeRecommendation, setResumeRecommendation] = useState("Loading...");
+  const [MasterResumeRecommendation, setMasterResumeRecommendation] = useState("Loading...");
   const [qualified, setQualified] = useState(false);
   const { user, logoutUser } = useContext(UserContext);
-
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [showApplicationForm, setShowApplicationForm] = useState(false);
+  const [ResumeRecommendation, setResumeRecommendation] = useState("");
+  const [isGenerateButtonDisabled, setIsGenerateButtonDisabled] = useState(true);
+  const [isGenerateButtonClicked, setIsGenerateButtonClicked] = useState(false);
+  const [submissionStatus, setSubmissionStatus] = useState("");
+  const [isQualificationsLoading, setIsQualificationsLoading] = useState(false);
 
   // Fetch jobs and favorited jobs
   useEffect(() => {
@@ -187,30 +191,35 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
     reader.onload = () => {
       if (fileType === "resume") {
         setResumeFile(reader.result);
+        setIsGenerateButtonDisabled(false);
+        setIsGenerateButtonClicked(false);
+        setResumeRecommendation("");
         setResumeState("Attached");
       }
     };
     reader.readAsDataURL(file);
   };
 
-  // Handle job application submission
   const handleApplicationSubmit = async (e) => {
     e.preventDefault();
     if (resumeFile === null) {
       setResumeState("Missing");
     } else {
       setIsSubmitting(true);
+      setSubmissionStatus("Submitting application");
+      setShowConfirmation(true);
+      setShowApplicationForm(false);
       try {
         const scoreFormattedData = await formatScoreData(selectedItem.qualifications, selectedItem.description, resumeFile);
         const scoreResponse = await DashboardController.fetchGeminiResponse(scoreFormattedData);
         const scoreCleanedResponse = scoreResponse.response.replace(/```json|```/g, '');
         const scoreResponseJson = JSON.parse(scoreCleanedResponse);  
-
+  
         const descFormattedData = await formatDescData(selectedItem.qualifications, selectedItem.description, resumeFile);
         const descResponse = await DashboardController.fetchGeminiResponse(descFormattedData);
         const descCleanedResponse = descResponse.response.replace(/```json|```/g, '');
         const descResponseJson = JSON.parse(descCleanedResponse);  
-
+  
         const applicationToSubmit = {
           applicantID: user.userId,
           jobID: selectedItem._id,
@@ -232,18 +241,19 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
         const response = await DashboardController.applyForJob(applicationToSubmit);
         setApplications((prevApplications) => [response, ...prevApplications]);
         setShowApplicationForm(false);
-        setShowConfirmation(true);
         setResumeState("Missing");
+        setSubmissionStatus("Application submitted successfully!");
         setTimeout(() => {
           window.location.reload();
         }, 100);
       } catch (error) {
         console.error("Error submitting application:", error);
+        setSubmissionStatus("Error submitting application.");
       } finally {
         setIsSubmitting(false);
       }
     }
-  };
+  };  
   
   
   
@@ -354,8 +364,8 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
     `;
   };
 
-  // Format the master resume analysis data for the API call for the AI resume review
-  const formatMasterResumeData = async (qualifications, jobDescription, resumeText) => {
+  // Format the resume analysis data for the API call for the AI resume review
+  const formatResumeData = async (qualifications, jobDescription, resumeText) => {
     return `
       Instructions:
       - Evaluate the master resume based on how much the applicant matches the Qualifications and Job Description provided below.
@@ -379,8 +389,12 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
 
   // Handle the checking for qualifications in the master resume
   const handleQualificationsCheck = async (keywords, resume, qualifications, jobDescription) => {
+
+    setIsQualificationsLoading(true);
+
     if(masterResume === null){
       setQualified(false);
+      setIsQualificationsLoading(false);
       return;
     }
 
@@ -388,9 +402,9 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
     
     let resumeText = await TurnPdfToString(resume);
 
-    const formattedData = await formatMasterResumeData(qualifications, jobDescription, resumeText);
+    const formattedData = await formatResumeData(qualifications, jobDescription, resumeText);
     const resumeResponse = await DashboardController.fetchGeminiResponse(formattedData);   
-    setResumeRecommendation(resumeResponse.response);
+    setMasterResumeRecommendation(resumeResponse.response);
 
     resumeText = resumeText.toLowerCase();
 
@@ -401,7 +415,9 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
     }
     else{
       setQualified(false);
+      
     }
+    setIsQualificationsLoading(false);
   };   
 
   const allItems = items.filter(
@@ -452,7 +468,7 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
                 onClick={() => {
                   setSelectedItem(item);
                   setQualified(false);
-                  setResumeRecommendation("Loading...");
+                  setMasterResumeRecommendation("Loading...");
                   handleQualificationsCheck(item.hiddenKeywords, masterResume, item.qualifications, item.description);
                 }}
               >
@@ -505,23 +521,33 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
                         </button>
                       </>
                     ) : (
-                      <div className="tooltip-apply-container">
+                      <div className="tooltip-container">
                         <button
                           className="resume-submit-button"
-                          disabled={qualified !== true}                          
+                          disabled={qualified !== true || isQualificationsLoading}
                           onClick={() => {
                             if (qualified) {
                               setShowApplicationForm(true);
                             }
                           }}
                         >
-                          Apply
+                          {isQualificationsLoading ? (
+                            <div className="loading-dots-container">
+                              <div className="loading-dots">
+                                <span></span>
+                                <span></span>
+                                <span></span>
+                              </div>
+                            </div>
+                          ) : (
+                            "Apply"
+                          )}
                         </button>
-                        {(qualified !== true) && (
-                          <span className="tooltip-apply">
+                        {(qualified !== true && !isQualificationsLoading) && (
+                          <span className="tooltip tooltip-apply">
                             Master resume does not contain the required keywords for this posting
                           </span>
-                        )}                        
+                        )}
                       </div>
                     )}
                   </div>
@@ -560,7 +586,7 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
                           <h2>AI master resume analysis:</h2>
                           {masterResume !== null ? (
                               <>    
-                                {resumeRecommendation === "Loading..." ? (
+                                {MasterResumeRecommendation === "Loading..." ? (
                                     <>    
                                       <div class="loading-dots-container">                  
                                         <div className="loading-dots">
@@ -572,7 +598,7 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
                                     </>
                                   ) : (
                                     <>
-                                      <p>{resumeRecommendation}</p>                  
+                                      <p>{MasterResumeRecommendation}</p>                  
                                     </>
                                 )}  
                               </>
@@ -673,8 +699,15 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
       </Modal>
       <Modal
         show={showApplicationForm}
-        onClose={() => setShowApplicationForm(false)}
-        title={editMode ? "Edit Application" : "New Application"}
+        onClose={() => {
+          setShowApplicationForm(false);
+          setResumeRecommendation("");
+          setIsGenerateButtonDisabled(true);
+          setIsGenerateButtonClicked(false);
+          setResumeFile(null);
+          setResumeState("Missing");
+        }}
+        title="New Application"
       >
         <form className="new-item-form" onSubmit={handleApplicationSubmit}>
           <p>Upload resume: </p>        
@@ -683,30 +716,79 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
             accept=".pdf"
             onChange={(event) => handleFileChange(event, "resume")}
           />
-          {isSubmitting ? (
-          <div className="submitting-message">
-          Submitting application
-            <div className="loading-dots">
-              <span></span>
-              <span></span>
-              <span></span>
+          <div className="ai-feedback-section">
+            <div className="ai-feedback-header">
+              <h3>
+                AI Generated Feedback
+                <span className="tooltip-container">
+                  <span className="tooltip-icon">?</span>
+                  <span className="tooltip tooltip-modal">
+                    Upload a customized resume for detailed feedback
+                  </span>
+                </span>
+              </h3>
+              <div className="tooltip-container">
+                <button
+                  type="button"
+                  className="generate-feedback-button"
+                  disabled={isGenerateButtonDisabled || isGenerateButtonClicked}
+                  onClick={async () => {
+                    setIsGenerateButtonClicked(true);
+                    setResumeRecommendation("Loading...");
+
+                    try {
+                      const resumeText = await TurnPdfToString(resumeFile);
+                      const formattedData = await formatResumeData(
+                        selectedItem.qualifications,
+                        selectedItem.description,
+                        resumeText
+                      );
+                      const response = await DashboardController.fetchGeminiResponse(formattedData);
+                      setResumeRecommendation(response.response);
+                    } catch (error) {
+                      console.error("Error generating feedback:", error);
+                      setResumeRecommendation("Error generating feedback.");
+                    }
+                  }}
+                >
+                  Generate Feedback
+                </button>
+                {(isGenerateButtonDisabled || isGenerateButtonClicked) && (
+                  <span className="tooltip tooltip-modal">
+                    Upload a new resume to generate corresponding feedback
+                  </span>
+                )}
+              </div>
             </div>
-        </div>
-        ) : (
+            <div className="ai-feedback-box">
+              {ResumeRecommendation === "Loading..." ? (
+                <div className="loading-dots-container">
+                  <div className="loading-dots">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                  </div>
+                </div>
+              ) : (
+                <p>{ResumeRecommendation || "No feedback generated yet."}</p>
+              )}
+            </div>
+          </div>
           <button 
             type="submit"
             className="resume-submit-button"
             disabled={resumeState !== "Attached"}            
-          >
-            {editMode ? "Update Application" : "Submit"}
+          > Submit
           </button>
-    )}
           <button
             className="cancel-button"
             onClick={() => {
               setShowApplicationForm(false);
-              setResumeState("Missing");
+              setResumeRecommendation("");
+              setIsGenerateButtonDisabled(true);
+              setIsGenerateButtonClicked(false);
               setResumeFile(null);
+              setResumeState("Missing");
             }}
             disabled={isSubmitting}
           >
@@ -714,26 +796,45 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
           </button>
         </form>
       </Modal>
-      <Modal show={showConfirmation} onClose={() => setShowConfirmation(false)}>
-        <p>Application submitted successfully!</p>
-      </Modal>
       <Modal
-        show={showDeleteConfirm}
-        onClose={() => setShowDeleteConfirm(false)}
-        title="Confirm Deletion"
+        show={showConfirmation}
+        onClose={() => {
+          setShowConfirmation(false);
+          setIsGenerateButtonDisabled(true);
+          setIsGenerateButtonClicked(false);
+          setResumeFile(null);
+          setResumeState("Missing");
+        }}
       >
-        <p>Are you sure you want to delete this job?</p>
-        <div className="delete-modal">
-          <button className="delete-button" onClick={handleDelete}>
-            Delete
-          </button>
-          <button
-            className="cancel-button"
-            onClick={() => setShowDeleteConfirm(false)}
-          >
-            Cancel
-          </button>
+        <div className="modal-header">
+          {submissionStatus === "Error submitting application." && (
+            <button
+              className="modal-close-button"
+              onClick={() => {
+                setShowConfirmation(false);
+                setIsGenerateButtonDisabled(true);
+                setIsGenerateButtonClicked(false);
+                setResumeFile(null);
+                setResumeRecommendation("");
+                setResumeState("Missing");
+              }}
+            >
+              X
+            </button>
+          )}
         </div>
+        {submissionStatus === "Submitting application" ? (
+          <div className="loading-dots-container">
+            <p>{submissionStatus}</p>
+            <div className="loading-dots modal-loading-dots">
+              <span></span>
+              <span></span>
+              <span></span>
+            </div>
+          </div>
+        ) : (
+          <p>{submissionStatus}</p>
+        )}
       </Modal>
     </div>
   );
