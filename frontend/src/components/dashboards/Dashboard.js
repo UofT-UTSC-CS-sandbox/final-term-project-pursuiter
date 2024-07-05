@@ -836,6 +836,24 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
           <p>{submissionStatus}</p>
         )}
       </Modal>
+      <Modal
+        show={showDeleteConfirm}
+        onClose={() => setShowDeleteConfirm(false)}
+        title="Confirm Deletion"
+      >
+        <p>Are you sure you want to delete this job?</p>
+        <div className="delete-modal">
+          <button className="delete-button" onClick={handleDelete}>
+            Delete
+          </button>
+          <button
+            className="cancel-button"
+            onClick={() => setShowDeleteConfirm(false)}
+          >
+            Cancel
+          </button>
+        </div>
+      </Modal>
     </div>
   );
 };
