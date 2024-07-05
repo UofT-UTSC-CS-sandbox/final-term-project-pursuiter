@@ -16,6 +16,7 @@ Pursuiter is a revolutionary job board designed to enhance the job application p
 - Node.js (v22.2.0): [Download Node.js](https://nodejs.org/en/download/package-manager)
 - MongoDB (v7.0.8): [Install MongoDB](https://www.mongodb.com/docs/manual/administration/install-community/)
 - MongoDB Compass: [Download MongoDB Compass GUI](https://www.mongodb.com/try/download/atlascli)
+- Add a `GEMINI_API_KEY` to the `.env` files : [Gemini API Key](https://ai.google.dev/gemini-api/docs/api-key)
 
 ### Run backend
 
@@ -76,7 +77,7 @@ This projecy leverages the Model-View-Controller (MVC) architecture to ensure ea
 
 ### Workflow
 
-- **Branching Strategy**: Our project uses a structured Git flow. All development should take place in feature branches, which should be created from the `dev` branch. Branch names must follow the format `yourname-ticketnumber`.
+- **Branching Strategy**: Our project uses a structured Git flow. All development should take place in feature branches, which should be created from the `dev` branch. Branch names must follow the format `ticketnumber`.
 - **Pull Requests (PRs)**: After completing development on a feature branch, create a pull request to the `dev` branch. The PR title should clearly state the purpose of the changes, and the description should reference the relevant issue or ticket number.
 - **Code Reviews**: At least one peer review is required for each pull request. Reviewers should ensure that the changes meet all project standards.
 - **Merging**: No direct commits to the `main` branch are allowed. At the end of each development sprint, the `dev` branch is merged into `main`. Ensure that `dev` is stable before performing the merge.
