@@ -16,6 +16,7 @@ Pursuiter is a revolutionary job board designed to enhance the job application p
 - Node.js (v22.2.0): [Download Node.js](https://nodejs.org/en/download/package-manager)
 - MongoDB (v7.0.8): [Install MongoDB](https://www.mongodb.com/docs/manual/administration/install-community/)
 - MongoDB Compass: [Download MongoDB Compass GUI](https://www.mongodb.com/try/download/atlascli)
+- Add a `GEMINI_API_KEY` to the `.env` files : [Gemini API Key](https://ai.google.dev/gemini-api/docs/api-key)
 
 ### Run backend
 
