@@ -4,7 +4,10 @@ import bcrypt from "bcrypt"; // Password hashing library
 import cors from "cors"; // Cross-origin resource sharing middleware
 import mongoose from "mongoose"; // Mongoose library
 import dotenv from "dotenv"; // Dotenv library
+<<<<<<< HEAD
 import GeminiService from "./geminiService.js"; // Import the GeminiService
+=======
+>>>>>>> main
 
 const env = process.env.NODE_ENV || "development";
 dotenv.config({ path: `.env.${env}` });
@@ -47,6 +50,7 @@ app.use(async (req, res, next) => {
       return res
         .status(500)
         .json({ message: "Error connecting to the database" });
+<<<<<<< HEAD
     }
   }
   req.db = db;
@@ -113,6 +117,44 @@ app.post("/signup", async (req, res) => {
     if (existingUser) {
       return res.status(409).json({ message: "User already exists" });
     }
+=======
+    }
+  }
+  req.db = db;
+  next();
+});
+
+// Start the server
+async function startServer() {
+  db = await connectToMongo();
+  app.listen(PORT, () => {
+    console.log(`Server is running on http://localhost:${PORT}`);
+  });
+}
+
+startServer();
+
+/************************************
+ * User API Endpoints
+ *************************************/
+
+// Signup
+app.post("/signup", async (req, res) => {
+  const {
+    userType,
+    email,
+    password,
+    fullName,
+    companyName,
+    address,
+    positions,
+  } = req.body;
+  try {
+    const existingUser = await db.collection("users").findOne({ email });
+    if (existingUser) {
+      return res.status(409).json({ message: "User already exists" });
+    }
+>>>>>>> main
     const hashedPassword = await bcrypt.hash(password, 10);
     const newUser = {
       userType,
@@ -123,7 +165,10 @@ app.post("/signup", async (req, res) => {
       address,
       positions,
       favorites: [],
+<<<<<<< HEAD
       masterResume,
+=======
+>>>>>>> main
     };
     const result = await db.collection("users").insertOne(newUser);
     res
@@ -135,11 +180,15 @@ app.post("/signup", async (req, res) => {
   }
 });
 
+<<<<<<< HEAD
 /**
  * @route POST /login
  * @description Login a user
  * @access public
  */
+=======
+// Login
+>>>>>>> main
 app.post("/login", async (req, res) => {
   const { email, password } = req.body;
   try {
@@ -164,6 +213,7 @@ app.post("/login", async (req, res) => {
   }
 });
 
+<<<<<<< HEAD
 /**
  * @route GET /user/:id
  * @description Fetch user information
@@ -203,6 +253,9 @@ app.get("/user/:id", async (req, res) => {
  * @description Update user information
  * @access private
  */
+=======
+// Update user information
+>>>>>>> main
 app.put("/updateUser", async (req, res) => {
   const {
     email,
@@ -212,7 +265,10 @@ app.put("/updateUser", async (req, res) => {
     positions,
     companyName,
     userType,
+<<<<<<< HEAD
     masterResume,
+=======
+>>>>>>> main
   } = req.body;
   try {
     const user = await db.collection("users").findOne({ email });
@@ -235,7 +291,10 @@ app.put("/updateUser", async (req, res) => {
       if (positions) updatedUser.positions = positions;
       if (companyName) updatedUser.companyName = companyName;
       if (userType) updatedUser.userType = userType;
+<<<<<<< HEAD
       if (masterResume) updatedUser.masterResume = masterResume;
+=======
+>>>>>>> main
       await db.collection("users").updateOne({ email }, { $set: updatedUser });
       res.json({
         message: "Update successful",
@@ -245,7 +304,10 @@ app.put("/updateUser", async (req, res) => {
         positions: updatedUser.positions,
         companyName: updatedUser.companyName,
         userType: updatedUser.userType,
+<<<<<<< HEAD
         masterResume: updatedUser.masterResume,
+=======
+>>>>>>> main
       });
     } else {
       res.status(404).json({ message: "User not found" });
@@ -260,11 +322,15 @@ app.put("/updateUser", async (req, res) => {
  * Job API Endpoints
  *************************************/
 
+<<<<<<< HEAD
 /**
  * @route GET /jobs
  * @description Fetch all jobs
  * @access private
  */
+=======
+// Fetch all jobs
+>>>>>>> main
 app.get("/jobs", async (req, res) => {
   try {
     const jobs = await db.collection("jobs").find().toArray();
@@ -274,11 +340,15 @@ app.get("/jobs", async (req, res) => {
   }
 });
 
+<<<<<<< HEAD
 /**
  * @route GET /jobs/:id
  * @description Fetch job details
  * @access private
  */
+=======
+// Fetch job details
+>>>>>>> main
 app.get("/jobs/:id", async (req, res) => {
   const jobId = req.params.id;
   try {
@@ -295,11 +365,15 @@ app.get("/jobs/:id", async (req, res) => {
   }
 });
 
+<<<<<<< HEAD
 /**
  * @route POST /jobs/add
  * @description Add a new job
  * @access private
  */
+=======
+// Post a job
+>>>>>>> main
 app.post("/jobs/add", async (req, res) => {
   const job = req.body;
 
@@ -317,11 +391,15 @@ app.post("/jobs/add", async (req, res) => {
   }
 });
 
+<<<<<<< HEAD
 /**
  * @route PUT /jobs/:id
  * @description Update a job
  * @access private
  */
+=======
+// Edit a job
+>>>>>>> main
 app.put("/jobs/:id", async (req, res) => {
   const jobId = req.params.id;
   const job = req.body;
@@ -345,11 +423,15 @@ app.put("/jobs/:id", async (req, res) => {
   }
 });
 
+<<<<<<< HEAD
 /**
  * @route DELETE /jobs/:id
  * @description Delete a job
  * @access private
  */
+=======
+// Delete a job
+>>>>>>> main
 app.delete("/jobs/:id", async (req, res) => {
   const jobId = req.params.id;
   try {
@@ -371,11 +453,15 @@ app.delete("/jobs/:id", async (req, res) => {
  * Application API Endpoints
  *************************************/
 
+<<<<<<< HEAD
 /**
  * @route POST /applications/add
  * @description Add a new application
  * @access private
  */
+=======
+// Add an application
+>>>>>>> main
 app.post("/applications/add", async (req, res) => {
   const application = req.body;
 
@@ -396,11 +482,15 @@ app.post("/applications/add", async (req, res) => {
   }
 });
 
+<<<<<<< HEAD
 /**
  * @route GET /applications/:jobId
  * @description Fetch user details of applicants for a job
  * @access private
  */
+=======
+// Fetch user details of applicants for a job
+>>>>>>> main
 app.get("/jobs/:id/applicants", async (req, res) => {
   const jobId = req.params.id;
   try {
@@ -420,11 +510,15 @@ app.get("/jobs/:id/applicants", async (req, res) => {
   }
 });
 
+<<<<<<< HEAD
 /**
  * @route GET /applications/:jobId
  * @description Fetch applications for a job
  * @access private
  */
+=======
+// Fetch applications for a job
+>>>>>>> main
 app.get("/applications/:jobId", async (req, res) => {
   const jobId = req.params.jobId;
   try {
@@ -461,6 +555,7 @@ app.get("/applications/:jobId", async (req, res) => {
   }
 });
 
+<<<<<<< HEAD
 /**
  * @route GET /applications/details/:applicantID/:jobID
  * @description Fetch specific application details
@@ -502,15 +597,21 @@ app.get("/applications/user/:userId", async (req, res) => {
   }
 });
 
+=======
+>>>>>>> main
 /************************************
  * Favorites API Endpoints
  *************************************/
 
+<<<<<<< HEAD
 /**
  * @route GET /favorites/:userId
  * @description Fetch favorite jobs for a user
  * @access private
  */
+=======
+// Fetch user's favorite jobs
+>>>>>>> main
 app.get("/favorites/:userId", async (req, res) => {
   const userId = req.params.userId;
 
@@ -533,11 +634,15 @@ app.get("/favorites/:userId", async (req, res) => {
   }
 });
 
+<<<<<<< HEAD
 /**
  * @route POST /favorites/add
  * @description Add a job to favorites
  * @access private
  */
+=======
+// Add a job to favorites
+>>>>>>> main
 app.post("/favorites/add", async (req, res) => {
   const { userId, jobId } = req.body;
 
@@ -555,11 +660,15 @@ app.post("/favorites/add", async (req, res) => {
   }
 });
 
+<<<<<<< HEAD
 /**
  * @route POST /favorites/remove
  * @description Remove a job from favorites
  * @access private
  */
+=======
+// Remove a job from favorites
+>>>>>>> main
 app.post("/favorites/remove", async (req, res) => {
   const { userId, jobId } = req.body;
 

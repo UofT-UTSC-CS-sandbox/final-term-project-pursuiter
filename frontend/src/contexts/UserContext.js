@@ -36,7 +36,10 @@ const UserProvider = ({ children }) => {
     companyName,
     address,
     positions,
+<<<<<<< HEAD
     masterResume,
+=======
+>>>>>>> main
   ) => {
     try {
       const user = await UserController.signupUser(
@@ -47,7 +50,10 @@ const UserProvider = ({ children }) => {
         companyName,
         address,
         positions,
+<<<<<<< HEAD
         masterResume,
+=======
+>>>>>>> main
       );
       setUser(user);
       return user;
@@ -65,7 +71,10 @@ const UserProvider = ({ children }) => {
     companyName,
     userType,
     userId,
+<<<<<<< HEAD
     masterResume,
+=======
+>>>>>>> main
   ) => {
     try {
       const updatedUser = await UserController.updateUser(
@@ -77,7 +86,10 @@ const UserProvider = ({ children }) => {
         companyName,
         userType,
         userId,
+<<<<<<< HEAD
         masterResume,
+=======
+>>>>>>> main
       );
       setUser(updatedUser);
       return updatedUser;

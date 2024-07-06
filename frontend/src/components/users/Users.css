@@ -4,17 +4,21 @@
  * General Styles
  *************************************/
 
+<<<<<<< HEAD
 .users-page-container {
   display: flex;
   flex-direction: column;
 }
 
+=======
+>>>>>>> main
 .users-container {
   margin: 20px;
   display: flex;
   flex-direction: column;
 }
 
+<<<<<<< HEAD
 .users-information-wrapper {
   min-height: 94vh;
 }
@@ -32,6 +36,13 @@
   border: 1px solid #ddd;
   border-top-left-radius: 10px;
   border-top-right-radius: 10px;
+=======
+.users-info-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 0 auto;
+>>>>>>> main
 }
 
 /************************************
@@ -59,6 +70,7 @@
   flex-direction: column;
   justify-content: space-between;
   align-items: center;
+<<<<<<< HEAD
   padding-left: 20px;
   padding-right: 20px;
 }
@@ -83,6 +95,9 @@
   margin-left: 40px;
   margin-top: 20px;
   margin-bottom: 5px;
+=======
+  margin: 20px 0px;
+>>>>>>> main
 }
 
 /************************************
@@ -97,7 +112,10 @@
 
 .users-info-container form {
   max-width: 100%;
+<<<<<<< HEAD
   padding-bottom: 20px;
+=======
+>>>>>>> main
 }
 
 .users-info-form-group {
@@ -106,8 +124,11 @@
   flex-direction: column;
   justify-content: space-between;
   align-items: center;
+<<<<<<< HEAD
   padding-left: 20px;
   padding-right: 20px;
+=======
+>>>>>>> main
 }
 
 .users-info-container label {
@@ -136,7 +157,11 @@
 .users-container button {
   margin-bottom: 20px;
   white-space: nowrap;
+<<<<<<< HEAD
   box-shadow: 0px 4px 4px 0px #1e1e1e40;
+=======
+
+>>>>>>> main
   width: fit-content;
 }
 
@@ -144,6 +169,7 @@
   margin-bottom: 0px;
 }
 
+<<<<<<< HEAD
 .submit-button:disabled {
   background-color: #e0e0e0;
   color: #fff;
@@ -165,6 +191,8 @@
   margin-left: -110px;
 }
 
+=======
+>>>>>>> main
 /************************************
  * Links
  *************************************/

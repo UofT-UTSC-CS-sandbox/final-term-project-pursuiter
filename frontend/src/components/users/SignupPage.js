@@ -55,7 +55,11 @@ function SignupPage({ userType }) {
       <div className="users-container">
         <h1>{heading}</h1>
         <form onSubmit={handleSubmit}>
+<<<<<<< HEAD
           <div className="users-form-group">
+=======
+          <div className="users-from-group">
+>>>>>>> main
             <label>Full Name:</label>
             <input
               type="text"
@@ -64,7 +68,11 @@ function SignupPage({ userType }) {
               required
             />
           </div>
+<<<<<<< HEAD
           <div className="users-form-group">
+=======
+          <div className="users-from-group">
+>>>>>>> main
             <label>Email:</label>
             <input
               type="text"
@@ -73,7 +81,11 @@ function SignupPage({ userType }) {
               required
             />
           </div>
+<<<<<<< HEAD
           <div className="users-form-group">
+=======
+          <div className="users-from-group">
+>>>>>>> main
             <label>Password:</label>
             <input
               type="password"
@@ -83,7 +95,11 @@ function SignupPage({ userType }) {
             />
           </div>
           {userType === "recruiter" && (
+<<<<<<< HEAD
             <div className="users-form-group">
+=======
+            <div className="users-from-group">
+>>>>>>> main
               <label>Company Name:</label>
               <input
                 type="text"

@@ -31,7 +31,10 @@ const UserController = {
     companyName,
     address,
     positions,
+<<<<<<< HEAD
     masterResume,
+=======
+>>>>>>> main
   }) => {
     try {
       const response = await fetch(`${API_URL}/signup`, {
@@ -47,7 +50,10 @@ const UserController = {
           companyName,
           address,
           positions,
+<<<<<<< HEAD
           masterResume,
+=======
+>>>>>>> main
         }),
       });
       if (!response.ok) {
@@ -61,6 +67,7 @@ const UserController = {
     }
   },
 
+<<<<<<< HEAD
   // Fetch User Information
   fetchUserInformation: async (userId) => {
     const response = await fetch(`${API_URL}/user/${userId}`);
@@ -71,6 +78,8 @@ const UserController = {
     return userData;
   },
 
+=======
+>>>>>>> main
   // Update User Information
   updateUser: async ({
     email,
@@ -81,7 +90,10 @@ const UserController = {
     companyName,
     userType,
     userId,
+<<<<<<< HEAD
     masterResume,
+=======
+>>>>>>> main
   }) => {
     try {
       const response = await fetch(`${API_URL}/updateUser`, {
@@ -98,7 +110,10 @@ const UserController = {
           companyName,
           userType,
           userId,
+<<<<<<< HEAD
           masterResume,
+=======
+>>>>>>> main
         }),
       });
       if (!response.ok) {

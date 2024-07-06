@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 import React, { useState, useEffect, useContext, useRef } from "react";
+=======
+import React, { useState, useEffect, useContext } from "react";
+>>>>>>> main
 import { useParams, useNavigate } from "react-router-dom";
 import { UserContext } from "../../contexts/UserContext";
 import DashboardController from "../../controllers/DashboardController";
@@ -14,15 +18,20 @@ function ApplicantList() {
   const [jobDetails, setJobDetails] = useState({});
   const [favoritedApplicants, setFavoritedApplicants] = useState([]);
   const [selectedResume, setSelectedResume] = useState(null);
+<<<<<<< HEAD
   const [applicationDetails, setApplicationDetails] = useState(null);
   const { user, logoutUser } = useContext(UserContext);
   const progressBarRef = useRef(null);
+=======
+  const { user, logoutUser } = useContext(UserContext);
+>>>>>>> main
 
   // Fetch applicants and job details
   useEffect(() => {
     const fetchApplicants = async () => {
       try {
         const response = await DashboardController.fetchApplicants(jobId);
+<<<<<<< HEAD
         const applicantsWithScores = await Promise.all(
           response.map(async (applicant) => {
             const applicationDetails =
@@ -43,6 +52,9 @@ function ApplicantList() {
         );
         applicantsWithScores.sort((a, b) => b.totalScore - a.totalScore);
         setApplicants(applicantsWithScores);
+=======
+        setApplicants(response);
+>>>>>>> main
       } catch (error) {
         console.error("Error fetching applicants:", error);
       }
@@ -51,7 +63,11 @@ function ApplicantList() {
     const fetchJobDetails = async () => {
       try {
         const response = await DashboardController.fetchJobDetails(jobId);
+<<<<<<< HEAD
         setJobDetails(response || {});
+=======
+        setJobDetails(response);
+>>>>>>> main
       } catch (error) {
         console.error("Error fetching job details:", error);
       }
@@ -79,6 +95,7 @@ function ApplicantList() {
   );
 
   // Handle select applicant
+<<<<<<< HEAD
   const handleSelectApplicant = async (applicant) => {
     setSelectedApplicant(applicant);
     setSelectedResume(applicant.resumeData);
@@ -135,6 +152,13 @@ function ApplicantList() {
     }
   }, [selectedApplicant, progressBarWidth]);
 
+=======
+  const handleSelectApplicant = (applicant) => {
+    setSelectedApplicant(applicant);
+    setSelectedResume(applicant.resumeData);
+  };
+
+>>>>>>> main
   return (
     <div className="dashboard-container">
       <div className="dashboard-content">
@@ -191,6 +215,7 @@ function ApplicantList() {
                 >
                   <div className="dashboard-title">{applicant.fullName}</div>
                   <div className="dashboard-company">{applicant.email}</div>
+<<<<<<< HEAD
                   {applicant.totalScore !== undefined && (
                     <div className="dashboard-total-score">
                       Compatibility score:{" "}
@@ -206,6 +231,11 @@ function ApplicantList() {
                       )}
                     </div>
                   )}
+=======
+                  <div className="dashboard-apply-by">
+                    <strong>Applied On:</strong> {applicant.applyDate}
+                  </div>
+>>>>>>> main
                   <div
                     className={`favorite-icon ${isFavorited(applicant) ? "favorited" : ""}`}
                     onClick={(e) => {
@@ -233,6 +263,7 @@ function ApplicantList() {
                 </div>
                 <div className="dashboard-detail-body">
                   <div className="dashboard-detail-section">
+<<<<<<< HEAD
                     <strong>Email:</strong> {selectedApplicant.email}
                   </div>
                   <div className="dashboard-detail-section">
@@ -319,6 +350,19 @@ function ApplicantList() {
                       </p>
                     </div>
                   ) : null}
+=======
+                    <h2>Email:</h2>
+                    <p>{selectedApplicant.email}</p>
+                  </div>
+                  <div className="dashboard-detail-section">
+                    <h2>AI Generated Compatibility:</h2>
+                    <p>To be implemented in another feature</p>
+                  </div>
+                  <div className="dashboard-detail-section">
+                    <h2>AI Generated Summary:</h2>
+                    <p>To be implemented in another feature</p>
+                  </div>
+>>>>>>> main
                   <div className="dashboard-detail-section">
                     <h2>Status:</h2>
                     <p>To be implemented in another feature</p>

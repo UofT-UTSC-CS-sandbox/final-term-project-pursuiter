@@ -77,7 +77,11 @@ This projecy leverages the Model-View-Controller (MVC) architecture to ensure ea
 
 ### Workflow
 
+<<<<<<< HEAD
 - **Branching Strategy**: Our project uses a structured Git flow. All development should take place in feature branches, which should be created from the `dev` branch. Branch names must follow the format `ticketnumber`.
+=======
+- **Branching Strategy**: Our project uses a structured Git flow. All development should take place in feature branches, which should be created from the `dev` branch. Branch names must follow the format `yourname-ticketnumber`.
+>>>>>>> main
 - **Pull Requests (PRs)**: After completing development on a feature branch, create a pull request to the `dev` branch. The PR title should clearly state the purpose of the changes, and the description should reference the relevant issue or ticket number.
 - **Code Reviews**: At least one peer review is required for each pull request. Reviewers should ensure that the changes meet all project standards.
 - **Merging**: No direct commits to the `main` branch are allowed. At the end of each development sprint, the `dev` branch is merged into `main`. Ensure that `dev` is stable before performing the merge.

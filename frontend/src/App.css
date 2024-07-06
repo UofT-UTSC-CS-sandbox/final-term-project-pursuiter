@@ -65,6 +65,7 @@ button:hover {
   border-color: #800020;
 }
 
+<<<<<<< HEAD
 button:disabled {
   background-color: #e0e0e0;
   color: #1e1e1e;
@@ -133,6 +134,8 @@ button:disabled:hover {
   display: none;
 }
 
+=======
+>>>>>>> main
 /************************************
  * Responsive Styling
  *************************************/

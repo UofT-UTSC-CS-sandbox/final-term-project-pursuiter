@@ -2,12 +2,18 @@ import React, { useState, useEffect, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import { UserContext } from "../../contexts/UserContext";
 import { FaStar } from "react-icons/fa";
+<<<<<<< HEAD
 import Modal from "../modal/Modal";
 import UserController from "../../controllers/UserController";
 
 import DashboardController from "../../controllers/DashboardController";
 import "./Dashboard.css";
 import * as pdfjsLib from "pdfjs-dist/webpack";
+=======
+import Modal from "./Modal";
+import DashboardController from "../../controllers/DashboardController";
+import "./Dashboard.css";
+>>>>>>> main
 
 const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
   const navigate = useNavigate();
@@ -19,7 +25,10 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [itemToDelete, setItemToDelete] = useState(null);
   const [editMode, setEditMode] = useState(false);
+<<<<<<< HEAD
   const [isSubmitting, setIsSubmitting] = useState(false);
+=======
+>>>>>>> main
   const [newItem, setNewItem] = useState({
     title: "",
     company: "",
@@ -33,6 +42,7 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
   });
   const [applications, setApplications] = useState([]);
   const [resumeFile, setResumeFile] = useState(null);
+<<<<<<< HEAD
   const [resumeState, setResumeState] = useState("Missing");
   const [masterResume, setMasterResume] = useState(null);
   const [MasterResumeRecommendation, setMasterResumeRecommendation] =
@@ -47,12 +57,19 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
   const [isGenerateButtonClicked, setIsGenerateButtonClicked] = useState(false);
   const [submissionStatus, setSubmissionStatus] = useState("");
   const [isQualificationsLoading, setIsQualificationsLoading] = useState(false);
+=======
+  const { user, logoutUser } = useContext(UserContext);
+
+  const [showConfirmation, setShowConfirmation] = useState(false);
+  const [showApplicationForm, setShowApplicationForm] = useState(false);
+>>>>>>> main
 
   // Fetch jobs and favorited jobs
   useEffect(() => {
     if (user) {
       fetchFavoritedJobs(user.userId, setFavoritedItems);
       fetchJobs(user.userId, setItems);
+<<<<<<< HEAD
 
       UserController.fetchUserInformation(user.userId)
         .then((userInfo) => {
@@ -61,6 +78,8 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
         .catch((error) => {
           console.error("Error fetching user information:", error);
         });
+=======
+>>>>>>> main
     }
   }, [user, fetchFavoritedJobs, fetchJobs]);
 
@@ -186,6 +205,23 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
     navigate(`/applicants/${item._id}`);
   };
 
+<<<<<<< HEAD
+=======
+  // Handle apply for job
+  const handleApply = async () => {
+    const application = {
+      jobID: selectedItem._id,
+      userID: user._id,
+    };
+
+    try {
+      await DashboardController.applyForJob(application);
+    } catch (error) {
+      console.error("Error applying for job:", error);
+    }
+  };
+
+>>>>>>> main
   // Handle file change in apply to job
   const handleFileChange = (event, fileType) => {
     const file = event.target.files[0];
@@ -193,15 +229,19 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
     reader.onload = () => {
       if (fileType === "resume") {
         setResumeFile(reader.result);
+<<<<<<< HEAD
         setIsGenerateButtonDisabled(false);
         setIsGenerateButtonClicked(false);
         setResumeRecommendation("");
         setResumeState("Attached");
+=======
+>>>>>>> main
       }
     };
     reader.readAsDataURL(file);
   };
 
+<<<<<<< HEAD
   const handleApplicationSubmit = async (e) => {
     e.preventDefault();
     if (resumeFile === null) {
@@ -457,6 +497,30 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
     setIsQualificationsLoading(false);
   };
 
+=======
+  // Handle job application submission
+  const handleApplicationSubmit = async (e) => {
+    e.preventDefault();
+
+    const applicationToSubmit = {
+      applicantID: user.userId,
+      jobID: selectedItem._id,
+      resumeData: resumeFile,
+    };
+
+    try {
+      const response =
+        await DashboardController.applyForJob(applicationToSubmit);
+      setApplications((prevApplications) => [response, ...prevApplications]);
+      setShowApplicationForm(false);
+      setShowConfirmation(true);
+      window.location.reload();
+    } catch (error) {
+      console.error("Error submitting application:", error);
+    }
+  };
+
+>>>>>>> main
   const allItems = items.filter(
     (item) => !favoritedItems.some((fav) => fav._id === item._id),
   );
@@ -502,6 +566,7 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
               <div
                 key={index}
                 className="dashboard-item"
+<<<<<<< HEAD
                 onClick={() => {
                   setSelectedItem(item);
                   setQualified(false);
@@ -513,6 +578,9 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
                     item.description,
                   );
                 }}
+=======
+                onClick={() => setSelectedItem(item)}
+>>>>>>> main
               >
                 <div className="dashboard-title">{item.title}</div>
                 <div className="dashboard-company">{item.company}</div>
@@ -563,6 +631,7 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
                         </button>
                       </>
                     ) : (
+<<<<<<< HEAD
                       <div className="tooltip-container">
                         <button
                           className="resume-submit-button"
@@ -594,6 +663,14 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
                           </span>
                         )}
                       </div>
+=======
+                      <button
+                        className="apply-button"
+                        onClick={() => setShowApplicationForm(true)}
+                      >
+                        Apply
+                      </button>
+>>>>>>> main
                     )}
                   </div>
                 </div>
@@ -611,6 +688,13 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
                     <p>{selectedItem.type}</p>
                   </div>
                   <div className="dashboard-detail-section">
+<<<<<<< HEAD
+=======
+                    <h2>Hidden Keywords:</h2>{" "}
+                    <p>{selectedItem.hiddenKeywords}</p>
+                  </div>
+                  <div className="dashboard-detail-section">
+>>>>>>> main
                     <h2>Description:</h2>
                     <p>{selectedItem.description}</p>
                   </div>
@@ -618,6 +702,7 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
                     <h2>Qualifications:</h2>
                     <p>{selectedItem.qualifications}</p>
                   </div>
+<<<<<<< HEAD
                   {role === "recruiter" ? (
                     <>
                       <div className="dashboard-detail-section">
@@ -659,6 +744,8 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
                       </div>
                     </>
                   )}
+=======
+>>>>>>> main
                 </div>
               </>
             ) : (
@@ -748,6 +835,7 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
       </Modal>
       <Modal
         show={showApplicationForm}
+<<<<<<< HEAD
         onClose={() => {
           setShowApplicationForm(false);
           setResumeRecommendation("");
@@ -760,11 +848,19 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
       >
         <form className="new-item-form" onSubmit={handleApplicationSubmit}>
           <p>Upload resume: </p>
+=======
+        onClose={() => setShowApplicationForm(false)}
+        title={editMode ? "Edit Application" : "New Application"}
+      >
+        <form className="new-item-form" onSubmit={handleApplicationSubmit}>
+          <p>Upload Resume: </p>
+>>>>>>> main
           <input
             type="file"
             accept=".pdf"
             onChange={(event) => handleFileChange(event, "resume")}
           />
+<<<<<<< HEAD
           <div className="ai-feedback-section">
             <div className="ai-feedback-header">
               <h3>
@@ -845,11 +941,20 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
               setResumeState("Missing");
             }}
             disabled={isSubmitting}
+=======
+          <button type="submit">
+            {editMode ? "Update Application" : "Submit"}
+          </button>
+          <button
+            className="cancel-button"
+            onClick={() => setShowApplicationForm(false)}
+>>>>>>> main
           >
             Cancel
           </button>
         </form>
       </Modal>
+<<<<<<< HEAD
       <Modal
         show={showConfirmation}
         onClose={() => {
@@ -889,6 +994,10 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
         ) : (
           <p>{submissionStatus}</p>
         )}
+=======
+      <Modal show={showConfirmation} onClose={() => setShowConfirmation(false)}>
+        <p>Application submitted successfully!</p>
+>>>>>>> main
       </Modal>
       <Modal
         show={showDeleteConfirm}
@@ -935,6 +1044,7 @@ const fetchJobsForRecruiter = async (userId, setItems) => {
 
 const fetchJobsForApplicant = async (userId, setItems) => {
   try {
+<<<<<<< HEAD
     const jobsResponse = await DashboardController.fetchJobs();
     const applicationsResponse =
       await DashboardController.fetchUserApplications(userId);
@@ -954,6 +1064,10 @@ const fetchJobsForApplicant = async (userId, setItems) => {
       (job) => !appliedJobIds.has(job._id),
     );
     setItems(availableJobs);
+=======
+    const response = await DashboardController.fetchJobs();
+    setItems(response);
+>>>>>>> main
   } catch (error) {
     console.error("Error fetching jobs:", error);
   }

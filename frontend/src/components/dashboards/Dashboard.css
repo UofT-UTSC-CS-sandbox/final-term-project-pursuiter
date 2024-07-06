@@ -117,6 +117,7 @@
   position: absolute;
   bottom: 10px;
   right: 10px;
+<<<<<<< HEAD
 }
 
 .dashboard-summary {
@@ -125,6 +126,9 @@
 
 .dashboard-detail-section {
   white-space: pre-wrap;
+=======
+  font-size: 14px;
+>>>>>>> main
 }
 
 .resume-iframe {
@@ -171,6 +175,44 @@
 }
 
 /************************************
+<<<<<<< HEAD
+=======
+ * Modal
+ *************************************/
+
+.modal-overlay {
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  background-color: #1e1e1e80;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 10px;
+  position: relative;
+  max-width: 500px;
+  width: 100%;
+  justify-content: center;
+  align-items: center;
+}
+
+.delete-modal {
+  margin-top: 20px;
+  width: 80%;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/************************************
+>>>>>>> main
  * Search and Filters
  *************************************/
 
@@ -216,6 +258,7 @@
 }
 
 /************************************
+<<<<<<< HEAD
  * Tooltip
  *************************************/
 
@@ -244,6 +287,8 @@
 }
 
 /************************************
+=======
+>>>>>>> main
  * Buttons and Icons
  *************************************/
 
@@ -276,6 +321,7 @@
   color: gold;
 }
 
+<<<<<<< HEAD
 .generate-feedback-button {
   margin-left: 10px;
   border-radius: 10px;
@@ -293,6 +339,8 @@
   right: 10px;
 }
 
+=======
+>>>>>>> main
 /************************************
  * Fonts
  *************************************/
@@ -305,6 +353,7 @@
 }
 
 /************************************
+<<<<<<< HEAD
  * Submitting Message
  *************************************/
 
@@ -458,6 +507,8 @@
 }
 
 /************************************
+=======
+>>>>>>> main
  * Responsive Styling
  *************************************/
 
@@ -501,10 +552,13 @@
   .new-item-button {
     width: 100%;
   }
+<<<<<<< HEAD
 
   .ai-feedback-box {
     height: 100px;
   }
+=======
+>>>>>>> main
 }
 
 @media (max-width: 768px) {
@@ -547,10 +601,13 @@
   .new-item-button {
     width: 100%;
   }
+<<<<<<< HEAD
 
   .ai-feedback-box {
     height: 120px;
   }
+=======
+>>>>>>> main
 }
 
 @media (max-width: 1200px) {
@@ -566,10 +623,13 @@
   .new-item-button {
     width: 25%;
   }
+<<<<<<< HEAD
 
   .ai-feedback-box {
     height: 130px;
   }
+=======
+>>>>>>> main
 }
 
 @media (min-width: 1201px) {

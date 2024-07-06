@@ -110,6 +110,7 @@ const DashboardController = {
       throw error;
     }
   },
+<<<<<<< HEAD
   // Fetch user applications
   fetchUserApplications: async (userId) => {
     try {
@@ -122,6 +123,8 @@ const DashboardController = {
       throw error;
     }
   },
+=======
+>>>>>>> main
 
   // Fetch job details
   fetchJobDetails: async (jobId) => {
@@ -133,6 +136,7 @@ const DashboardController = {
       throw error;
     }
   },
+<<<<<<< HEAD
 
   // Make Gemini API request
   fetchGeminiResponse: async (Prompt) => {
@@ -159,6 +163,8 @@ const DashboardController = {
       throw error;
     }
   },
+=======
+>>>>>>> main
 };
 
 export default DashboardController;

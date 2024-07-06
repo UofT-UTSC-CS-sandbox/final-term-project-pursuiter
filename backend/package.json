@@ -33,7 +33,11 @@
     "mongodb-memory-server": "^9.3.0",
     "mongoose": "^8.4.1",
     "nodemon": "^3.1.0",
+<<<<<<< HEAD
     "supertest": "^7.0.0",
     "sinon": "^10.0.0"
+=======
+    "supertest": "^7.0.0"
+>>>>>>> main
   }
 }

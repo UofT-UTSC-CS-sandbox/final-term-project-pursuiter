@@ -2,7 +2,11 @@ import request from "supertest";
 import { expect } from "chai";
 import { app } from "../server.js";
 import mongoose from "mongoose";
+<<<<<<< HEAD
 import "./setup.js";
+=======
+import "./setup.js"; // Import the common setup
+>>>>>>> main
 
 describe("User Management", () => {
   let user1, user2;
@@ -56,6 +60,7 @@ describe("User Management", () => {
     expect(res.body).to.have.property("address", "New Address");
     expect(res.body).to.have.property("positions", "New Position");
   });
+<<<<<<< HEAD
 
   it("should update the master resume", async () => {
     const res = await request(app).put("/updateUser").send({
@@ -69,4 +74,6 @@ describe("User Management", () => {
     expect(res.status).to.equal(200);
     expect(res.body).to.have.property("message", "Update successful");
   });
+=======
+>>>>>>> main
 });
