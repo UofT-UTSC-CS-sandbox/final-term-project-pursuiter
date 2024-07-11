@@ -50,18 +50,20 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
   const handleNewJob = () => {
     setNewItem({
       title: "",
-      company: "",
-      location: "",
+      company: recruiterInfo.companyName || "",
+      location: recruiterInfo.address || "",
       type: "",
       applyBy: "",
       hiddenKeywords: "",
       description: "",
       qualifications: "",
-      recruiterID: "",
+      recruiterID: user.userId,
     });
     setEditMode(false);
     setShowItemForm(true);
-  };
+  };  
+  const [recruiterInfo, setRecruiterInfo] = useState({});
+
 
   // Fetch jobs and favorited jobs
   useEffect(() => {
@@ -78,6 +80,19 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
         });
     }
   }, [user, fetchFavoritedJobs, fetchJobs]);
+
+  // Fetch recruiter information
+  useEffect(() => {
+    if (user && role === "recruiter") {
+      UserController.fetchUserInformation(user.userId)
+        .then((userInfo) => {
+          setRecruiterInfo(userInfo);
+        })
+        .catch((error) => {
+          console.error("Error fetching recruiter information:", error);
+        });
+    }
+  }, [user, role]);
 
   // Handle favorite
   const handleFavorite = async (item) => {
