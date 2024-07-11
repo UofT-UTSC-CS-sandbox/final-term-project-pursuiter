@@ -56,5 +56,34 @@ describe("Application Process", () => {
       "resumeData",
       "Base64EncodedResumeData",
     );
+
+    // Check for default status
+    expect(application).to.have.property("status", "Pending Review");
+  });
+
+  it("should allow a recruiter to update the application status", async () => {
+    const applicationData = {
+      applicantID: applicant,
+      jobID: job,
+      resumeData: "Base64EncodedResumeData",
+      applyDate: new Date().toISOString(),
+    };
+
+    await request(app).post("/applications/add").send(applicationData);
+
+    // Update the application status
+    const updateRes = await request(app)
+      .put(`/applications/${applicant}/${job}/status`)
+      .send({ status: "reviewed" });
+
+    expect(updateRes.status).to.equal(200);
+    expect(updateRes.body).to.have.property("message", "Application status updated");
+    expect(updateRes.body).to.have.property("status", "reviewed");
+
+    const updatedApplication = await mongoose.connection.db
+      .collection("applications")
+      .findOne({ applicantID: applicant, jobID: job });
+    expect(updatedApplication).to.not.be.null;
+    expect(updatedApplication).to.have.property("status", "reviewed");
   });
 });

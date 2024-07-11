@@ -383,6 +383,8 @@ app.post("/applications/add", async (req, res) => {
     return res.status(400).json({ message: "Expected an application object" });
   }
 
+  application.status = 'Pending Review'; // default status
+
   try {
     const result = await db.collection("applications").insertOne(application);
     res
@@ -393,6 +395,32 @@ app.post("/applications/add", async (req, res) => {
     res
       .status(500)
       .json({ message: "Error adding application", error: error.message });
+  }
+});
+
+/**
+ * @route PUT /applications/:applicantID/:jobID/status
+ * @description Update application status
+ * @access private
+ */
+app.put("/applications/:applicantID/:jobID/status", async (req, res) => {
+  const { applicantID, jobID } = req.params;
+  const { status } = req.body;
+
+  try {
+    const result = await db.collection("applications").updateOne(
+      { applicantID, jobID },
+      { $set: { status } }
+    );
+
+    if (result.modifiedCount === 1) {
+      res.json({ message: "Application status updated", status });
+    } else {
+      res.status(404).json({ message: "Application not found" });
+    }
+  } catch (error) {
+    console.error("Error updating application status:", error);
+    res.status(500).json({ message: "Error updating application status" });
   }
 });
 
