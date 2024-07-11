@@ -10,6 +10,10 @@ const UserProvider = ({ children }) => {
     return userCookie ? JSON.parse(userCookie) : null;
   });
 
+  const [selectedTab, setSelectedTab] = useState(() => {
+    return Cookies.get("selectedTab") || "newJobs";
+  });
+
   useEffect(() => {
     if (user) {
       Cookies.set("user", JSON.stringify(user), { expires: 1 });
@@ -17,6 +21,10 @@ const UserProvider = ({ children }) => {
       Cookies.remove("user");
     }
   }, [user]);
+
+  useEffect(() => {
+    Cookies.set("selectedTab", selectedTab, { expires: 1 });
+  }, [selectedTab]);
 
   const loginUser = async (email, password) => {
     try {
@@ -92,7 +100,15 @@ const UserProvider = ({ children }) => {
 
   return (
     <UserContext.Provider
-      value={{ user, loginUser, signupUser, logoutUser, updateUser }}
+      value={{
+        user,
+        selectedTab,
+        setSelectedTab,
+        loginUser,
+        signupUser,
+        logoutUser,
+        updateUser,
+      }}
     >
       {children}
     </UserContext.Provider>
