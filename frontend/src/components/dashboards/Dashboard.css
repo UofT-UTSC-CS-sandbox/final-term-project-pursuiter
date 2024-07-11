@@ -609,3 +609,30 @@
     width: 20vh;
   }
 }
+
+/************************************
+ * Textarea Styles
+ *************************************/
+
+ .new-item-form {
+  display: flex;
+  flex-direction: column;
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+.new-item-form textarea {
+  resize: vertical;
+  min-height: 50px;
+  max-height: 150px;
+  overflow: auto;
+}
+
+.new-item-form button {
+  margin-top: 10px;
+}
+
+.modal-content {
+  max-height: 90vh;
+  overflow-y: auto; 
+}

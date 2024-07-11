@@ -698,82 +698,82 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
         </div>
       </div>
       <Modal
-        show={showItemForm}
-        onClose={() => setShowItemForm(false)}
-        title={editMode ? "Edit Job" : "New Job"}
-      >
-        <form className="new-item-form" onSubmit={handleSubmit}>
-          <input
-            type="text"
-            name="title"
-            placeholder="Job Title"
-            value={newItem.title}
-            onChange={handleInputChange}
-            required
-          />
-          <input
-            type="text"
-            name="company"
-            placeholder="Company"
-            value={newItem.company}
-            onChange={handleInputChange}
-            required
-          />
-          <input
-            type="text"
-            name="location"
-            placeholder="Location"
-            value={newItem.location}
-            onChange={handleInputChange}
-            required
-          />
-          <input
-            type="text"
-            name="type"
-            placeholder="Job Type"
-            value={newItem.type}
-            onChange={handleInputChange}
-            required
-          />
-          <input
-            type="date"
-            name="applyBy"
-            placeholder="Apply By"
-            value={newItem.applyBy}
-            onChange={handleInputChange}
-            required
-          />
-          <input
-            type="text"
-            name="hiddenKeywords"
-            placeholder="Hidden Keywords"
-            value={newItem.hiddenKeywords}
-            onChange={handleInputChange}
-            required
-          />
-          <textarea
-            name="description"
-            placeholder="Job Description"
-            value={newItem.description}
-            onChange={handleInputChange}
-            required
-          ></textarea>
-          <textarea
-            name="qualifications"
-            placeholder="Qualifications"
-            value={newItem.qualifications}
-            onChange={handleInputChange}
-            required
-          ></textarea>
-          <button type="submit">{editMode ? "Update Job" : "Submit"}</button>
-          <button
-            className="cancel-button"
-            onClick={() => setShowItemForm(false)}
-          >
-            Cancel
-          </button>
-        </form>
-      </Modal>
+      show={showItemForm}
+      onClose={() => setShowItemForm(false)}
+      title={editMode ? "Edit Job" : "New Job"}
+    >
+      <form className="new-item-form" onSubmit={handleSubmit}>
+        <input
+          type="text"
+          name="title"
+          placeholder="Job Title"
+          value={newItem.title}
+          onChange={handleInputChange}
+          required
+        />
+        <input
+          type="text"
+          name="company"
+          placeholder="Company"
+          value={newItem.company}
+          onChange={handleInputChange}
+          required
+        />
+        <input
+          type="text"
+          name="location"
+          placeholder="Location"
+          value={newItem.location}
+          onChange={handleInputChange}
+          required
+        />
+        <input
+          type="text"
+          name="type"
+          placeholder="Job Type"
+          value={newItem.type}
+          onChange={handleInputChange}
+          required
+        />
+        <input
+          type="date"
+          name="applyBy"
+          placeholder="Apply By"
+          value={newItem.applyBy}
+          onChange={handleInputChange}
+          required
+        />
+        <input
+          type="text"
+          name="hiddenKeywords"
+          placeholder="Hidden Keywords"
+          value={newItem.hiddenKeywords}
+          onChange={handleInputChange}
+          required
+        />
+        <textarea
+          name="description"
+          placeholder="Job Description"
+          value={newItem.description}
+          onChange={handleInputChange}
+          required
+        ></textarea>
+        <textarea
+          name="qualifications"
+          placeholder="Qualifications"
+          value={newItem.qualifications}
+          onChange={handleInputChange}
+          required
+        ></textarea>
+        <button type="submit">{editMode ? "Update Job" : "Submit"}</button>
+        <button
+          className="cancel-button"
+          onClick={() => setShowItemForm(false)}
+        >
+          Cancel
+        </button>
+      </form>
+    </Modal>
       <Modal
         show={showApplicationForm}
         onClose={() => {
