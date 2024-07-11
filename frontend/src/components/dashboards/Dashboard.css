@@ -20,6 +20,24 @@
   border-top-left-radius: 10px;
   border-top-right-radius: 10px;
   margin-bottom: 20px;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+.tab-bar {
+  height: 48px;
+  margin-bottom: 20px;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  box-shadow: 0px 4px 4px 0px #1e1e1e40;
+}
+
+.tab-container {
+  display: flex;
+  width: 100%;
+  justify-content: space-around;
 }
 
 .dashboard-content {
@@ -293,6 +311,31 @@
   right: 10px;
 }
 
+.tab-button {
+  background-color: #e7e7e7;
+  color: #1e1e1e;
+  height: 100%;
+  width: 100%;
+  border-radius: 0px;
+  border: none;
+  font-weight: normal;
+}
+
+.tab-button.selected {
+  background-color: #800020;
+  color: #fff;  
+}
+
+.tab-button:hover {
+  background-color: #e7e7e7;
+  color: #1e1e1e;
+}
+
+.tab-button.selected:hover {
+  background-color: #800020;
+  color: #fff;
+}
+
 /************************************
  * Fonts
  *************************************/
@@ -302,6 +345,12 @@
   font-size: 18px;
   font-weight: 600;
   margin-bottom: 5px;
+}
+
+.job-title {
+  font-size: 28px;
+  font-weight: bold;
+  color: #800020;
 }
 
 /************************************

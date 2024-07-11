@@ -38,7 +38,7 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
   const [MasterResumeRecommendation, setMasterResumeRecommendation] =
     useState("Loading...");
   const [qualified, setQualified] = useState(false);
-  const { user, logoutUser } = useContext(UserContext);
+  const { user, selectedTab, setSelectedTab } = useContext(UserContext);
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [showApplicationForm, setShowApplicationForm] = useState(false);
   const [ResumeRecommendation, setResumeRecommendation] = useState("");
@@ -68,18 +68,22 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
   // Fetch jobs and favorited jobs
   useEffect(() => {
     if (user) {
-      fetchFavoritedJobs(user.userId, setFavoritedItems);
-      fetchJobs(user.userId, setItems);
+      if (selectedTab === "myApplications") {
+        fetchApplications(user.userId);
+      } else {
+        fetchFavoritedJobs(user.userId, setFavoritedItems);
+        fetchJobs(user.userId, setItems);
 
-      UserController.fetchUserInformation(user.userId)
-        .then((userInfo) => {
-          setMasterResume(userInfo.masterResume || null);
-        })
-        .catch((error) => {
-          console.error("Error fetching user information:", error);
-        });
+        UserController.fetchUserInformation(user.userId)
+          .then((userInfo) => {
+            setMasterResume(userInfo.masterResume || null);
+          })
+          .catch((error) => {
+            console.error("Error fetching user information:", error);
+          });
+      }
     }
-  }, [user, fetchFavoritedJobs, fetchJobs]);
+  }, [user, fetchFavoritedJobs, fetchJobs, selectedTab]);    
 
   // Fetch recruiter information
   useEffect(() => {
@@ -488,10 +492,29 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
     setIsQualificationsLoading(false);
   };
 
+  // Fetch user's applications
+  const fetchApplications = async (userId) => {
+    try {
+      const response = await DashboardController.fetchUserApplications(userId);
+      if (response) {
+        const applicationsWithJobDetails = await Promise.all(
+          response.map(async (application) => {
+            const jobDetails = await DashboardController.fetchJobDetails(application.jobID);
+            return { ...application, jobDetails };
+          })
+        );
+        setApplications(applicationsWithJobDetails);
+      }
+    } catch (error) {
+      console.error("Error fetching applications:", error);
+    }
+  };  
+  
+
   const allItems = items.filter(
     (item) => !favoritedItems.some((fav) => fav._id === item._id),
   );
-  const displayedItems = [...favoritedItems, ...allItems];
+  const displayedItems = selectedTab === "myApplications" ? applications : [...favoritedItems, ...allItems];
 
   return (
     <div className="dashboard-container">
@@ -521,6 +544,30 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
             <button className="filter-button">Skills</button>
           </div>
         </div>
+        {role === "applicant" && (
+        <div className="tab-bar">
+            <div className="tab-container">
+              <button
+                className={`tab-button ${selectedTab === "newJobs" ? "selected" : ""}`}
+                onClick={() => {
+                  setSelectedTab("newJobs");
+                  window.location.reload();
+                }}
+              >
+                New Jobs
+              </button>
+              <button
+                className={`tab-button ${selectedTab === "myApplications" ? "selected" : ""}`}
+                onClick={() => {
+                  setSelectedTab("myApplications");
+                  window.location.reload();
+                }}
+              >
+                My Applications
+              </button>
+            </div>
+        </div>
+      )}
         <div className="dashboard-listings">
           <div className="dashboard-list">
             <div className="dashboard-count">
@@ -528,37 +575,57 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
             </div>
             {displayedItems.map((item, index) => (
               <div
-                key={index}
-                className="dashboard-item"
-                onClick={() => {
-                  setSelectedItem(item);
-                  setQualified(false);
-                  setMasterResumeRecommendation("Loading...");
+              key={index}
+              className="dashboard-item"
+              onClick={() => {
+                setSelectedItem(item);
+                setQualified(false);
+                setMasterResumeRecommendation("Loading...");
+                if (selectedTab === "myApplications") {
+                  handleQualificationsCheck(
+                    item.jobDetails.hiddenKeywords,
+                    masterResume,
+                    item.jobDetails.qualifications,
+                    item.jobDetails.description
+                  );
+                } else {
                   handleQualificationsCheck(
                     item.hiddenKeywords,
                     masterResume,
                     item.qualifications,
                     item.description,
                   );
-                }}
-              >
-                <div className="dashboard-title">{item.title}</div>
-                <div className="dashboard-company">{item.company}</div>
-                <div className="dashboard-location">{item.location}</div>
-                <div className="dashboard-type">{item.type}</div>
-                <div className="dashboard-apply-by">
-                  <strong>Closing Date:</strong> {item.applyBy}
-                </div>
-                <div
-                  className={`favorite-icon ${isFavorited(item) ? "favorited" : ""}`}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleFavorite(item);
-                  }}
-                >
-                  <FaStar />
-                </div>
-              </div>
+                }
+              }}
+            >
+              {selectedTab === "myApplications" ? (
+                <>
+                  <div className="dashboard-title">{item.jobDetails.title}</div>
+                  <div className="dashboard-company">{item.jobDetails.company}</div>
+                  <div className="dashboard-location">{item.jobDetails.location}</div>
+                  <div className="dashboard-type">{item.jobDetails.type}</div>
+                </>
+              ) : (
+                <>
+                  <div className="dashboard-title">{item.title}</div>
+                  <div className="dashboard-company">{item.company}</div>
+                  <div className="dashboard-location">{item.location}</div>
+                  <div className="dashboard-type">{item.type}</div>
+                  <div className="dashboard-apply-by">
+                    <strong>Closing Date:</strong> {item.applyBy}
+                  </div>
+                  <div
+                    className={`favorite-icon ${isFavorited(item) ? "favorited" : ""}`}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleFavorite(item);
+                    }}
+                  >
+                    <FaStar />
+                  </div>
+                </>
+              )}
+            </div>                             
             ))}
           </div>
           <div className="dashboard-detail">
@@ -591,100 +658,139 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
                         </button>
                       </>
                     ) : (
-                      <div className="tooltip-container">
-                        <button
-                          className="resume-submit-button"
+                      selectedTab !== "myApplications" && (
+                        <div className="tooltip-container">
+                          <button
+                            className="resume-submit-button"
                           disabled={
                             qualified !== true || isQualificationsLoading
                           }
-                          onClick={() => {
-                            if (qualified) {
-                              setShowApplicationForm(true);
-                            }
-                          }}
-                        >
-                          {isQualificationsLoading ? (
-                            <div className="loading-dots-container">
-                              <div className="loading-dots">
-                                <span></span>
-                                <span></span>
-                                <span></span>
+                            onClick={() => {
+                              if (qualified) {
+                                setShowApplicationForm(true);
+                              }
+                            }}
+                          >
+                            {isQualificationsLoading ? (
+                              <div className="loading-dots-container">
+                                <div className="loading-dots">
+                                  <span></span>
+                                  <span></span>
+                                  <span></span>
+                                </div>
                               </div>
-                            </div>
-                          ) : (
-                            "Apply"
+                            ) : (
+                              "Apply"
+                            )}
+                          </button>
+                          {qualified !== true && !isQualificationsLoading && (
+                            <span className="tooltip tooltip-apply">
+                              Master resume does not contain the required keywords
+                              for this posting
+                            </span>
                           )}
-                        </button>
-                        {qualified !== true && !isQualificationsLoading && (
-                          <span className="tooltip tooltip-apply">
-                            Master resume does not contain the required keywords
-                            for this posting
-                          </span>
-                        )}
-                      </div>
+                        </div>
+                      )
                     )}
                   </div>
                 </div>
                 <div className="dashboard-detail-body">
-                  <div className="dashboard-detail-section">
-                    <h2>Company:</h2>
-                    <p>{selectedItem.company}</p>
-                  </div>
-                  <div className="dashboard-detail-section">
-                    <h2>Location:</h2>
-                    <p>{selectedItem.location}</p>
-                  </div>
-                  <div className="dashboard-detail-section">
-                    <h2>Type:</h2>
-                    <p>{selectedItem.type}</p>
-                  </div>
-                  <div className="dashboard-detail-section">
-                    <h2>Description:</h2>
-                    <p>{selectedItem.description}</p>
-                  </div>
-                  <div className="dashboard-detail-section">
-                    <h2>Qualifications:</h2>
-                    <p>{selectedItem.qualifications}</p>
-                  </div>
-                  {role === "recruiter" ? (
+                  {selectedTab === "myApplications" ? (
                     <>
+                      <div className="dashboard-detail-section job-title">
+                        {selectedItem.jobDetails.title}
+                      </div>
                       <div className="dashboard-detail-section">
-                        <h2>Hidden Keywords:</h2>
-                        <p>{selectedItem.hiddenKeywords}</p>
+                        <h2>Company:</h2>
+                        <p>{selectedItem.jobDetails.company}</p>
+                      </div>
+                      <div className="dashboard-detail-section">
+                        <h2>Location:</h2>
+                        <p>{selectedItem.jobDetails.location}</p>
+                      </div>
+                      <div className="dashboard-detail-section">
+                        <h2>Type:</h2>
+                        <p>{selectedItem.jobDetails.type}</p>
+                      </div>
+                      <div className="dashboard-detail-section">
+                        <h2>Description:</h2>
+                        <p>{selectedItem.jobDetails.description}</p>
+                      </div>
+                      <div className="dashboard-detail-section">
+                        <h2>Qualifications:</h2>
+                        <p>{selectedItem.jobDetails.qualifications}</p>
+                      </div>
+                      <div className="dashboard-detail-section">
+                        <h2>Status:</h2>
+                        <p>{selectedItem.status}</p>
+                      </div>
+                      <div className="dashboard-detail-section">
+                        <h2>Resume:</h2>
+                        {selectedItem.resumeData ? (
+                          <iframe
+                            src={selectedItem.resumeData}
+                            className="resume-iframe"
+                            title="Resume"
+                          ></iframe>
+                        ) : (
+                          "Resume not available"
+                        )}
                       </div>
                     </>
                   ) : (
                     <>
                       <div className="dashboard-detail-section">
-                        <h2>AI master resume analysis:</h2>
-                        {masterResume !== null ? (
-                          <>
-                            {MasterResumeRecommendation === "Loading..." ? (
-                              <>
-                                <div class="loading-dots-container">
+                        <h2>Company:</h2>
+                        <p>{selectedItem.company}</p>
+                      </div>
+                      <div className="dashboard-detail-section">
+                        <h2>Location:</h2>
+                        <p>{selectedItem.location}</p>
+                      </div>
+                      <div className="dashboard-detail-section">
+                        <h2>Type:</h2>
+                        <p>{selectedItem.type}</p>
+                      </div>
+                      <div className="dashboard-detail-section">
+                        <h2>Description:</h2>
+                        <p>{selectedItem.description}</p>
+                      </div>
+                      <div className="dashboard-detail-section">
+                        <h2>Qualifications:</h2>
+                        <p>{selectedItem.qualifications}</p>
+                      </div>
+                      {role === "recruiter" && (
+                        <div className="dashboard-detail-section">
+                          <h2>Hidden Keywords:</h2>
+                          <p>{selectedItem.hiddenKeywords}</p>
+                        </div>
+                      )}
+                      {role === "applicant" && (
+                        <div className="dashboard-detail-section">
+                          <h2>AI master resume analysis:</h2>
+                          {masterResume !== null ? (
+                            <>
+                              {MasterResumeRecommendation === "Loading..." ? (
+                                <div className="loading-dots-container">
                                   <div className="loading-dots">
                                     <span></span>
                                     <span></span>
                                     <span></span>
                                   </div>
                                 </div>
-                              </>
-                            ) : (
-                              <>
+                              ) : (
                                 <p>{MasterResumeRecommendation}</p>
-                              </>
-                            )}
-                          </>
-                        ) : (
-                          <>
+                              )}
+                            </>
+                          ) : (
                             <p>
-                              Master resume has not been uploaded. Analysis will
-                              be available once you upload it from the account
-                              page.
+                              Master resume has not been uploaded. Analysis
+                              will be available once you upload it from the
+                              account page.
                             </p>
-                          </>
-                        )}
-                      </div>
+                          )}
+                        </div>
+                      )}
                     </>
                   )}
                 </div>
