@@ -30,6 +30,7 @@ const UserProvider = ({ children }) => {
     try {
       const user = await UserController.loginUser(email, password);
       setUser(user);
+      setSelectedTab("newJobs");
       return user;
     } catch (error) {
       throw error;
@@ -96,6 +97,7 @@ const UserProvider = ({ children }) => {
 
   const logoutUser = () => {
     setUser(null);
+    setSelectedTab(null);
   };
 
   return (
