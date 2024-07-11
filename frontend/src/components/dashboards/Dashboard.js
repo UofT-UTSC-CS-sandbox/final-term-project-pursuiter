@@ -47,6 +47,23 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
   const [isGenerateButtonClicked, setIsGenerateButtonClicked] = useState(false);
   const [submissionStatus, setSubmissionStatus] = useState("");
   const [isQualificationsLoading, setIsQualificationsLoading] = useState(false);
+  const handleNewJob = () => {
+    setNewItem({
+      title: "",
+      company: recruiterInfo.companyName || "",
+      location: recruiterInfo.address || "",
+      type: "",
+      applyBy: "",
+      hiddenKeywords: "",
+      description: "",
+      qualifications: "",
+      recruiterID: user.userId,
+    });
+    setEditMode(false);
+    setShowItemForm(true);
+  };  
+  const [recruiterInfo, setRecruiterInfo] = useState({});
+
 
   // Fetch jobs and favorited jobs
   useEffect(() => {
@@ -63,6 +80,19 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
         });
     }
   }, [user, fetchFavoritedJobs, fetchJobs]);
+
+  // Fetch recruiter information
+  useEffect(() => {
+    if (user && role === "recruiter") {
+      UserController.fetchUserInformation(user.userId)
+        .then((userInfo) => {
+          setRecruiterInfo(userInfo);
+        })
+        .catch((error) => {
+          console.error("Error fetching recruiter information:", error);
+        });
+    }
+  }, [user, role]);
 
   // Handle favorite
   const handleFavorite = async (item) => {
@@ -467,10 +497,7 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
     <div className="dashboard-container">
       <div className="dashboard-content">
         {role === "recruiter" && (
-          <button
-            className="new-item-button"
-            onClick={() => setShowItemForm(true)}
-          >
+          <button className="new-item-button" onClick={handleNewJob}>
             New Job
           </button>
         )}
@@ -671,82 +698,82 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
         </div>
       </div>
       <Modal
-        show={showItemForm}
-        onClose={() => setShowItemForm(false)}
-        title={editMode ? "Edit Job" : "New Job"}
-      >
-        <form className="new-item-form" onSubmit={handleSubmit}>
-          <input
-            type="text"
-            name="title"
-            placeholder="Job Title"
-            value={newItem.title}
-            onChange={handleInputChange}
-            required
-          />
-          <input
-            type="text"
-            name="company"
-            placeholder="Company"
-            value={newItem.company}
-            onChange={handleInputChange}
-            required
-          />
-          <input
-            type="text"
-            name="location"
-            placeholder="Location"
-            value={newItem.location}
-            onChange={handleInputChange}
-            required
-          />
-          <input
-            type="text"
-            name="type"
-            placeholder="Job Type"
-            value={newItem.type}
-            onChange={handleInputChange}
-            required
-          />
-          <input
-            type="date"
-            name="applyBy"
-            placeholder="Apply By"
-            value={newItem.applyBy}
-            onChange={handleInputChange}
-            required
-          />
-          <input
-            type="text"
-            name="hiddenKeywords"
-            placeholder="Hidden Keywords"
-            value={newItem.hiddenKeywords}
-            onChange={handleInputChange}
-            required
-          />
-          <textarea
-            name="description"
-            placeholder="Job Description"
-            value={newItem.description}
-            onChange={handleInputChange}
-            required
-          ></textarea>
-          <textarea
-            name="qualifications"
-            placeholder="Qualifications"
-            value={newItem.qualifications}
-            onChange={handleInputChange}
-            required
-          ></textarea>
-          <button type="submit">{editMode ? "Update Job" : "Submit"}</button>
-          <button
-            className="cancel-button"
-            onClick={() => setShowItemForm(false)}
-          >
-            Cancel
-          </button>
-        </form>
-      </Modal>
+      show={showItemForm}
+      onClose={() => setShowItemForm(false)}
+      title={editMode ? "Edit Job" : "New Job"}
+    >
+      <form className="new-item-form" onSubmit={handleSubmit}>
+        <input
+          type="text"
+          name="title"
+          placeholder="Job Title"
+          value={newItem.title}
+          onChange={handleInputChange}
+          required
+        />
+        <input
+          type="text"
+          name="company"
+          placeholder="Company"
+          value={newItem.company}
+          onChange={handleInputChange}
+          required
+        />
+        <input
+          type="text"
+          name="location"
+          placeholder="Location"
+          value={newItem.location}
+          onChange={handleInputChange}
+          required
+        />
+        <input
+          type="text"
+          name="type"
+          placeholder="Job Type"
+          value={newItem.type}
+          onChange={handleInputChange}
+          required
+        />
+        <input
+          type="date"
+          name="applyBy"
+          placeholder="Apply By"
+          value={newItem.applyBy}
+          onChange={handleInputChange}
+          required
+        />
+        <input
+          type="text"
+          name="hiddenKeywords"
+          placeholder="Hidden Keywords"
+          value={newItem.hiddenKeywords}
+          onChange={handleInputChange}
+          required
+        />
+        <textarea
+          name="description"
+          placeholder="Job Description"
+          value={newItem.description}
+          onChange={handleInputChange}
+          required
+        ></textarea>
+        <textarea
+          name="qualifications"
+          placeholder="Qualifications"
+          value={newItem.qualifications}
+          onChange={handleInputChange}
+          required
+        ></textarea>
+        <button type="submit">{editMode ? "Update Job" : "Submit"}</button>
+        <button
+          className="cancel-button"
+          onClick={() => setShowItemForm(false)}
+        >
+          Cancel
+        </button>
+      </form>
+    </Modal>
       <Modal
         show={showApplicationForm}
         onClose={() => {
