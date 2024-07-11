@@ -190,7 +190,6 @@ function ApplicantList() {
                   onClick={() => handleSelectApplicant(applicant)}
                 >
                   <div className="dashboard-title">{applicant.fullName}</div>
-                  <div className="dashboard-company">{applicant.email}</div>
                   {applicant.totalScore !== undefined && (
                     <div className="dashboard-total-score">
                       Compatibility score:{" "}
@@ -334,6 +333,9 @@ function ApplicantList() {
                     ) : (
                       "Resume not available"
                     )}
+                  </div>
+                  <div className="dashboard-detail-section">
+                    <strong>Applied Date:</strong> {selectedApplicant.applyDate}
                   </div>
                 </div>
               </>
