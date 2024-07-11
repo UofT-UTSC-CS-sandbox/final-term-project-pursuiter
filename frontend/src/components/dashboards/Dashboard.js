@@ -524,8 +524,28 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
             New Job
           </button>
         )}
-        <div className="aesthetic-bar">
-          {role === "applicant" && (
+        <div className="aesthetic-bar"></div>
+        <div className="search-and-filters">
+          <div className="search">
+            <input
+              type="text"
+              className="search-input"
+              placeholder="Search by experience, keywords..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+            <button className="search-button">Search</button>
+          </div>
+          <div className="filter-buttons">
+            <p>Filter by:</p>
+            <button className="filter-button">Experience</button>
+            <button className="filter-button">Education</button>
+            <button className="filter-button">Keywords</button>
+            <button className="filter-button">Skills</button>
+          </div>
+        </div>
+        {role === "applicant" && (
+        <div className="tab-bar">
             <div className="tab-container">
               <button
                 className={`tab-button ${selectedTab === "newJobs" ? "selected" : ""}`}
@@ -546,27 +566,8 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
                 My Applications
               </button>
             </div>
-          )}
         </div>
-        <div className="search-and-filters">
-          <div className="search">
-            <input
-              type="text"
-              className="search-input"
-              placeholder="Search by experience, keywords..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
-            <button className="search-button">Search</button>
-          </div>
-          <div className="filter-buttons">
-            <p>Filter by:</p>
-            <button className="filter-button">Experience</button>
-            <button className="filter-button">Education</button>
-            <button className="filter-button">Keywords</button>
-            <button className="filter-button">Skills</button>
-          </div>
-        </div>
+      )}
         <div className="dashboard-listings">
           <div className="dashboard-list">
             <div className="dashboard-count">
