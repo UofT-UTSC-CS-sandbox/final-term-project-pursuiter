@@ -72,7 +72,7 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
         fetchApplications(user.userId);
       } else {
         fetchFavoritedJobs(user.userId, setFavoritedItems);
-        fetchJobs(user.userId, setItems);
+        fetchJobs(user.userId, setItems, searchTerm);
 
         UserController.fetchUserInformation(user.userId)
           .then((userInfo) => {
@@ -534,7 +534,13 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
-            <button className="search-button">Search</button>
+            <button className="search-button" onClick={() => {
+              fetchJobs(user.userId, setItems, searchTerm);
+              setSelectedItem(null);
+              }}
+            >
+              Search
+            </button>
           </div>
           <div className="filter-buttons">
             <p>Filter by:</p>
@@ -1055,19 +1061,36 @@ const fetchFavoritedJobs = async (userId, setFavoritedItems) => {
   }
 };
 
-const fetchJobsForRecruiter = async (userId, setItems) => {
+const fetchJobsForRecruiter = async (userId, setItems, searchTerm) => {
   try {
     const response = await DashboardController.fetchJobs();
-    const filteredJobs = response.filter(
+    const availableJobs = response.filter(
       (job) => job.recruiterID.toString() === userId,
     );
-    setItems(filteredJobs);
+    if (searchTerm === "") {
+      setItems(availableJobs);
+    } else { 
+      const searchWords = searchTerm.toLowerCase().split(/\s+/);
+
+      const filteredJobs = availableJobs.filter((job) => {
+        return searchWords.some((word) =>
+          job.title.toLowerCase().includes(word) ||
+          job.company.toLowerCase().includes(word) ||
+          job.location.toLowerCase().includes(word) ||
+          job.type.toLowerCase().includes(word) ||
+          job.description.toLowerCase().includes(word) ||
+          job.qualifications.toLowerCase().includes(word) ||
+          job.hiddenKeywords.toLowerCase().includes(word)
+        );
+      });
+      setItems(filteredJobs);
+    }
   } catch (error) {
     console.error("Error fetching jobs:", error);
   }
 };
 
-const fetchJobsForApplicant = async (userId, setItems) => {
+const fetchJobsForApplicant = async (userId, setItems, searchTerm) => {
   try {
     const jobsResponse = await DashboardController.fetchJobs();
     const applicationsResponse =
@@ -1087,7 +1110,24 @@ const fetchJobsForApplicant = async (userId, setItems) => {
     const availableJobs = jobsResponse.filter(
       (job) => !appliedJobIds.has(job._id),
     );
-    setItems(availableJobs);
+    if (searchTerm === "") {
+      setItems(availableJobs);
+    } else { 
+      const searchWords = searchTerm.toLowerCase().split(/\s+/);
+
+      const filteredJobs = availableJobs.filter((job) => {
+        return searchWords.some((word) =>
+          job.title.toLowerCase().includes(word) ||
+          job.company.toLowerCase().includes(word) ||
+          job.location.toLowerCase().includes(word) ||
+          job.type.toLowerCase().includes(word) ||
+          job.description.toLowerCase().includes(word) ||
+          job.qualifications.toLowerCase().includes(word)
+        );
+      });
+      setItems(filteredJobs);
+    }
+
   } catch (error) {
     console.error("Error fetching jobs:", error);
   }
