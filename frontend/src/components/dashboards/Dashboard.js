@@ -47,6 +47,21 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
   const [isGenerateButtonClicked, setIsGenerateButtonClicked] = useState(false);
   const [submissionStatus, setSubmissionStatus] = useState("");
   const [isQualificationsLoading, setIsQualificationsLoading] = useState(false);
+  const handleNewJob = () => {
+    setNewItem({
+      title: "",
+      company: "",
+      location: "",
+      type: "",
+      applyBy: "",
+      hiddenKeywords: "",
+      description: "",
+      qualifications: "",
+      recruiterID: "",
+    });
+    setEditMode(false);
+    setShowItemForm(true);
+  };
 
   // Fetch jobs and favorited jobs
   useEffect(() => {
@@ -466,10 +481,7 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
     <div className="dashboard-container">
       <div className="dashboard-content">
         {role === "recruiter" && (
-          <button
-            className="new-item-button"
-            onClick={() => setShowItemForm(true)}
-          >
+          <button className="new-item-button" onClick={handleNewJob}>
             New Job
           </button>
         )}
