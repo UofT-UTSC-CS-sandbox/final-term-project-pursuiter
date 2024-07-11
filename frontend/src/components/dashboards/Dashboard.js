@@ -257,6 +257,7 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
           applicantID: user.userId,
           jobID: selectedItem._id,
           resumeData: resumeFile,
+          applyDate: new Date().toISOString().slice(0, 10),
           totalScore: scoreResponseJson.totalScore,
           qualificationsScore: {
             score: scoreResponseJson.qualificationsScore.score,
