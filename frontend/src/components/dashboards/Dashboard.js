@@ -69,7 +69,7 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
   useEffect(() => {
     if (user) {
       if (selectedTab === "myApplications") {
-        fetchApplications(user.userId);
+        fetchApplications(user.userId, searchTerm);
       } else {
         fetchFavoritedJobs(user.userId, setFavoritedItems);
         fetchJobs(user.userId, setItems, searchTerm);
@@ -493,7 +493,7 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
   };
 
   // Fetch user's applications
-  const fetchApplications = async (userId) => {
+  const fetchApplications = async (userId, searchTerm) => {
     try {
       const response = await DashboardController.fetchUserApplications(userId);
       if (response) {
@@ -503,7 +503,23 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
             return { ...application, jobDetails };
           })
         );
-        setApplications(applicationsWithJobDetails);
+        if (searchTerm === "") {
+          setApplications(applicationsWithJobDetails);
+        } else { 
+          const searchWords = searchTerm.toLowerCase().split(/\s+/);
+    
+          const filteredJobs = applicationsWithJobDetails.filter((job) => {
+            return searchWords.some((word) =>
+              job.jobDetails.title.toLowerCase().includes(word) ||
+              job.jobDetails.company.toLowerCase().includes(word) ||
+              job.jobDetails.location.toLowerCase().includes(word) ||
+              job.jobDetails.type.toLowerCase().includes(word) ||
+              job.jobDetails.description.toLowerCase().includes(word) ||
+              job.jobDetails.qualifications.toLowerCase().includes(word)
+            );
+          });   
+          setApplications(filteredJobs);
+        }     
       }
     } catch (error) {
       console.error("Error fetching applications:", error);
@@ -535,6 +551,11 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
               onChange={(e) => setSearchTerm(e.target.value)}
             />
             <button className="search-button" onClick={() => {
+              if (selectedTab === "newJobs") {
+                fetchJobs(user.userId, setItems, searchTerm);
+              } else {
+                fetchApplications(user.userId, searchTerm);               
+              }             
               fetchJobs(user.userId, setItems, searchTerm);
               setSelectedItem(null);
               }}
@@ -556,6 +577,7 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
               <button
                 className={`tab-button ${selectedTab === "newJobs" ? "selected" : ""}`}
                 onClick={() => {
+                  setSelectedItem(null);
                   setSelectedTab("newJobs");
                   window.location.reload();
                 }}
@@ -565,6 +587,7 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
               <button
                 className={`tab-button ${selectedTab === "myApplications" ? "selected" : ""}`}
                 onClick={() => {
+                  setSelectedItem(null);
                   setSelectedTab("myApplications");
                   window.location.reload();
                 }}
