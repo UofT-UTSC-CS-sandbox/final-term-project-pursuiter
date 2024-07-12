@@ -63,7 +63,17 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
     setShowItemForm(true);
   };  
   const [recruiterInfo, setRecruiterInfo] = useState({});
-
+  const [isFormValid, setIsFormValid] = useState(false);
+  const [initialItem, setInitialItem] = useState({
+    title: "",
+    company: "",
+    location: "",
+    type: "",
+    applyBy: "",
+    hiddenKeywords: "",
+    description: "",
+    qualifications: "",
+  });
 
   // Fetch jobs and favorited jobs
   useEffect(() => {
@@ -173,6 +183,16 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
 
   // Handle edit job
   const handleEdit = (item) => {
+    setInitialItem({
+      title: item.title,
+      company: item.company,
+      location: item.location,
+      type: item.type,
+      applyBy: item.applyBy,
+      hiddenKeywords: item.hiddenKeywords,
+      description: item.description,
+      qualifications: item.qualifications,
+    });
     setNewItem({
       title: item.title,
       company: item.company,
@@ -525,6 +545,37 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
       console.error("Error fetching applications:", error);
     }
   };  
+
+  // Checks if all form fields are filled
+  const checkFormValidity = () => {
+    const { title, company, location, type, applyBy, hiddenKeywords, description, qualifications } = newItem;
+    const allFieldsFilled =
+      title.trim() !== "" &&
+      company.trim() !== "" &&
+      location.trim() !== "" &&
+      type.trim() !== "" &&
+      applyBy.trim() !== "" &&
+      hiddenKeywords.trim() !== "" &&
+      description.trim() !== "" &&
+      qualifications.trim() !== "";
+  
+    const anyFieldChanged =
+      title !== initialItem.title ||
+      company !== initialItem.company ||
+      location !== initialItem.location ||
+      type !== initialItem.type ||
+      applyBy !== initialItem.applyBy ||
+      hiddenKeywords !== initialItem.hiddenKeywords ||
+      description !== initialItem.description ||
+      qualifications !== initialItem.qualifications;
+  
+    setIsFormValid(allFieldsFilled && anyFieldChanged);
+  };
+
+  // Call checkFormValidity whenever newItem changes
+  useEffect(() => {
+    checkFormValidity();
+  }, [newItem]);
   
 
   const allItems = items.filter(
@@ -765,6 +816,9 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
                           "Resume not available"
                         )}
                       </div>
+                      <div className="dashboard-detail-section">
+                        <strong>Applied Date:</strong> {selectedItem.applyDate}
+                      </div>
                     </>
                   ) : (
                     <>
@@ -862,14 +916,19 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
           onChange={handleInputChange}
           required
         />
-        <input
-          type="text"
+        <select
           name="type"
-          placeholder="Job Type"
           value={newItem.type}
           onChange={handleInputChange}
           required
-        />
+        >
+          <option value="">Select Job Type</option>
+          <option value="full-time">Full-time</option>
+          <option value="part-time">Part-time</option>
+          <option value="internship">Internship</option>
+          <option value="contract">Contract</option>
+          <option value="freelance">Freelance</option>
+        </select>
         <input
           type="date"
           name="applyBy"
@@ -900,7 +959,9 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
           onChange={handleInputChange}
           required
         ></textarea>
-        <button type="submit">{editMode ? "Update Job" : "Submit"}</button>
+        <button type="submit" disabled={!isFormValid}>
+          {editMode ? "Update Job" : "Submit"}
+        </button>
         <button
           className="cancel-button"
           onClick={() => setShowItemForm(false)}
