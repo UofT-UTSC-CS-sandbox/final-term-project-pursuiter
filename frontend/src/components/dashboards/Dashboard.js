@@ -480,7 +480,6 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
       setQualified(true);
       setMissingQualifications([]);
       
-      // Only fetch AI response if qualified
       const formattedData = await formatResumeData(
         qualifications,
         jobDescription,
@@ -612,57 +611,57 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
             </div>
             {displayedItems.map((item, index) => (
               <div
-                key={index}
-                className="dashboard-item"
-                onClick={() => {
-                  setSelectedItem(item);
-                  setQualified(false);
-                  setMasterResumeRecommendation("Loading...");
-                  if (selectedTab === "myApplications") {
-                    handleQualificationsCheck(
-                      item.jobDetails.hiddenKeywords,
-                      masterResume,
-                      item.jobDetails.qualifications,
-                      item.jobDetails.description
-                    );
-                  } else {
-                    handleQualificationsCheck(
-                      item.hiddenKeywords,
-                      masterResume,
-                      item.qualifications,
-                      item.description
-                    );
-                  }
-                }}
-              >
-                {selectedTab === "myApplications" ? (
-                  <>
-                    <div className="dashboard-title">{item.jobDetails.title}</div>
-                    <div className="dashboard-company">{item.jobDetails.company}</div>
-                    <div className="dashboard-location">{item.jobDetails.location}</div>
-                    <div className="dashboard-type">{item.jobDetails.type}</div>
-                  </>
-                ) : (
-                  <>
-                    <div className="dashboard-title">{item.title}</div>
-                    <div className="dashboard-company">{item.company}</div>
-                    <div className="dashboard-location">{item.location}</div>
-                    <div className="dashboard-type">{item.type}</div>
-                    <div className="dashboard-apply-by">
-                      <strong>Closing Date:</strong> {item.applyBy}
-                    </div>
-                    <div
-                      className={`favorite-icon ${isFavorited(item) ? "favorited" : ""}`}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleFavorite(item);
-                      }}
-                    >
-                      <FaStar />
-                    </div>
-                  </>
-                )}
-              </div>
+              key={index}
+              className="dashboard-item"
+              onClick={() => {
+                setSelectedItem(item);
+                setQualified(false);
+                setMasterResumeRecommendation("Loading...");
+                if (selectedTab === "myApplications") {
+                  handleQualificationsCheck(
+                    item.jobDetails.hiddenKeywords,
+                    masterResume,
+                    item.jobDetails.qualifications,
+                    item.jobDetails.description
+                  );
+                } else {
+                  handleQualificationsCheck(
+                    item.hiddenKeywords,
+                    masterResume,
+                    item.qualifications,
+                    item.description
+                  );
+                }
+              }}
+            >
+              {selectedTab === "myApplications" ? (
+                <>
+                  <div className="dashboard-title">{item.jobDetails.title}</div>
+                  <div className="dashboard-company">{item.jobDetails.company}</div>
+                  <div className="dashboard-location">{item.jobDetails.location}</div>
+                  <div className="dashboard-type">{item.jobDetails.type}</div>
+                </>
+              ) : (
+                <>
+                  <div className="dashboard-title">{item.title}</div>
+                  <div className="dashboard-company">{item.company}</div>
+                  <div className="dashboard-location">{item.location}</div>
+                  <div className="dashboard-type">{item.type}</div>
+                  <div className="dashboard-apply-by">
+                    <strong>Closing Date:</strong> {item.applyBy}
+                  </div>
+                  <div
+                    className={`favorite-icon ${isFavorited(item) ? "favorited" : ""}`}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleFavorite(item);
+                    }}
+                  >
+                    <FaStar />
+                  </div>
+                </>
+              )}
+            </div>
             ))}
           </div>
           <div className="dashboard-detail">
@@ -699,9 +698,9 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
                         <div className="tooltip-container">
                           <button
                             className="resume-submit-button"
-                            disabled={
-                              qualified !== true || isQualificationsLoading
-                            }
+                          disabled={
+                            qualified !== true || isQualificationsLoading
+                          }
                             onClick={() => {
                               if (qualified) {
                                 setShowApplicationForm(true);
@@ -852,82 +851,82 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
       </div>
       <Modal
         show={showItemForm}
-        onClose={() => setShowItemForm(false)}
-        title={editMode ? "Edit Job" : "New Job"}
-      >
-        <form className="new-item-form" onSubmit={handleSubmit}>
-          <input
-            type="text"
-            name="title"
-            placeholder="Job Title"
-            value={newItem.title}
-            onChange={handleInputChange}
-            required
-          />
-          <input
-            type="text"
-            name="company"
-            placeholder="Company"
-            value={newItem.company}
-            onChange={handleInputChange}
-            required
-          />
-          <input
-            type="text"
-            name="location"
-            placeholder="Location"
-            value={newItem.location}
-            onChange={handleInputChange}
-            required
-          />
-          <input
-            type="text"
-            name="type"
-            placeholder="Job Type"
-            value={newItem.type}
-            onChange={handleInputChange}
-            required
-          />
-          <input
-            type="date"
-            name="applyBy"
-            placeholder="Apply By"
-            value={newItem.applyBy}
-            onChange={handleInputChange}
-            required
-          />
-          <input
-            type="text"
-            name="hiddenKeywords"
-            placeholder="Hidden Keywords"
-            value={newItem.hiddenKeywords}
-            onChange={handleInputChange}
-            required
-          />
-          <textarea
-            name="description"
-            placeholder="Job Description"
-            value={newItem.description}
-            onChange={handleInputChange}
-            required
-          ></textarea>
-          <textarea
-            name="qualifications"
-            placeholder="Qualifications"
-            value={newItem.qualifications}
-            onChange={handleInputChange}
-            required
-          ></textarea>
-          <button type="submit">{editMode ? "Update Job" : "Submit"}</button>
-          <button
-            className="cancel-button"
-            onClick={() => setShowItemForm(false)}
-          >
-            Cancel
-          </button>
-        </form>
-      </Modal>
-      <Modal
+      onClose={() => setShowItemForm(false)}
+      title={editMode ? "Edit Job" : "New Job"}
+    >
+      <form className="new-item-form" onSubmit={handleSubmit}>
+        <input
+          type="text"
+          name="title"
+          placeholder="Job Title"
+          value={newItem.title}
+          onChange={handleInputChange}
+          required
+        />
+        <input
+          type="text"
+          name="company"
+          placeholder="Company"
+          value={newItem.company}
+          onChange={handleInputChange}
+          required
+        />
+        <input
+          type="text"
+          name="location"
+          placeholder="Location"
+          value={newItem.location}
+          onChange={handleInputChange}
+          required
+        />
+        <input
+          type="text"
+          name="type"
+          placeholder="Job Type"
+          value={newItem.type}
+          onChange={handleInputChange}
+          required
+        />
+        <input
+          type="date"
+          name="applyBy"
+          placeholder="Apply By"
+          value={newItem.applyBy}
+          onChange={handleInputChange}
+          required
+        />
+        <input
+          type="text"
+          name="hiddenKeywords"
+          placeholder="Hidden Keywords"
+          value={newItem.hiddenKeywords}
+          onChange={handleInputChange}
+          required
+        />
+        <textarea
+          name="description"
+          placeholder="Job Description"
+          value={newItem.description}
+          onChange={handleInputChange}
+          required
+        ></textarea>
+        <textarea
+          name="qualifications"
+          placeholder="Qualifications"
+          value={newItem.qualifications}
+          onChange={handleInputChange}
+          required
+        ></textarea>
+        <button type="submit">{editMode ? "Update Job" : "Submit"}</button>
+        <button
+          className="cancel-button"
+          onClick={() => setShowItemForm(false)}
+        >
+          Cancel
+        </button>
+      </form>
+    </Modal>
+    <Modal
         show={showApplicationForm}
         onClose={() => {
           setShowApplicationForm(false);
