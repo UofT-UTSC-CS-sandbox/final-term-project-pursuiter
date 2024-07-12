@@ -342,12 +342,12 @@ function ApplicantList() {
                       onChange={(e) => handleStatusChange(e.target.value)}
                       disabled={isStatusLoading}
                     >
-                      <option value="applied">Pending Review</option>
-                      <option value="review">Under Review</option>
-                      <option value="interview">Interview</option>
-                      <option value="offer">Offer</option>
-                      <option value="hired">Hired</option>
-                      <option value="rejected">Rejected</option>
+                      <option value="Applied">Pending Review</option>
+                      <option value="Review">Under Review</option>
+                      <option value="Interview">Interview</option>
+                      <option value="Offer">Offer</option>
+                      <option value="Hired">Hired</option>
+                      <option value="Rejected">Rejected</option>
                     </select>
                   </div>
                   <div className="dashboard-detail-section">
