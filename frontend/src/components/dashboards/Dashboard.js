@@ -529,10 +529,10 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
             return { ...application, jobDetails };
           })
         );
-        if (searchTerm === "") {
+        if (searchTerm.trim() === "") {
           setApplications(applicationsWithJobDetails);
         } else { 
-          const searchWords = searchTerm.toLowerCase().split(/\s+/);
+          const searchWords = searchTerm.trim().toLowerCase().split(/\s+/);
     
           const filteredJobs = applicationsWithJobDetails.filter((job) => {
             return searchWords.some((word) =>
@@ -599,27 +599,39 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
         <div className="aesthetic-bar"></div>
         <div className="search-and-filters">
           <div className="search">
-            <input
-              type="text"
-              className="search-input"
-              placeholder="Search by experience, keywords..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
-            <button
-              className="search-button"
-              onClick={() => {
-                if (selectedTab === "newJobs") {
-                  fetchJobs(user.userId, setItems, searchTerm);
-                } else {
-                  fetchApplications(user.userId, searchTerm);
-                }
-                fetchJobs(user.userId, setItems, searchTerm);
-                setSelectedItem(null);
-              }}
-            >
-              Search
-            </button>
+            <div className="search-container">
+              <input
+                type="text"
+                className="search-input"
+                placeholder="Search by experience, keywords..."
+                value={searchTerm}
+                onChange={(e) => {
+                  setSearchTerm(e.target.value);
+                  if (selectedTab === "newJobs") {
+                    fetchJobs(user.userId, setItems, e.target.value);
+                  } else {
+                    fetchApplications(user.userId, e.target.value);
+                  }
+                  setSelectedItem(null);
+                }}
+              />
+              {searchTerm && (
+                <button
+                  className="clear-button"
+                  onClick={() => {
+                    setSearchTerm("");
+                    if (selectedTab === "newJobs") {
+                      fetchJobs(user.userId, setItems, "");
+                    } else {
+                      fetchApplications(user.userId, "");
+                    }
+                    setSelectedItem(null);                    
+                  }}
+                >
+                  X
+                </button>
+              )}
+            </div>
           </div>
           <div className="filter-buttons">
             <p>Filter by:</p>
@@ -716,116 +728,146 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
             ))}
           </div>
           <div className="dashboard-detail">
-          {selectedItem ? (
-            <>
-              <div className="dashboard-detail-header">
-                <div className="dashboard-detail-title">
-                  {selectedItem.title}
-                </div>
-                <div className="dashboard-detail-actions">
-                  {role === "recruiter" ? (
-                    <>
-                      <button
-                        className="see-applicants-button"
-                        onClick={() => handleSeeApplicants(selectedItem)}
-                      >
-                        See Applicants
-                      </button>
-                      <button
-                        className="edit-button"
-                        onClick={() => handleEdit(selectedItem)}
-                      >
-                        Edit
-                      </button>
-                      <button
-                        className="delete-button"
-                        onClick={() => confirmDelete(selectedItem)}
-                      >
-                        Delete
-                      </button>
-                    </>
-                  ) : (
-                    selectedTab !== "myApplications" && (
-                      <div className="tooltip-container">
+            {selectedItem ? (
+              <>
+                <div className="dashboard-detail-header">
+                  <div className="dashboard-detail-title">
+                    {selectedItem.title}
+                  </div>
+                  <div className="dashboard-detail-actions">
+                    {role === "recruiter" ? (
+                      <>
                         <button
-                          className="resume-submit-button"
+                          className="see-applicants-button"
+                          onClick={() => handleSeeApplicants(selectedItem)}
+                        >
+                          See Applicants
+                        </button>
+                        <button
+                          className="edit-button"
+                          onClick={() => handleEdit(selectedItem)}
+                        >
+                          Edit
+                        </button>
+                        <button
+                          className="delete-button"
+                          onClick={() => confirmDelete(selectedItem)}
+                        >
+                          Delete
+                        </button>
+                      </>
+                    ) : (
+                      selectedTab !== "myApplications" && (
+                        <div className="tooltip-container">
+                          <button
+                            className="resume-submit-button"
                           disabled={
                             qualified !== true || isQualificationsLoading
                           }
-                          onClick={() => {
-                            if (qualified) {
-                              setShowApplicationForm(true);
-                            }
-                          }}
-                        >
-                          {isQualificationsLoading ? (
-                            <div className="loading-dots-container">
-                              <div className="loading-dots">
-                                <span></span>
-                                <span></span>
-                                <span></span>
+                            onClick={() => {
+                              if (qualified) {
+                                setShowApplicationForm(true);
+                              }
+                            }}
+                          >
+                            {isQualificationsLoading ? (
+                              <div className="loading-dots-container">
+                                <div className="loading-dots">
+                                  <span></span>
+                                  <span></span>
+                                  <span></span>
+                                </div>
                               </div>
-                            </div>
-                          ) : (
-                            "Apply"
+                            ) : (
+                              "Apply"
+                            )}
+                          </button>
+                          {qualified !== true && !isQualificationsLoading && (
+                            <span className="tooltip tooltip-apply">
+                              Master resume does not contain the required keywords
+                              for this posting
+                            </span>
                           )}
-                        </button>
-                        {qualified !== true && !isQualificationsLoading && (
-                          <span className="tooltip tooltip-apply">
-                            Master resume does not contain the required keywords
-                            for this posting
-                          </span>
+                        </div>
+                      )
+                    )}
+                  </div>
+                </div>
+                <div className="dashboard-detail-body">
+                  {selectedTab === "myApplications" ? (
+                    <>
+                      <div className="dashboard-detail-section job-title">
+                        {selectedItem.jobDetails.title}
+                      </div>
+                      <div className="dashboard-detail-section">
+                        <h2>Company:</h2>
+                        <p>{selectedItem.jobDetails.company}</p>
+                      </div>
+                      <div className="dashboard-detail-section">
+                        <h2>Location:</h2>
+                        <p>{selectedItem.jobDetails.location}</p>
+                      </div>
+                      <div className="dashboard-detail-section">
+                        <h2>Type:</h2>
+                        <p>{selectedItem.jobDetails.type}</p>
+                      </div>
+                      <div className="dashboard-detail-section">
+                        <h2>Description:</h2>
+                        <p>{selectedItem.jobDetails.description}</p>
+                      </div>
+                      <div className="dashboard-detail-section">
+                        <h2>Qualifications:</h2>
+                        <p>{selectedItem.jobDetails.qualifications}</p>
+                      </div>
+                      <div className="dashboard-detail-section">
+                        <h2>Status:</h2>
+                        <p>{selectedItem.status}</p>
+                      </div>
+                      <div className="dashboard-detail-section">
+                        <h2>Resume:</h2>
+                        {selectedItem.resumeData ? (
+                          <iframe
+                            src={selectedItem.resumeData}
+                            className="resume-iframe"
+                            title="Resume"
+                          ></iframe>
+                        ) : (
+                          "Resume not available"
                         )}
                       </div>
-                    )
-                  )}
-                </div>
-              </div>
-              <div className="dashboard-detail-body">
-                {selectedTab === "myApplications" ? (
-                  <>
-                    {/* My Applications details */}
-                  </>
-                ) : (
-                  <>
-                    <div className="dashboard-detail-section">
-                      <h2>Company:</h2>
-                      <p>{selectedItem.company}</p>
-                    </div>
-                    <div className="dashboard-detail-section">
-                      <h2>Location:</h2>
-                      <p>{selectedItem.location}</p>
-                    </div>
-                    <div className="dashboard-detail-section">
-                      <h2>Type:</h2>
-                      <p>{selectedItem.type}</p>
-                    </div>
-                    <div className="dashboard-detail-section">
-                      <h2>Description:</h2>
-                      <p>{selectedItem.description}</p>
-                    </div>
-                    <div className="dashboard-detail-section">
-                      <h2>Qualifications:</h2>
-                      <p>{selectedItem.qualifications}</p>
-                    </div>
-                    {role === "recruiter" && (
                       <div className="dashboard-detail-section">
-                        <h2>Hidden Keywords:</h2>
-                        <p>{selectedItem.hiddenKeywords}</p>
+                        <strong>Applied Date:</strong> {selectedItem.applyDate}
                       </div>
-                    )}
-                  {!qualified && missingQualifications.length > 0 ? (
+                    </>
+                  ) : (
+                    <>
                       <div className="dashboard-detail-section">
-                      <h2>Missing Qualifications:</h2>
-                      <ul>
-                        {missingQualifications.map((qualification, index) => (
-                          <li key={index}>{qualification}</li>
-                        ))}
-                      </ul>
-                    </div>
-                    ) : (
-                      <>
-                      {role === "applicant" && (
+                        <h2>Company:</h2>
+                        <p>{selectedItem.company}</p>
+                      </div>
+                      <div className="dashboard-detail-section">
+                        <h2>Location:</h2>
+                        <p>{selectedItem.location}</p>
+                      </div>
+                      <div className="dashboard-detail-section">
+                        <h2>Type:</h2>
+                        <p>{selectedItem.type}</p>
+                      </div>
+                      <div className="dashboard-detail-section">
+                        <h2>Description:</h2>
+                        <p>{selectedItem.description}</p>
+                      </div>
+                      <div className="dashboard-detail-section">
+                        <h2>Qualifications:</h2>
+                        <p>{selectedItem.qualifications}</p>
+                      </div>
+                      {role === "recruiter" && (
+                        <div className="dashboard-detail-section">
+                          <h2>Hidden Keywords:</h2>
+                          <p>{selectedItem.hiddenKeywords}</p>
+                        </div>
+                      )}
+                      {role === "applicant" && qualified && (
                         <div className="dashboard-detail-section">
                           <h2>AI master resume analysis:</h2>
                           {masterResume !== null ? (
@@ -851,18 +893,26 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
                           )}
                         </div>
                       )}
-                      </>
-                    )}
-                  </>
-                )}
+                      {!qualified && missingQualifications.length > 0 && (
+                        <div className="dashboard-detail-section">
+                          <h2>Missing Qualifications:</h2>
+                          <ul>
+                            {missingQualifications.map((qualification, index) => (
+                              <li key={index}>{qualification}</li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
+                    </>
+                  )}
+                </div>
+              </>
+            ) : (
+              <div className="dashboard-detail-body">
+                <p>Select a job to see the details</p>
               </div>
-            </>
-          ) : (
-            <div className="dashboard-detail-body">
-              <p>Select a job to see the details</p>
-            </div>
-          )}
-        </div>
+            )}
+          </div>
         </div>
       </div>
       <Modal
@@ -1135,10 +1185,10 @@ const fetchJobsForRecruiter = async (userId, setItems, searchTerm) => {
     const availableJobs = response.filter(
       (job) => job.recruiterID.toString() === userId,
     );
-    if (searchTerm === "") {
+    if (searchTerm.trim() === "") {
       setItems(availableJobs);
     } else { 
-      const searchWords = searchTerm.toLowerCase().split(/\s+/);
+      const searchWords = searchTerm.trim().toLowerCase().split(/\s+/);
 
       const filteredJobs = availableJobs.filter((job) => {
         return searchWords.some((word) =>
@@ -1178,10 +1228,10 @@ const fetchJobsForApplicant = async (userId, setItems, searchTerm) => {
     const availableJobs = jobsResponse.filter(
       (job) => !appliedJobIds.has(job._id),
     );
-    if (searchTerm === "") {
+    if (searchTerm.trim() === "") {
       setItems(availableJobs);
     } else { 
-      const searchWords = searchTerm.toLowerCase().split(/\s+/);
+      const searchWords = searchTerm.trim().toLowerCase().split(/\s+/);
 
       const filteredJobs = availableJobs.filter((job) => {
         return searchWords.some((word) =>
