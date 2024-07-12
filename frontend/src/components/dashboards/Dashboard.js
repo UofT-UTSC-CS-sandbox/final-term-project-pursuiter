@@ -716,49 +716,110 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
             ))}
           </div>
           <div className="dashboard-detail">
-            {selectedItem ? (
-              <>
-                <div className="dashboard-detail-header">
-                  <div className="dashboard-detail-title">
-                    {selectedItem.title}
-                  </div>
-                  <div className="dashboard-detail-actions">
-                    {role === "recruiter" ? (
-                      <>
+          {selectedItem ? (
+            <>
+              <div className="dashboard-detail-header">
+                <div className="dashboard-detail-title">
+                  {selectedItem.title}
+                </div>
+                <div className="dashboard-detail-actions">
+                  {role === "recruiter" ? (
+                    <>
+                      <button
+                        className="see-applicants-button"
+                        onClick={() => handleSeeApplicants(selectedItem)}
+                      >
+                        See Applicants
+                      </button>
+                      <button
+                        className="edit-button"
+                        onClick={() => handleEdit(selectedItem)}
+                      >
+                        Edit
+                      </button>
+                      <button
+                        className="delete-button"
+                        onClick={() => confirmDelete(selectedItem)}
+                      >
+                        Delete
+                      </button>
+                    </>
+                  ) : (
+                    selectedTab !== "myApplications" && (
+                      <div className="tooltip-container">
                         <button
-                          className="see-applicants-button"
-                          onClick={() => handleSeeApplicants(selectedItem)}
-                        >
-                          See Applicants
-                        </button>
-                        <button
-                          className="edit-button"
-                          onClick={() => handleEdit(selectedItem)}
-                        >
-                          Edit
-                        </button>
-                        <button
-                          className="delete-button"
-                          onClick={() => confirmDelete(selectedItem)}
-                        >
-                          Delete
-                        </button>
-                      </>
-                    ) : (
-                      selectedTab !== "myApplications" && (
-                        <div className="tooltip-container">
-                          <button
-                            className="resume-submit-button"
+                          className="resume-submit-button"
                           disabled={
                             qualified !== true || isQualificationsLoading
                           }
-                            onClick={() => {
-                              if (qualified) {
-                                setShowApplicationForm(true);
-                              }
-                            }}
-                          >
-                            {isQualificationsLoading ? (
+                          onClick={() => {
+                            if (qualified) {
+                              setShowApplicationForm(true);
+                            }
+                          }}
+                        >
+                          {isQualificationsLoading ? (
+                            <div className="loading-dots-container">
+                              <div className="loading-dots">
+                                <span></span>
+                                <span></span>
+                                <span></span>
+                              </div>
+                            </div>
+                          ) : (
+                            "Apply"
+                          )}
+                        </button>
+                        {qualified !== true && !isQualificationsLoading && (
+                          <span className="tooltip tooltip-apply">
+                            Master resume does not contain the required keywords
+                            for this posting
+                          </span>
+                        )}
+                      </div>
+                    )
+                  )}
+                </div>
+              </div>
+              <div className="dashboard-detail-body">
+                {selectedTab === "myApplications" ? (
+                  <>
+                    {/* My Applications details */}
+                  </>
+                ) : (
+                  <>
+                    <div className="dashboard-detail-section">
+                      <h2>Company:</h2>
+                      <p>{selectedItem.company}</p>
+                    </div>
+                    <div className="dashboard-detail-section">
+                      <h2>Location:</h2>
+                      <p>{selectedItem.location}</p>
+                    </div>
+                    <div className="dashboard-detail-section">
+                      <h2>Type:</h2>
+                      <p>{selectedItem.type}</p>
+                    </div>
+                    <div className="dashboard-detail-section">
+                      <h2>Description:</h2>
+                      <p>{selectedItem.description}</p>
+                    </div>
+                    <div className="dashboard-detail-section">
+                      <h2>Qualifications:</h2>
+                      <p>{selectedItem.qualifications}</p>
+                    </div>
+                    {role === "recruiter" && (
+                      <div className="dashboard-detail-section">
+                        <h2>Hidden Keywords:</h2>
+                        <p>{selectedItem.hiddenKeywords}</p>
+                      </div>
+                    )}
+                    {qualified && role === "applicant" && (
+                      <div className="dashboard-detail-section">
+                        <h2>AI master resume analysis:</h2>
+                        {masterResume !== null ? (
+                          <>
+                            {MasterResumeRecommendation === "Loading..." ? (
                               <div className="loading-dots-container">
                                 <div className="loading-dots">
                                   <span></span>
@@ -767,140 +828,38 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
                                 </div>
                               </div>
                             ) : (
-                              "Apply"
+                              <p>{MasterResumeRecommendation}</p>
                             )}
-                          </button>
-                          {qualified !== true && !isQualificationsLoading && (
-                            <span className="tooltip tooltip-apply">
-                              Master resume does not contain the required keywords
-                              for this posting
-                            </span>
-                          )}
-                        </div>
-                      )
-                    )}
-                  </div>
-                </div>
-                <div className="dashboard-detail-body">
-                  {selectedTab === "myApplications" ? (
-                    <>
-                      <div className="dashboard-detail-section job-title">
-                        {selectedItem.jobDetails.title}
-                      </div>
-                      <div className="dashboard-detail-section">
-                        <h2>Company:</h2>
-                        <p>{selectedItem.jobDetails.company}</p>
-                      </div>
-                      <div className="dashboard-detail-section">
-                        <h2>Location:</h2>
-                        <p>{selectedItem.jobDetails.location}</p>
-                      </div>
-                      <div className="dashboard-detail-section">
-                        <h2>Type:</h2>
-                        <p>{selectedItem.jobDetails.type}</p>
-                      </div>
-                      <div className="dashboard-detail-section">
-                        <h2>Description:</h2>
-                        <p>{selectedItem.jobDetails.description}</p>
-                      </div>
-                      <div className="dashboard-detail-section">
-                        <h2>Qualifications:</h2>
-                        <p>{selectedItem.jobDetails.qualifications}</p>
-                      </div>
-                      <div className="dashboard-detail-section">
-                        <h2>Status:</h2>
-                        <p>{selectedItem.status}</p>
-                      </div>
-                      <div className="dashboard-detail-section">
-                        <h2>Resume:</h2>
-                        {selectedItem.resumeData ? (
-                          <iframe
-                            src={selectedItem.resumeData}
-                            className="resume-iframe"
-                            title="Resume"
-                          ></iframe>
+                          </>
                         ) : (
-                          "Resume not available"
+                          <p>
+                            Master resume has not been uploaded. Analysis
+                            will be available once you upload it from the
+                            account page.
+                          </p>
                         )}
                       </div>
+                    )}
+                    {!qualified && missingQualifications.length > 0 && (
                       <div className="dashboard-detail-section">
-                        <strong>Applied Date:</strong> {selectedItem.applyDate}
+                        <h2>Missing Qualifications:</h2>
+                        <ul>
+                          {missingQualifications.map((qualification, index) => (
+                            <li key={index}>{qualification}</li>
+                          ))}
+                        </ul>
                       </div>
-                    </>
-                  ) : (
-                    <>
-                      <div className="dashboard-detail-section">
-                        <h2>Company:</h2>
-                        <p>{selectedItem.company}</p>
-                      </div>
-                      <div className="dashboard-detail-section">
-                        <h2>Location:</h2>
-                        <p>{selectedItem.location}</p>
-                      </div>
-                      <div className="dashboard-detail-section">
-                        <h2>Type:</h2>
-                        <p>{selectedItem.type}</p>
-                      </div>
-                      <div className="dashboard-detail-section">
-                        <h2>Description:</h2>
-                        <p>{selectedItem.description}</p>
-                      </div>
-                      <div className="dashboard-detail-section">
-                        <h2>Qualifications:</h2>
-                        <p>{selectedItem.qualifications}</p>
-                      </div>
-                      {role === "recruiter" && (
-                        <div className="dashboard-detail-section">
-                          <h2>Hidden Keywords:</h2>
-                          <p>{selectedItem.hiddenKeywords}</p>
-                        </div>
-                      )}
-                      {role === "applicant" && qualified && (
-                        <div className="dashboard-detail-section">
-                          <h2>AI master resume analysis:</h2>
-                          {masterResume !== null ? (
-                            <>
-                              {MasterResumeRecommendation === "Loading..." ? (
-                                <div className="loading-dots-container">
-                                  <div className="loading-dots">
-                                    <span></span>
-                                    <span></span>
-                                    <span></span>
-                                  </div>
-                                </div>
-                              ) : (
-                                <p>{MasterResumeRecommendation}</p>
-                              )}
-                            </>
-                          ) : (
-                            <p>
-                              Master resume has not been uploaded. Analysis
-                              will be available once you upload it from the
-                              account page.
-                            </p>
-                          )}
-                        </div>
-                      )}
-                      {!qualified && missingQualifications.length > 0 && (
-                        <div className="dashboard-detail-section">
-                          <h2>Missing Qualifications:</h2>
-                          <ul>
-                            {missingQualifications.map((qualification, index) => (
-                              <li key={index}>{qualification}</li>
-                            ))}
-                          </ul>
-                        </div>
-                      )}
-                    </>
-                  )}
-                </div>
-              </>
-            ) : (
-              <div className="dashboard-detail-body">
-                <p>Select a job to see the details</p>
+                    )}
+                  </>
+                )}
               </div>
-            )}
-          </div>
+            </>
+          ) : (
+            <div className="dashboard-detail-body">
+              <p>Select a job to see the details</p>
+            </div>
+          )}
+        </div>
         </div>
       </div>
       <Modal
