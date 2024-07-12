@@ -64,7 +64,6 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
     setEditMode(false);
     setShowItemForm(true);
   };  
-  const [recruiterInfo, setRecruiterInfo] = useState({});
   const [isFormValid, setIsFormValid] = useState(false);
   const [initialItem, setInitialItem] = useState({
     title: "",
