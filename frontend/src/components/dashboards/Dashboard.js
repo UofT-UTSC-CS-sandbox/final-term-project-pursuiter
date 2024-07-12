@@ -926,8 +926,11 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
           <option value="full-time">Full-time</option>
           <option value="part-time">Part-time</option>
           <option value="internship">Internship</option>
+          <option value="co-op">Co-op</option>
           <option value="contract">Contract</option>
           <option value="freelance">Freelance</option>
+          <option value="apprenticeship">Apprenticeship</option>
+          <option value="on-call">On-call</option>
         </select>
         <input
           type="date"
