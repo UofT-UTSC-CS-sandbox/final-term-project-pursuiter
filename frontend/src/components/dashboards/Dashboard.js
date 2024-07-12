@@ -47,6 +47,8 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
   const [isGenerateButtonClicked, setIsGenerateButtonClicked] = useState(false);
   const [submissionStatus, setSubmissionStatus] = useState("");
   const [isQualificationsLoading, setIsQualificationsLoading] = useState(false);
+  const [recruiterInfo, setRecruiterInfo] = useState({});
+  const [missingQualifications, setMissingQualifications] = useState([]);
   const handleNewJob = () => {
     setNewItem({
       title: "",
@@ -62,8 +64,6 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
     setEditMode(false);
     setShowItemForm(true);
   };  
-  const [recruiterInfo, setRecruiterInfo] = useState({});
-
 
   // Fetch jobs and favorited jobs
   useEffect(() => {
@@ -236,6 +236,7 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
     reader.readAsDataURL(file);
   };
 
+  // Handle application submission
   const handleApplicationSubmit = async (e) => {
     e.preventDefault();
     if (resumeFile === null) {
@@ -452,46 +453,51 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
     keywords,
     resume,
     qualifications,
-    jobDescription,
+    jobDescription
   ) => {
     setIsQualificationsLoading(true);
-
+  
     if (masterResume === null) {
       setQualified(false);
+      setMissingQualifications([]);
       setIsQualificationsLoading(false);
       return;
     }
-
+  
     const keywordsArray = keywords
       .toLowerCase()
       .split(",")
       .map((keyword) => keyword.trim());
-
+  
     let resumeText = await TurnPdfToString(resume);
-
-    const formattedData = await formatResumeData(
-      qualifications,
-      jobDescription,
-      resumeText,
-    );
-    const resumeResponse =
-      await DashboardController.fetchGeminiResponse(formattedData);
-    setMasterResumeRecommendation(resumeResponse.response);
-
     resumeText = resumeText.toLowerCase();
-
-    const allKeywordsFound = keywordsArray.every((keyword) =>
-      resumeText.includes(keyword),
+  
+    const missingKeywords = keywordsArray.filter(
+      (keyword) => !resumeText.includes(keyword)
     );
-
-    if (allKeywordsFound) {
+  
+    if (missingKeywords.length === 0) {
       setQualified(true);
+      setMissingQualifications([]);
+      
+      // Only fetch AI response if qualified
+      const formattedData = await formatResumeData(
+        qualifications,
+        jobDescription,
+        resumeText
+      );
+      const resumeResponse =
+        await DashboardController.fetchGeminiResponse(formattedData);
+      setMasterResumeRecommendation(resumeResponse.response);
     } else {
       setQualified(false);
+      setMissingQualifications(missingKeywords);
+      setMasterResumeRecommendation("");
     }
     setIsQualificationsLoading(false);
   };
-
+  
+  
   // Fetch user's applications
   const fetchApplications = async (userId, searchTerm) => {
     try {
@@ -550,14 +556,16 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
-            <button className="search-button" onClick={() => {
-              if (selectedTab === "newJobs") {
+            <button
+              className="search-button"
+              onClick={() => {
+                if (selectedTab === "newJobs") {
+                  fetchJobs(user.userId, setItems, searchTerm);
+                } else {
+                  fetchApplications(user.userId, searchTerm);
+                }
                 fetchJobs(user.userId, setItems, searchTerm);
-              } else {
-                fetchApplications(user.userId, searchTerm);               
-              }             
-              fetchJobs(user.userId, setItems, searchTerm);
-              setSelectedItem(null);
+                setSelectedItem(null);
               }}
             >
               Search
@@ -572,7 +580,7 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
           </div>
         </div>
         {role === "applicant" && (
-        <div className="tab-bar">
+          <div className="tab-bar">
             <div className="tab-container">
               <button
                 className={`tab-button ${selectedTab === "newJobs" ? "selected" : ""}`}
@@ -595,8 +603,8 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
                 My Applications
               </button>
             </div>
-        </div>
-      )}
+          </div>
+        )}
         <div className="dashboard-listings">
           <div className="dashboard-list">
             <div className="dashboard-count">
@@ -604,57 +612,57 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
             </div>
             {displayedItems.map((item, index) => (
               <div
-              key={index}
-              className="dashboard-item"
-              onClick={() => {
-                setSelectedItem(item);
-                setQualified(false);
-                setMasterResumeRecommendation("Loading...");
-                if (selectedTab === "myApplications") {
-                  handleQualificationsCheck(
-                    item.jobDetails.hiddenKeywords,
-                    masterResume,
-                    item.jobDetails.qualifications,
-                    item.jobDetails.description
-                  );
-                } else {
-                  handleQualificationsCheck(
-                    item.hiddenKeywords,
-                    masterResume,
-                    item.qualifications,
-                    item.description,
-                  );
-                }
-              }}
-            >
-              {selectedTab === "myApplications" ? (
-                <>
-                  <div className="dashboard-title">{item.jobDetails.title}</div>
-                  <div className="dashboard-company">{item.jobDetails.company}</div>
-                  <div className="dashboard-location">{item.jobDetails.location}</div>
-                  <div className="dashboard-type">{item.jobDetails.type}</div>
-                </>
-              ) : (
-                <>
-                  <div className="dashboard-title">{item.title}</div>
-                  <div className="dashboard-company">{item.company}</div>
-                  <div className="dashboard-location">{item.location}</div>
-                  <div className="dashboard-type">{item.type}</div>
-                  <div className="dashboard-apply-by">
-                    <strong>Closing Date:</strong> {item.applyBy}
-                  </div>
-                  <div
-                    className={`favorite-icon ${isFavorited(item) ? "favorited" : ""}`}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleFavorite(item);
-                    }}
-                  >
-                    <FaStar />
-                  </div>
-                </>
-              )}
-            </div>                             
+                key={index}
+                className="dashboard-item"
+                onClick={() => {
+                  setSelectedItem(item);
+                  setQualified(false);
+                  setMasterResumeRecommendation("Loading...");
+                  if (selectedTab === "myApplications") {
+                    handleQualificationsCheck(
+                      item.jobDetails.hiddenKeywords,
+                      masterResume,
+                      item.jobDetails.qualifications,
+                      item.jobDetails.description
+                    );
+                  } else {
+                    handleQualificationsCheck(
+                      item.hiddenKeywords,
+                      masterResume,
+                      item.qualifications,
+                      item.description
+                    );
+                  }
+                }}
+              >
+                {selectedTab === "myApplications" ? (
+                  <>
+                    <div className="dashboard-title">{item.jobDetails.title}</div>
+                    <div className="dashboard-company">{item.jobDetails.company}</div>
+                    <div className="dashboard-location">{item.jobDetails.location}</div>
+                    <div className="dashboard-type">{item.jobDetails.type}</div>
+                  </>
+                ) : (
+                  <>
+                    <div className="dashboard-title">{item.title}</div>
+                    <div className="dashboard-company">{item.company}</div>
+                    <div className="dashboard-location">{item.location}</div>
+                    <div className="dashboard-type">{item.type}</div>
+                    <div className="dashboard-apply-by">
+                      <strong>Closing Date:</strong> {item.applyBy}
+                    </div>
+                    <div
+                      className={`favorite-icon ${isFavorited(item) ? "favorited" : ""}`}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleFavorite(item);
+                      }}
+                    >
+                      <FaStar />
+                    </div>
+                  </>
+                )}
+              </div>
             ))}
           </div>
           <div className="dashboard-detail">
@@ -691,9 +699,9 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
                         <div className="tooltip-container">
                           <button
                             className="resume-submit-button"
-                          disabled={
-                            qualified !== true || isQualificationsLoading
-                          }
+                            disabled={
+                              qualified !== true || isQualificationsLoading
+                            }
                             onClick={() => {
                               if (qualified) {
                                 setShowApplicationForm(true);
@@ -794,7 +802,7 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
                           <p>{selectedItem.hiddenKeywords}</p>
                         </div>
                       )}
-                      {role === "applicant" && (
+                      {role === "applicant" && qualified && (
                         <div className="dashboard-detail-section">
                           <h2>AI master resume analysis:</h2>
                           {masterResume !== null ? (
@@ -820,6 +828,16 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
                           )}
                         </div>
                       )}
+                      {!qualified && missingQualifications.length > 0 && (
+                        <div className="dashboard-detail-section">
+                          <h2>Missing Qualifications:</h2>
+                          <ul>
+                            {missingQualifications.map((qualification, index) => (
+                              <li key={index}>{qualification}</li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
                     </>
                   )}
                 </div>
@@ -833,82 +851,82 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
         </div>
       </div>
       <Modal
-      show={showItemForm}
-      onClose={() => setShowItemForm(false)}
-      title={editMode ? "Edit Job" : "New Job"}
-    >
-      <form className="new-item-form" onSubmit={handleSubmit}>
-        <input
-          type="text"
-          name="title"
-          placeholder="Job Title"
-          value={newItem.title}
-          onChange={handleInputChange}
-          required
-        />
-        <input
-          type="text"
-          name="company"
-          placeholder="Company"
-          value={newItem.company}
-          onChange={handleInputChange}
-          required
-        />
-        <input
-          type="text"
-          name="location"
-          placeholder="Location"
-          value={newItem.location}
-          onChange={handleInputChange}
-          required
-        />
-        <input
-          type="text"
-          name="type"
-          placeholder="Job Type"
-          value={newItem.type}
-          onChange={handleInputChange}
-          required
-        />
-        <input
-          type="date"
-          name="applyBy"
-          placeholder="Apply By"
-          value={newItem.applyBy}
-          onChange={handleInputChange}
-          required
-        />
-        <input
-          type="text"
-          name="hiddenKeywords"
-          placeholder="Hidden Keywords"
-          value={newItem.hiddenKeywords}
-          onChange={handleInputChange}
-          required
-        />
-        <textarea
-          name="description"
-          placeholder="Job Description"
-          value={newItem.description}
-          onChange={handleInputChange}
-          required
-        ></textarea>
-        <textarea
-          name="qualifications"
-          placeholder="Qualifications"
-          value={newItem.qualifications}
-          onChange={handleInputChange}
-          required
-        ></textarea>
-        <button type="submit">{editMode ? "Update Job" : "Submit"}</button>
-        <button
-          className="cancel-button"
-          onClick={() => setShowItemForm(false)}
-        >
-          Cancel
-        </button>
-      </form>
-    </Modal>
+        show={showItemForm}
+        onClose={() => setShowItemForm(false)}
+        title={editMode ? "Edit Job" : "New Job"}
+      >
+        <form className="new-item-form" onSubmit={handleSubmit}>
+          <input
+            type="text"
+            name="title"
+            placeholder="Job Title"
+            value={newItem.title}
+            onChange={handleInputChange}
+            required
+          />
+          <input
+            type="text"
+            name="company"
+            placeholder="Company"
+            value={newItem.company}
+            onChange={handleInputChange}
+            required
+          />
+          <input
+            type="text"
+            name="location"
+            placeholder="Location"
+            value={newItem.location}
+            onChange={handleInputChange}
+            required
+          />
+          <input
+            type="text"
+            name="type"
+            placeholder="Job Type"
+            value={newItem.type}
+            onChange={handleInputChange}
+            required
+          />
+          <input
+            type="date"
+            name="applyBy"
+            placeholder="Apply By"
+            value={newItem.applyBy}
+            onChange={handleInputChange}
+            required
+          />
+          <input
+            type="text"
+            name="hiddenKeywords"
+            placeholder="Hidden Keywords"
+            value={newItem.hiddenKeywords}
+            onChange={handleInputChange}
+            required
+          />
+          <textarea
+            name="description"
+            placeholder="Job Description"
+            value={newItem.description}
+            onChange={handleInputChange}
+            required
+          ></textarea>
+          <textarea
+            name="qualifications"
+            placeholder="Qualifications"
+            value={newItem.qualifications}
+            onChange={handleInputChange}
+            required
+          ></textarea>
+          <button type="submit">{editMode ? "Update Job" : "Submit"}</button>
+          <button
+            className="cancel-button"
+            onClick={() => setShowItemForm(false)}
+          >
+            Cancel
+          </button>
+        </form>
+      </Modal>
       <Modal
         show={showApplicationForm}
         onClose={() => {
@@ -928,67 +946,69 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
             accept=".pdf"
             onChange={(event) => handleFileChange(event, "resume")}
           />
-          <div className="ai-feedback-section">
-            <div className="ai-feedback-header">
-              <h3>
-                AI Generated Feedback
-                <span className="tooltip-container">
-                  <span className="tooltip-icon">?</span>
-                  <span className="tooltip tooltip-modal">
-                    Upload a customized resume for detailed feedback
+          {qualified && (
+            <div className="ai-feedback-section">
+              <div className="ai-feedback-header">
+                <h3>
+                  AI Generated Feedback
+                  <span className="tooltip-container">
+                    <span className="tooltip-icon">?</span>
+                    <span className="tooltip tooltip-modal">
+                      Upload a customized resume for detailed feedback
+                    </span>
                   </span>
-                </span>
-              </h3>
-              <div className="tooltip-container">
-                <button
-                  type="button"
-                  className="generate-feedback-button"
-                  disabled={isGenerateButtonDisabled || isGenerateButtonClicked}
-                  onClick={async () => {
-                    setIsGenerateButtonClicked(true);
-                    setResumeRecommendation("Loading...");
+                </h3>
+                <div className="tooltip-container">
+                  <button
+                    type="button"
+                    className="generate-feedback-button"
+                    disabled={isGenerateButtonDisabled || isGenerateButtonClicked}
+                    onClick={async () => {
+                      setIsGenerateButtonClicked(true);
+                      setResumeRecommendation("Loading...");
 
-                    try {
-                      const resumeText = await TurnPdfToString(resumeFile);
-                      const formattedData = await formatResumeData(
-                        selectedItem.qualifications,
-                        selectedItem.description,
-                        resumeText,
-                      );
-                      const response =
-                        await DashboardController.fetchGeminiResponse(
-                          formattedData,
+                      try {
+                        const resumeText = await TurnPdfToString(resumeFile);
+                        const formattedData = await formatResumeData(
+                          selectedItem.qualifications,
+                          selectedItem.description,
+                          resumeText
                         );
-                      setResumeRecommendation(response.response);
-                    } catch (error) {
-                      console.error("Error generating feedback:", error);
-                      setResumeRecommendation("Error generating feedback.");
-                    }
-                  }}
-                >
-                  Generate Feedback
-                </button>
-                {(isGenerateButtonDisabled || isGenerateButtonClicked) && (
-                  <span className="tooltip tooltip-modal">
-                    Upload a new resume to generate corresponding feedback
-                  </span>
+                        const response =
+                          await DashboardController.fetchGeminiResponse(
+                            formattedData
+                          );
+                        setResumeRecommendation(response.response);
+                      } catch (error) {
+                        console.error("Error generating feedback:", error);
+                        setResumeRecommendation("Error generating feedback.");
+                      }
+                    }}
+                  >
+                    Generate Feedback
+                  </button>
+                  {(isGenerateButtonDisabled || isGenerateButtonClicked) && (
+                    <span className="tooltip tooltip-modal">
+                      Upload a new resume to generate corresponding feedback
+                    </span>
+                  )}
+                </div>
+              </div>
+              <div className="ai-feedback-box">
+                {ResumeRecommendation === "Loading..." ? (
+                  <div className="loading-dots-container">
+                    <div className="loading-dots">
+                      <span></span>
+                      <span></span>
+                      <span></span>
+                    </div>
+                  </div>
+                ) : (
+                  <p>{ResumeRecommendation || "No feedback generated yet."}</p>
                 )}
               </div>
             </div>
-            <div className="ai-feedback-box">
-              {ResumeRecommendation === "Loading..." ? (
-                <div className="loading-dots-container">
-                  <div className="loading-dots">
-                    <span></span>
-                    <span></span>
-                    <span></span>
-                  </div>
-                </div>
-              ) : (
-                <p>{ResumeRecommendation || "No feedback generated yet."}</p>
-              )}
-            </div>
-          </div>
+          )}
           <button
             type="submit"
             className="resume-submit-button"
