@@ -93,8 +93,8 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
           });
       }
     }
-  }, [user, fetchFavoritedJobs, fetchJobs, selectedTab]);    
-
+  }, [user, fetchFavoritedJobs, fetchJobs, selectedTab]);
+  
   // Fetch recruiter information
   useEffect(() => {
     if (user && role === "recruiter") {
@@ -577,7 +577,6 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
     checkFormValidity();
   }, [newItem]);
   
-
   const allItems = items.filter(
     (item) => !favoritedItems.some((fav) => fav._id === item._id),
   );
