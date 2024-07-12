@@ -923,14 +923,14 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
           required
         >
           <option value="">Select Job Type</option>
-          <option value="full-time">Full-time</option>
-          <option value="part-time">Part-time</option>
-          <option value="internship">Internship</option>
-          <option value="co-op">Co-op</option>
-          <option value="contract">Contract</option>
-          <option value="freelance">Freelance</option>
-          <option value="apprenticeship">Apprenticeship</option>
-          <option value="on-call">On-call</option>
+          <option value="Full-time">Full-time</option>
+          <option value="Part-time">Part-time</option>
+          <option value="Internship">Internship</option>
+          <option value="Co-op">Co-op</option>
+          <option value="Contract">Contract</option>
+          <option value="Freelance">Freelance</option>
+          <option value="Apprenticeship">Apprenticeship</option>
+          <option value="On-call">On-call</option>
         </select>
         <input
           type="date"
