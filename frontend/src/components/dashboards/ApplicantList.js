@@ -17,6 +17,8 @@ function ApplicantList() {
   const [applicationDetails, setApplicationDetails] = useState(null);
   const { user, logoutUser } = useContext(UserContext);
   const progressBarRef = useRef(null);
+  const [status, setStatus] = useState("");
+  const [isStatusLoading, setIsStatusLoading] = useState(false);
 
   // Fetch applicants and job details
   useEffect(() => {
@@ -93,10 +95,25 @@ function ApplicantList() {
         jobId,
       );
       setApplicationDetails(response);
+      setStatus(response.status || "");
     } catch (error) {
       console.error("Error fetching application details:", error);
     }
   };
+
+  // Handle applications status change
+  const handleStatusChange = async (newStatus) => {
+    if (!selectedApplicant) return;
+    setIsStatusLoading(true);
+    try {
+      await DashboardController.updateApplicationStatus(selectedApplicant._id, jobId, newStatus);
+      setStatus(newStatus);
+    } catch (error) {
+      console.error("Error updating application status:", error);
+    } finally {
+      setIsStatusLoading(false);
+    }
+  };  
 
   // Calculate the width of the bar
   const progressBarWidth = applicationDetails
@@ -320,7 +337,18 @@ function ApplicantList() {
                   ) : null}
                   <div className="dashboard-detail-section">
                     <h2>Status:</h2>
-                    <p>To be implemented in another feature</p>
+                    <select className="dropdown"
+                      value={status}
+                      onChange={(e) => handleStatusChange(e.target.value)}
+                      disabled={isStatusLoading}
+                    >
+                      <option value="Applied">Pending Review</option>
+                      <option value="Review">Under Review</option>
+                      <option value="Interview">Interview</option>
+                      <option value="Offer">Offer</option>
+                      <option value="Hired">Hired</option>
+                      <option value="Rejected">Rejected</option>
+                    </select>
                   </div>
                   <div className="dashboard-detail-section">
                     <h2>Resume:</h2>

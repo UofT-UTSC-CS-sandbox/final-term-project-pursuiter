@@ -181,7 +181,9 @@
 }
 
 .new-item-form input,
-.new-item-form textarea {
+.new-item-form textarea,
+.new-item-form select {
+  font-family: "Poppins", sans-serif;
   padding: 10px;
   font-size: 16px;
   border: 1px solid #ddd;
@@ -334,6 +336,17 @@
 .tab-button.selected:hover {
   background-color: #800020;
   color: #fff;
+}
+
+.dropdown {
+  width: auto;
+  padding: 10px;
+  border-color: #ddd;
+  border-radius: 5px;
+  font-family: "Poppins", sans-serif;
+  font-size: 18px;
+  cursor: pointer;
+  white-space: nowrap;
 }
 
 /************************************
