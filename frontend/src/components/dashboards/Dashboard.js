@@ -47,6 +47,8 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
   const [isGenerateButtonClicked, setIsGenerateButtonClicked] = useState(false);
   const [submissionStatus, setSubmissionStatus] = useState("");
   const [isQualificationsLoading, setIsQualificationsLoading] = useState(false);
+  const [recruiterInfo, setRecruiterInfo] = useState({});
+  const [missingQualifications, setMissingQualifications] = useState([]);
   const handleNewJob = () => {
     setNewItem({
       title: "",
@@ -62,7 +64,6 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
     setEditMode(false);
     setShowItemForm(true);
   };  
-  const [recruiterInfo, setRecruiterInfo] = useState({});
   const [isFormValid, setIsFormValid] = useState(false);
   const [initialItem, setInitialItem] = useState({
     title: "",
@@ -256,6 +257,7 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
     reader.readAsDataURL(file);
   };
 
+  // Handle application submission
   const handleApplicationSubmit = async (e) => {
     e.preventDefault();
     if (resumeFile === null) {
@@ -472,46 +474,50 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
     keywords,
     resume,
     qualifications,
-    jobDescription,
+    jobDescription
   ) => {
     setIsQualificationsLoading(true);
-
+  
     if (masterResume === null) {
       setQualified(false);
+      setMissingQualifications([]);
       setIsQualificationsLoading(false);
       return;
     }
-
+  
     const keywordsArray = keywords
       .toLowerCase()
       .split(",")
       .map((keyword) => keyword.trim());
-
+  
     let resumeText = await TurnPdfToString(resume);
-
-    const formattedData = await formatResumeData(
-      qualifications,
-      jobDescription,
-      resumeText,
-    );
-    const resumeResponse =
-      await DashboardController.fetchGeminiResponse(formattedData);
-    setMasterResumeRecommendation(resumeResponse.response);
-
     resumeText = resumeText.toLowerCase();
-
-    const allKeywordsFound = keywordsArray.every((keyword) =>
-      resumeText.includes(keyword),
+  
+    const missingKeywords = keywordsArray.filter(
+      (keyword) => !resumeText.includes(keyword)
     );
-
-    if (allKeywordsFound) {
+  
+    if (missingKeywords.length === 0) {
       setQualified(true);
+      setMissingQualifications([]);
+      
+      const formattedData = await formatResumeData(
+        qualifications,
+        jobDescription,
+        resumeText
+      );
+      const resumeResponse =
+        await DashboardController.fetchGeminiResponse(formattedData);
+      setMasterResumeRecommendation(resumeResponse.response);
     } else {
       setQualified(false);
+      setMissingQualifications(missingKeywords);
+      setMasterResumeRecommendation("");
     }
     setIsQualificationsLoading(false);
   };
-
+  
+  
   // Fetch user's applications
   const fetchApplications = async (userId, searchTerm) => {
     try {
@@ -600,14 +606,16 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
-            <button className="search-button" onClick={() => {
-              if (selectedTab === "newJobs") {
+            <button
+              className="search-button"
+              onClick={() => {
+                if (selectedTab === "newJobs") {
+                  fetchJobs(user.userId, setItems, searchTerm);
+                } else {
+                  fetchApplications(user.userId, searchTerm);
+                }
                 fetchJobs(user.userId, setItems, searchTerm);
-              } else {
-                fetchApplications(user.userId, searchTerm);               
-              }             
-              fetchJobs(user.userId, setItems, searchTerm);
-              setSelectedItem(null);
+                setSelectedItem(null);
               }}
             >
               Search
@@ -622,7 +630,7 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
           </div>
         </div>
         {role === "applicant" && (
-        <div className="tab-bar">
+          <div className="tab-bar">
             <div className="tab-container">
               <button
                 className={`tab-button ${selectedTab === "newJobs" ? "selected" : ""}`}
@@ -645,8 +653,8 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
                 My Applications
               </button>
             </div>
-        </div>
-      )}
+          </div>
+        )}
         <div className="dashboard-listings">
           <div className="dashboard-list">
             <div className="dashboard-count">
@@ -672,7 +680,7 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
                     item.hiddenKeywords,
                     masterResume,
                     item.qualifications,
-                    item.description,
+                    item.description
                   );
                 }
               }}
@@ -704,149 +712,119 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
                   </div>
                 </>
               )}
-            </div>                             
+            </div>
             ))}
           </div>
           <div className="dashboard-detail">
-            {selectedItem ? (
-              <>
-                <div className="dashboard-detail-header">
-                  <div className="dashboard-detail-title">
-                    {selectedItem.title}
-                  </div>
-                  <div className="dashboard-detail-actions">
-                    {role === "recruiter" ? (
-                      <>
+          {selectedItem ? (
+            <>
+              <div className="dashboard-detail-header">
+                <div className="dashboard-detail-title">
+                  {selectedItem.title}
+                </div>
+                <div className="dashboard-detail-actions">
+                  {role === "recruiter" ? (
+                    <>
+                      <button
+                        className="see-applicants-button"
+                        onClick={() => handleSeeApplicants(selectedItem)}
+                      >
+                        See Applicants
+                      </button>
+                      <button
+                        className="edit-button"
+                        onClick={() => handleEdit(selectedItem)}
+                      >
+                        Edit
+                      </button>
+                      <button
+                        className="delete-button"
+                        onClick={() => confirmDelete(selectedItem)}
+                      >
+                        Delete
+                      </button>
+                    </>
+                  ) : (
+                    selectedTab !== "myApplications" && (
+                      <div className="tooltip-container">
                         <button
-                          className="see-applicants-button"
-                          onClick={() => handleSeeApplicants(selectedItem)}
-                        >
-                          See Applicants
-                        </button>
-                        <button
-                          className="edit-button"
-                          onClick={() => handleEdit(selectedItem)}
-                        >
-                          Edit
-                        </button>
-                        <button
-                          className="delete-button"
-                          onClick={() => confirmDelete(selectedItem)}
-                        >
-                          Delete
-                        </button>
-                      </>
-                    ) : (
-                      selectedTab !== "myApplications" && (
-                        <div className="tooltip-container">
-                          <button
-                            className="resume-submit-button"
+                          className="resume-submit-button"
                           disabled={
                             qualified !== true || isQualificationsLoading
                           }
-                            onClick={() => {
-                              if (qualified) {
-                                setShowApplicationForm(true);
-                              }
-                            }}
-                          >
-                            {isQualificationsLoading ? (
-                              <div className="loading-dots-container">
-                                <div className="loading-dots">
-                                  <span></span>
-                                  <span></span>
-                                  <span></span>
-                                </div>
+                          onClick={() => {
+                            if (qualified) {
+                              setShowApplicationForm(true);
+                            }
+                          }}
+                        >
+                          {isQualificationsLoading ? (
+                            <div className="loading-dots-container">
+                              <div className="loading-dots">
+                                <span></span>
+                                <span></span>
+                                <span></span>
                               </div>
-                            ) : (
-                              "Apply"
-                            )}
-                          </button>
-                          {qualified !== true && !isQualificationsLoading && (
-                            <span className="tooltip tooltip-apply">
-                              Master resume does not contain the required keywords
-                              for this posting
-                            </span>
+                            </div>
+                          ) : (
+                            "Apply"
                           )}
-                        </div>
-                      )
-                    )}
-                  </div>
-                </div>
-                <div className="dashboard-detail-body">
-                  {selectedTab === "myApplications" ? (
-                    <>
-                      <div className="dashboard-detail-section job-title">
-                        {selectedItem.jobDetails.title}
-                      </div>
-                      <div className="dashboard-detail-section">
-                        <h2>Company:</h2>
-                        <p>{selectedItem.jobDetails.company}</p>
-                      </div>
-                      <div className="dashboard-detail-section">
-                        <h2>Location:</h2>
-                        <p>{selectedItem.jobDetails.location}</p>
-                      </div>
-                      <div className="dashboard-detail-section">
-                        <h2>Type:</h2>
-                        <p>{selectedItem.jobDetails.type}</p>
-                      </div>
-                      <div className="dashboard-detail-section">
-                        <h2>Description:</h2>
-                        <p>{selectedItem.jobDetails.description}</p>
-                      </div>
-                      <div className="dashboard-detail-section">
-                        <h2>Qualifications:</h2>
-                        <p>{selectedItem.jobDetails.qualifications}</p>
-                      </div>
-                      <div className="dashboard-detail-section">
-                        <h2>Status:</h2>
-                        <p>{selectedItem.status}</p>
-                      </div>
-                      <div className="dashboard-detail-section">
-                        <h2>Resume:</h2>
-                        {selectedItem.resumeData ? (
-                          <iframe
-                            src={selectedItem.resumeData}
-                            className="resume-iframe"
-                            title="Resume"
-                          ></iframe>
-                        ) : (
-                          "Resume not available"
+                        </button>
+                        {qualified !== true && !isQualificationsLoading && (
+                          <span className="tooltip tooltip-apply">
+                            Master resume does not contain the required keywords
+                            for this posting
+                          </span>
                         )}
                       </div>
+                    )
+                  )}
+                </div>
+              </div>
+              <div className="dashboard-detail-body">
+                {selectedTab === "myApplications" ? (
+                  <>
+                    {/* My Applications details */}
+                  </>
+                ) : (
+                  <>
+                    <div className="dashboard-detail-section">
+                      <h2>Company:</h2>
+                      <p>{selectedItem.company}</p>
+                    </div>
+                    <div className="dashboard-detail-section">
+                      <h2>Location:</h2>
+                      <p>{selectedItem.location}</p>
+                    </div>
+                    <div className="dashboard-detail-section">
+                      <h2>Type:</h2>
+                      <p>{selectedItem.type}</p>
+                    </div>
+                    <div className="dashboard-detail-section">
+                      <h2>Description:</h2>
+                      <p>{selectedItem.description}</p>
+                    </div>
+                    <div className="dashboard-detail-section">
+                      <h2>Qualifications:</h2>
+                      <p>{selectedItem.qualifications}</p>
+                    </div>
+                    {role === "recruiter" && (
                       <div className="dashboard-detail-section">
-                        <strong>Applied Date:</strong> {selectedItem.applyDate}
+                        <h2>Hidden Keywords:</h2>
+                        <p>{selectedItem.hiddenKeywords}</p>
                       </div>
-                    </>
-                  ) : (
-                    <>
+                    )}
+                  {!qualified && missingQualifications.length > 0 ? (
                       <div className="dashboard-detail-section">
-                        <h2>Company:</h2>
-                        <p>{selectedItem.company}</p>
-                      </div>
-                      <div className="dashboard-detail-section">
-                        <h2>Location:</h2>
-                        <p>{selectedItem.location}</p>
-                      </div>
-                      <div className="dashboard-detail-section">
-                        <h2>Type:</h2>
-                        <p>{selectedItem.type}</p>
-                      </div>
-                      <div className="dashboard-detail-section">
-                        <h2>Description:</h2>
-                        <p>{selectedItem.description}</p>
-                      </div>
-                      <div className="dashboard-detail-section">
-                        <h2>Qualifications:</h2>
-                        <p>{selectedItem.qualifications}</p>
-                      </div>
-                      {role === "recruiter" && (
-                        <div className="dashboard-detail-section">
-                          <h2>Hidden Keywords:</h2>
-                          <p>{selectedItem.hiddenKeywords}</p>
-                        </div>
-                      )}
+                      <h2>Missing Qualifications:</h2>
+                      <ul>
+                        {missingQualifications.map((qualification, index) => (
+                          <li key={index}>{qualification}</li>
+                        ))}
+                      </ul>
+                    </div>
+                    ) : (
+                      <>
                       {role === "applicant" && (
                         <div className="dashboard-detail-section">
                           <h2>AI master resume analysis:</h2>
@@ -873,20 +851,22 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
                           )}
                         </div>
                       )}
-                    </>
-                  )}
-                </div>
-              </>
-            ) : (
-              <div className="dashboard-detail-body">
-                <p>Select a job to see the details</p>
+                      </>
+                    )}
+                  </>
+                )}
               </div>
-            )}
-          </div>
+            </>
+          ) : (
+            <div className="dashboard-detail-body">
+              <p>Select a job to see the details</p>
+            </div>
+          )}
+        </div>
         </div>
       </div>
       <Modal
-      show={showItemForm}
+        show={showItemForm}
       onClose={() => setShowItemForm(false)}
       title={editMode ? "Edit Job" : "New Job"}
     >
@@ -972,7 +952,7 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
         </button>
       </form>
     </Modal>
-      <Modal
+    <Modal
         show={showApplicationForm}
         onClose={() => {
           setShowApplicationForm(false);
@@ -991,67 +971,69 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
             accept=".pdf"
             onChange={(event) => handleFileChange(event, "resume")}
           />
-          <div className="ai-feedback-section">
-            <div className="ai-feedback-header">
-              <h3>
-                AI Generated Feedback
-                <span className="tooltip-container">
-                  <span className="tooltip-icon">?</span>
-                  <span className="tooltip tooltip-modal">
-                    Upload a customized resume for detailed feedback
+          {qualified && (
+            <div className="ai-feedback-section">
+              <div className="ai-feedback-header">
+                <h3>
+                  AI Generated Feedback
+                  <span className="tooltip-container">
+                    <span className="tooltip-icon">?</span>
+                    <span className="tooltip tooltip-modal">
+                      Upload a customized resume for detailed feedback
+                    </span>
                   </span>
-                </span>
-              </h3>
-              <div className="tooltip-container">
-                <button
-                  type="button"
-                  className="generate-feedback-button"
-                  disabled={isGenerateButtonDisabled || isGenerateButtonClicked}
-                  onClick={async () => {
-                    setIsGenerateButtonClicked(true);
-                    setResumeRecommendation("Loading...");
+                </h3>
+                <div className="tooltip-container">
+                  <button
+                    type="button"
+                    className="generate-feedback-button"
+                    disabled={isGenerateButtonDisabled || isGenerateButtonClicked}
+                    onClick={async () => {
+                      setIsGenerateButtonClicked(true);
+                      setResumeRecommendation("Loading...");
 
-                    try {
-                      const resumeText = await TurnPdfToString(resumeFile);
-                      const formattedData = await formatResumeData(
-                        selectedItem.qualifications,
-                        selectedItem.description,
-                        resumeText,
-                      );
-                      const response =
-                        await DashboardController.fetchGeminiResponse(
-                          formattedData,
+                      try {
+                        const resumeText = await TurnPdfToString(resumeFile);
+                        const formattedData = await formatResumeData(
+                          selectedItem.qualifications,
+                          selectedItem.description,
+                          resumeText
                         );
-                      setResumeRecommendation(response.response);
-                    } catch (error) {
-                      console.error("Error generating feedback:", error);
-                      setResumeRecommendation("Error generating feedback.");
-                    }
-                  }}
-                >
-                  Generate Feedback
-                </button>
-                {(isGenerateButtonDisabled || isGenerateButtonClicked) && (
-                  <span className="tooltip tooltip-modal">
-                    Upload a new resume to generate corresponding feedback
-                  </span>
+                        const response =
+                          await DashboardController.fetchGeminiResponse(
+                            formattedData
+                          );
+                        setResumeRecommendation(response.response);
+                      } catch (error) {
+                        console.error("Error generating feedback:", error);
+                        setResumeRecommendation("Error generating feedback.");
+                      }
+                    }}
+                  >
+                    Generate Feedback
+                  </button>
+                  {(isGenerateButtonDisabled || isGenerateButtonClicked) && (
+                    <span className="tooltip tooltip-modal">
+                      Upload a new resume to generate corresponding feedback
+                    </span>
+                  )}
+                </div>
+              </div>
+              <div className="ai-feedback-box">
+                {ResumeRecommendation === "Loading..." ? (
+                  <div className="loading-dots-container">
+                    <div className="loading-dots">
+                      <span></span>
+                      <span></span>
+                      <span></span>
+                    </div>
+                  </div>
+                ) : (
+                  <p>{ResumeRecommendation || "No feedback generated yet."}</p>
                 )}
               </div>
             </div>
-            <div className="ai-feedback-box">
-              {ResumeRecommendation === "Loading..." ? (
-                <div className="loading-dots-container">
-                  <div className="loading-dots">
-                    <span></span>
-                    <span></span>
-                    <span></span>
-                  </div>
-                </div>
-              ) : (
-                <p>{ResumeRecommendation || "No feedback generated yet."}</p>
-              )}
-            </div>
-          </div>
+          )}
           <button
             type="submit"
             className="resume-submit-button"
