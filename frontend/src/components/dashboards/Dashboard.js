@@ -814,41 +814,44 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
                         <p>{selectedItem.hiddenKeywords}</p>
                       </div>
                     )}
-                    {qualified && role === "applicant" && (
+                  {!qualified && missingQualifications.length > 0 ? (
                       <div className="dashboard-detail-section">
-                        <h2>AI master resume analysis:</h2>
-                        {masterResume !== null ? (
-                          <>
-                            {MasterResumeRecommendation === "Loading..." ? (
-                              <div className="loading-dots-container">
-                                <div className="loading-dots">
-                                  <span></span>
-                                  <span></span>
-                                  <span></span>
+                      <h2>Missing Qualifications:</h2>
+                      <ul>
+                        {missingQualifications.map((qualification, index) => (
+                          <li key={index}>{qualification}</li>
+                        ))}
+                      </ul>
+                    </div>
+                    ) : (
+                      <>
+                      {role === "applicant" && (
+                        <div className="dashboard-detail-section">
+                          <h2>AI master resume analysis:</h2>
+                          {masterResume !== null ? (
+                            <>
+                              {MasterResumeRecommendation === "Loading..." ? (
+                                <div className="loading-dots-container">
+                                  <div className="loading-dots">
+                                    <span></span>
+                                    <span></span>
+                                    <span></span>
+                                  </div>
                                 </div>
-                              </div>
-                            ) : (
-                              <p>{MasterResumeRecommendation}</p>
-                            )}
-                          </>
-                        ) : (
-                          <p>
-                            Master resume has not been uploaded. Analysis
-                            will be available once you upload it from the
-                            account page.
-                          </p>
-                        )}
-                      </div>
-                    )}
-                    {!qualified && missingQualifications.length > 0 && (
-                      <div className="dashboard-detail-section">
-                        <h2>Missing Qualifications:</h2>
-                        <ul>
-                          {missingQualifications.map((qualification, index) => (
-                            <li key={index}>{qualification}</li>
-                          ))}
-                        </ul>
-                      </div>
+                              ) : (
+                                <p>{MasterResumeRecommendation}</p>
+                              )}
+                            </>
+                          ) : (
+                            <p>
+                              Master resume has not been uploaded. Analysis
+                              will be available once you upload it from the
+                              account page.
+                            </p>
+                          )}
+                        </div>
+                      )}
+                      </>
                     )}
                   </>
                 )}
