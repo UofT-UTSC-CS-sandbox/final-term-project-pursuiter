@@ -597,7 +597,7 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
       <div className="dashboard-content">
       {role === "applicant" && masterResume === null && selectedTab === "newJobs" &&(
         <div className="warning-message dashboard-warning-message">
-          Warning: You have not uploaded a master resume and your eligibility for job postings cannot be determined. You can apply to the waitlist.
+          Warning: You have not uploaded a master resume and your eligibility for job postings cannot be determined. You can only apply to the waitlist.
         </div>
       )}
         {role === "recruiter" && (
@@ -802,7 +802,7 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
               <div className="dashboard-detail-body">
               {showWarning && (
                   <div className="warning-message">
-                    Warning: You do not meet the minimum qualifications for this job and can apply to the waitlist.
+                    Warning: You do not meet the minimum qualifications for this job and can only apply to the waitlist.
                   </div>
                 )}
                 {selectedTab === "myApplications" ? (
