@@ -800,9 +800,50 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
                   </div>
                 )}
                 {selectedTab === "myApplications" ? (
-                  <>
-                    {/* My Applications details */}
-                  </>
+                    <>
+                      <div className="dashboard-detail-section job-title">
+                        {selectedItem.jobDetails.title}
+                      </div>
+                      <div className="dashboard-detail-section">
+                        <h2>Company:</h2>
+                        <p>{selectedItem.jobDetails.company}</p>
+                      </div>
+                      <div className="dashboard-detail-section">
+                        <h2>Location:</h2>
+                        <p>{selectedItem.jobDetails.location}</p>
+                      </div>
+                      <div className="dashboard-detail-section">
+                        <h2>Type:</h2>
+                        <p>{selectedItem.jobDetails.type}</p>
+                      </div>
+                      <div className="dashboard-detail-section">
+                        <h2>Description:</h2>
+                        <p>{selectedItem.jobDetails.description}</p>
+                      </div>
+                      <div className="dashboard-detail-section">
+                        <h2>Qualifications:</h2>
+                        <p>{selectedItem.jobDetails.qualifications}</p>
+                      </div>
+                      <div className="dashboard-detail-section">
+                        <h2>Status:</h2>
+                        <p>{selectedItem.status}</p>
+                      </div>
+                      <div className="dashboard-detail-section">
+                        <h2>Resume:</h2>
+                        {selectedItem.resumeData ? (
+                          <iframe
+                            src={selectedItem.resumeData}
+                            className="resume-iframe"
+                            title="Resume"
+                          ></iframe>
+                        ) : (
+                          "Resume not available"
+                        )}
+                      </div>
+                      <div className="dashboard-detail-section">
+                        <strong>Applied Date:</strong> {selectedItem.applyDate}
+                      </div>
+                    </>
                 ) : (
                   <>
                     <div className="dashboard-detail-section">
