@@ -594,7 +594,7 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
   return (
     <div className="dashboard-container">
       <div className="dashboard-content">
-      {role === "applicant" && masterResume === null && (
+      {role === "applicant" && masterResume === null && selectedTab === "newJobs" &&(
         <div className="warning-message dashboard-warning-message">
           Warning: You have not uploaded a master resume and your eligibility for job postings cannot be determined. You can apply to the waitlist.
         </div>
