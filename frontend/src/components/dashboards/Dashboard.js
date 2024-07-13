@@ -16,6 +16,7 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
   const [items, setItems] = useState([]);
   const [showItemForm, setShowItemForm] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
+  const [filterTerm, setFilterTerm] = useState({ jobType: "", applyBy: "" });
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [itemToDelete, setItemToDelete] = useState(null);
   const [editMode, setEditMode] = useState(false);
@@ -80,10 +81,10 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
   useEffect(() => {
     if (user) {
       if (selectedTab === "myApplications") {
-        fetchApplications(user.userId, searchTerm);
+        fetchApplications(user.userId, searchTerm, filterTerm);
       } else {
         fetchFavoritedJobs(user.userId, setFavoritedItems);
-        fetchJobs(user.userId, setItems, searchTerm);
+        fetchJobs(user.userId, setItems, searchTerm, filterTerm);
 
         UserController.fetchUserInformation(user.userId)
           .then((userInfo) => {
@@ -108,6 +109,14 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
         });
     }
   }, [user, role]);
+
+  useEffect(() => {
+    if (selectedTab === "newJobs") {
+      fetchJobs(user.userId, setItems, searchTerm, filterTerm);
+    } else {
+      fetchApplications(user.userId, searchTerm, filterTerm);
+    }
+  }, [filterTerm, searchTerm, selectedTab]);
 
   // Handle favorite
   const handleFavorite = async (item) => {
@@ -519,7 +528,7 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
   
   
   // Fetch user's applications
-  const fetchApplications = async (userId, searchTerm) => {
+  const fetchApplications = async (userId, searchTerm, filterTerm) => {
     try {
       const response = await DashboardController.fetchUserApplications(userId);
       if (response) {
@@ -529,28 +538,49 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
             return { ...application, jobDetails };
           })
         );
-        if (searchTerm.trim() === "") {
-          setApplications(applicationsWithJobDetails);
-        } else { 
-          const searchWords = searchTerm.trim().toLowerCase().split(/\s+/);
-    
-          const filteredJobs = applicationsWithJobDetails.filter((job) => {
-            return searchWords.some((word) =>
-              job.jobDetails.title.toLowerCase().includes(word) ||
-              job.jobDetails.company.toLowerCase().includes(word) ||
-              job.jobDetails.location.toLowerCase().includes(word) ||
-              job.jobDetails.type.toLowerCase().includes(word) ||
-              job.jobDetails.description.toLowerCase().includes(word) ||
-              job.jobDetails.qualifications.toLowerCase().includes(word)
-            );
-          });   
-          setApplications(filteredJobs);
-        }     
+
+        let filteredApplications = applicationsWithJobDetails;
+
+        // Filter by jobType if specified
+        if (filterTerm.jobType !== "") {
+          console.log("Selected Job Type in fetch:", filterTerm.jobType);
+
+          filteredApplications = filteredApplications.filter((application) => 
+            application.jobDetails.type.toLowerCase() === filterTerm.jobType.toLowerCase()
+          );
+        }
+
+        // Filter by search term if specified
+      if (searchTerm.trim() !== "") {
+        const searchWords = searchTerm.trim().toLowerCase().split(/\s+/);
+
+        filteredApplications = filteredApplications.filter((job) => {
+          return searchWords.some((word) =>
+            job.jobDetails.title.toLowerCase().includes(word) ||
+            job.jobDetails.company.toLowerCase().includes(word) ||
+            job.jobDetails.location.toLowerCase().includes(word) ||
+            job.jobDetails.type.toLowerCase().includes(word) ||
+            job.jobDetails.description.toLowerCase().includes(word) ||
+            job.jobDetails.qualifications.toLowerCase().includes(word)
+          );
+        });
+      }
+      
+        setApplications(filteredApplications);
+          
       }
     } catch (error) {
       console.error("Error fetching applications:", error);
     }
   };  
+
+
+  const addFilterWord = (filterType, word) => {
+    setFilterTerm(filterTerm => ({
+      ...filterTerm,
+      [filterType]: word
+    }));
+  };
 
   // Checks if all form fields are filled
   const checkFormValidity = () => {
@@ -611,9 +641,9 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
                 onChange={(e) => {
                   setSearchTerm(e.target.value);
                   if (selectedTab === "newJobs") {
-                    fetchJobs(user.userId, setItems, e.target.value);
+                    fetchJobs(user.userId, setItems, e.target.value, filterTerm);
                   } else {
-                    fetchApplications(user.userId, e.target.value);
+                    fetchApplications(user.userId, e.target.value, filterTerm);
                   }
                   setSelectedItem(null);
                 }}
@@ -624,9 +654,9 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
                   onClick={() => {
                     setSearchTerm("");
                     if (selectedTab === "newJobs") {
-                      fetchJobs(user.userId, setItems, "");
+                      fetchJobs(user.userId, setItems, "", filterTerm);
                     } else {
-                      fetchApplications(user.userId, "");
+                      fetchApplications(user.userId, "", filterTerm);
                     }
                     setSelectedItem(null);                    
                   }}
@@ -637,20 +667,45 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
             </div>
           </div>
           <div className="filter-dropdowns">
-            <div class="filter-dropdown">
-              <button class="dropbtn">
-                Type <i class="fa-solid fa-caret-down icon"></i></button>
-              <div class="dropdown-content" >
-                <span>Full-time</span>
-                <span>Part-time</span>
-                <span>Internship</span>
-                <span>Co-op</span>
-                <span>Contract</span>
-                <span>Freelance</span>
-                <span>Apprenticeship</span>
-                <span>On-call</span>
+            { !filterTerm.jobType && (
+              <div class="filter-dropdown">
+                <button class="dropbtn">
+                  Job Type <i class="fa-solid fa-caret-down icon"></i></button>
+                <div class="dropdown-content" 
+                    onClick={(e) => {addFilterWord("jobType", e.target.textContent);
+                                      addFilterWord("jobType", e.target.textContent);
+                                      console.log("Selected Job Type:", filterTerm.jobType);
+                                      // if (selectedTab === "newJobs") {
+                                      //   fetchJobs(user.userId, setItems, searchTerm, filterTerm);
+                                      // } else {
+                                      //   fetchApplications(user.userId, searchTerm, filterTerm);
+                                      // }
+                                      // setSelectedItem(null);
+                    }}>
+                  <span>Full-time</span>
+                  <span>Part-time</span>
+                  <span>Internship</span>
+                  <span>Co-op</span>
+                  <span>Contract</span>
+                  <span>Freelance</span>
+                  <span>Apprenticeship</span>
+                  <span>On-call</span>
+                </div>
               </div>
-            </div>
+            )}
+            {filterTerm.jobType && (
+                <button class="filter-display-btn" onClick={() => {setFilterTerm({...filterTerm, jobType: ''});
+                                                                  console.log("Selected Job Type after emptying:", filterTerm.jobType);
+                                                                  if (selectedTab === "newJobs") {
+                                                                    fetchJobs(user.userId, setItems, searchTerm, filterTerm);
+                                                                  } else {
+                                                                    fetchApplications(user.userId, searchTerm, filterTerm);
+                                                                  }
+                                                                  setSelectedItem(null);
+                }}>
+                  {filterTerm.jobType} <i class="fa-solid fa-xmark icon"></i>
+                </button>
+            )}
             <div class="filter-dropdown">
               <button class="dropbtn">
                 Type <i class="fa-solid fa-caret-down icon"></i></button>

@@ -234,7 +234,7 @@
 .search-input {
   padding: 10px;
   font-size: 16px;
-  height: 21px;
+  height: 22px;
   width: 70vh;
   border-radius: 20px;
   border: 1px solid #e7e7e7;
@@ -290,6 +290,33 @@
   background-color: #DCDCDC; 
   color: #1e1e1e;
 }
+
+.filter-display-btn {
+  background-color: #680025;
+  color: #fffbfb;
+  /* padding: 16px; */
+  font-size: 16px;
+  border: none;
+  box-shadow: 0px 4px 4px 0px #1e1e1e40;
+}
+
+.filter-display-btn:hover {
+  background-color: #680025;
+  color: #E7E7E7;
+  /* padding: 16px; */
+  /* font-size: 16px; */
+  /* border: none; */
+  /* box-shadow: 0px 4px 4px 0px #1e1e1e40; */
+}
+
+/* .fa-xmark {
+  color:#505050;
+}
+
+.fa-xmark:hover{
+  color:#1e1e1e;
+} */
+
 
 /************************************
  * Tooltip
