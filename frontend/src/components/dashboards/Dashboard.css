@@ -199,6 +199,12 @@
   display: inline-block;
 }
 
+.applicants-search-container {
+  position: relative;
+  display: inline-block;
+  top: -10px;
+}
+
 .clear-button {
   position: absolute;
   right: 0px;
