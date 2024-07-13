@@ -194,6 +194,35 @@
  * Search and Filters
  *************************************/
 
+.search-container {
+  position: relative;
+  display: inline-block;
+}
+
+.applicants-search-container {
+  position: relative;
+  display: inline-block;
+  top: -10px;
+}
+
+.clear-button {
+  position: absolute;
+  right: 0px;
+  top: 50%;
+  transform: translateY(-50%);
+  border: none;
+  background-color: transparent;
+  color: grey;
+  cursor: pointer;
+  padding: 0 13px 0 0;
+  font-size: 25px;
+}
+
+.clear-button:hover {
+  color: #505050;
+  background-color: transparent;
+}
+
 .search-and-filters {
   width: 100vh;
 }
