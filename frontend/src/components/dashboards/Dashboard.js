@@ -590,6 +590,9 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
 
   return (
     <div className="dashboard-container">
+      <head>
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+      </head>
       <div className="dashboard-content">
         {role === "recruiter" && (
           <button className="new-item-button" onClick={handleNewJob}>
@@ -628,17 +631,40 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
                     setSelectedItem(null);                    
                   }}
                 >
-                  X
+                  <i class="fa-solid fa-xmark icon"></i>
                 </button>
               )}
             </div>
           </div>
-          <div className="filter-buttons">
-            <p>Filter by:</p>
-            <button className="filter-button">Experience</button>
-            <button className="filter-button">Education</button>
-            <button className="filter-button">Keywords</button>
-            <button className="filter-button">Skills</button>
+          <div className="filter-dropdowns">
+            <div class="filter-dropdown">
+              <button class="dropbtn">
+                Type <i class="fa-solid fa-caret-down icon"></i></button>
+              <div class="dropdown-content" >
+                <span>Full-time</span>
+                <span>Part-time</span>
+                <span>Internship</span>
+                <span>Co-op</span>
+                <span>Contract</span>
+                <span>Freelance</span>
+                <span>Apprenticeship</span>
+                <span>On-call</span>
+              </div>
+            </div>
+            <div class="filter-dropdown">
+              <button class="dropbtn">
+                Type <i class="fa-solid fa-caret-down icon"></i></button>
+              <div class="dropdown-content" >
+                <span>Full-time</span>
+                <span>Part-time</span>
+                <span>Internship</span>
+                <span>Co-op</span>
+                <span>Contract</span>
+                <span>Freelance</span>
+                <span>Apprenticeship</span>
+                <span>On-call</span>
+              </div>
+            </div>
           </div>
         </div>
         {role === "applicant" && (
