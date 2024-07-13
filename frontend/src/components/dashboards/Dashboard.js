@@ -678,7 +678,7 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
             {displayedItems.map((item, index) => (
               <div
               key={index}
-              className={`dashboard-item ${item.type === 'waitlist' ? 'waitlist-item' : ''}`} // Add a class for waitlist items
+              className={`dashboard-item ${item.type === 'waitlist' ? 'waitlist-item' : ''}`}
               onClick={() => {
                 setSelectedItem(item);
                 setQualified(false);
