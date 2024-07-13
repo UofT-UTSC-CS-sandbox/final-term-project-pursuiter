@@ -594,6 +594,11 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
   return (
     <div className="dashboard-container">
       <div className="dashboard-content">
+      {role === "applicant" && masterResume === null && (
+        <div className="warning-message dashboard-warning-message">
+          Warning: You have not uploaded a master resume and your eligibility for job postings cannot be determined. You can apply to the waitlist.
+        </div>
+      )}
         {role === "recruiter" && (
           <button className="new-item-button" onClick={handleNewJob}>
             New Job
@@ -796,7 +801,7 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
               <div className="dashboard-detail-body">
               {showWarning && (
                   <div className="warning-message">
-                    Warning: you do not qualify for this job and can apply to the waitlist.
+                    Warning: You do not meet the minimum qualifications for this job and can apply to the waitlist.
                   </div>
                 )}
                 {selectedTab === "myApplications" ? (

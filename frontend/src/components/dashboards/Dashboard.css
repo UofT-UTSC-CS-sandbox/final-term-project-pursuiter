@@ -417,6 +417,13 @@
   color: #800020;
 }
 
+.warning-message.dashboard-warning-message {
+  color: #1e1e1e;
+  font-size: 20px;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
 /************************************
  * Submitting Message
  *************************************/
