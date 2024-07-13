@@ -34,7 +34,7 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
   const [applications, setApplications] = useState([]);
   const [resumeFile, setResumeFile] = useState(null);
   const [resumeState, setResumeState] = useState("Missing");
-  const [masterResume, setMasterResume] = useState(null);
+  const [masterResume, setMasterResume] = useState("loading");
   const [MasterResumeRecommendation, setMasterResumeRecommendation] =
     useState("Loading...");
   const [qualified, setQualified] = useState(false);
@@ -92,6 +92,7 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
           })
           .catch((error) => {
             console.error("Error fetching user information:", error);
+            setMasterResume(null);
           });
       }
     }
