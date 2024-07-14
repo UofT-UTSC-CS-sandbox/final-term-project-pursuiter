@@ -242,11 +242,11 @@
   padding: 10px;
   padding-left: 15px;
   font-size: 16px;
-  height: 22px;
+  height: 24px;
   width: 70vh;
   border: none;
   background: #e7e7e7;
-  border-radius: 20px;
+  border-radius: 25px;
   box-shadow: 0px 4px 4px 0px #1e1e1e40;
 }
 
@@ -303,6 +303,7 @@
 .filter-display-btn {
   background-color: #680025;
   color: #fffbfb;
+  font-weight: normal;
   font-size: 16px;
   border: none;
   box-shadow: 0px 4px 4px 0px #1e1e1e40;
