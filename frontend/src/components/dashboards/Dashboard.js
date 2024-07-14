@@ -103,7 +103,7 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
           });
       }
     }
-  }, [user, fetchFavoritedJobs, fetchJobs, selectedTab]);
+  }, [user, fetchFavoritedJobs, fetchJobs, selectedTab, searchTerm, filterTerm]);
   
   // Fetch recruiter information
   useEffect(() => {
@@ -455,9 +455,9 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
     setSelectedItem(null);
     setSelectedTab(tab);
     if (tab === "newJobs") {
-      fetchJobs(user.userId, setItems, "");
+      fetchJobs(user.userId, setItems, "", filterTerm);
     } else {
-      fetchApplications(user.userId, "");
+      fetchApplications(user.userId, "", filterTerm);
     }
   };
 
