@@ -951,6 +951,10 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
                         <p>{selectedItem.jobDetails.type}</p>
                       </div>
                       <div className="dashboard-detail-section">
+                        <h2>Date Created:</h2>
+                        <p>{selectedItem.jobDetails.createdDate}</p>
+                      </div>
+                      <div className="dashboard-detail-section">
                         <h2>Description:</h2>
                         <p>{selectedItem.jobDetails.description}</p>
                       </div>
@@ -992,6 +996,10 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
                       <h2>Type:</h2>
                       <p>{selectedItem.type}</p>
                     </div>
+                    <div className="dashboard-detail-section">
+                        <h2>Date Created:</h2>
+                        <p>{selectedItem.createdDate}</p>
+                      </div>
                     <div className="dashboard-detail-section">
                       <h2>Description:</h2>
                       <p>{selectedItem.description}</p>
