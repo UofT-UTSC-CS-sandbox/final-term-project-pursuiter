@@ -68,6 +68,12 @@
   box-sizing: border-box;
 }
 
+.dashboard-title {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
 .dashboard-detail {
   width: 70%;
   padding: 20px;
@@ -449,6 +455,22 @@
   font-weight: 400;
   margin-bottom: 5px;
   margin: 5px 0;
+}
+
+.dashboard-waitlist {
+  color: #1e1e1e;
+  font-weight: normal;
+}
+
+.warning-message {
+  color: #800020;
+}
+
+.warning-message.dashboard-warning-message {
+  color: #1e1e1e;
+  font-size: 20px;
+  margin-bottom: 20px;
+  text-align: center;
 }
 
 /************************************
