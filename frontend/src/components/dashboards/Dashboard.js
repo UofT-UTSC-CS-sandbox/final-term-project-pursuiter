@@ -111,6 +111,40 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
     }
   }, [user, role]);
 
+   // Fetch user's applications
+   const fetchApplications = async (userId, searchTerm) => {
+    try {
+      const response = await DashboardController.fetchUserApplications(userId);
+      if (response) {
+        const applicationsWithJobDetails = await Promise.all(
+          response.map(async (application) => {
+            const jobDetails = await DashboardController.fetchJobDetails(application.jobID);
+            return { ...application, jobDetails };
+          })
+        );
+        if (searchTerm.trim() === "") {
+          setApplications(applicationsWithJobDetails);
+        } else { 
+          const searchWords = searchTerm.trim().toLowerCase().split(/\s+/);
+    
+          const filteredJobs = applicationsWithJobDetails.filter((job) => {
+            return searchWords.some((word) =>
+              job.jobDetails.title.toLowerCase().includes(word) ||
+              job.jobDetails.company.toLowerCase().includes(word) ||
+              job.jobDetails.location.toLowerCase().includes(word) ||
+              job.jobDetails.type.toLowerCase().includes(word) ||
+              job.jobDetails.description.toLowerCase().includes(word) ||
+              job.jobDetails.qualifications.toLowerCase().includes(word)
+            );
+          });   
+          setApplications(filteredJobs);
+        }     
+      }
+    } catch (error) {
+      console.error("Error fetching applications:", error);
+    }
+  };
+
   // Handle favorite
   const handleFavorite = async (item) => {
     try {
@@ -332,7 +366,53 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
         setIsSubmitting(false);
       }
     }
-  };  
+  };
+
+  // Checks if all form fields are filled
+  const checkFormValidity = () => {
+    const { title, company, location, type, applyBy, hiddenKeywords, description, qualifications } = newItem;
+    const allFieldsFilled =
+      title.trim() !== "" &&
+      company.trim() !== "" &&
+      location.trim() !== "" &&
+      type.trim() !== "" &&
+      applyBy.trim() !== "" &&
+      hiddenKeywords.trim() !== "" &&
+      description.trim() !== "" &&
+      qualifications.trim() !== "";
+  
+    const anyFieldChanged =
+      title !== initialItem.title ||
+      company !== initialItem.company ||
+      location !== initialItem.location ||
+      type !== initialItem.type ||
+      applyBy !== initialItem.applyBy ||
+      hiddenKeywords !== initialItem.hiddenKeywords ||
+      description !== initialItem.description ||
+      qualifications !== initialItem.qualifications;
+  
+    setIsFormValid(allFieldsFilled && anyFieldChanged);
+  };
+
+  // Call checkFormValidity whenever newItem changes
+  useEffect(() => {
+    checkFormValidity();
+  }, [newItem]);
+  
+  const allItems = items.filter(
+    (item) => !favoritedItems.some((fav) => fav._id === item._id),
+  );
+
+  // Handles tab change
+  const handleTabChange = (tab) => {
+    setSelectedItem(null);
+    setSelectedTab(tab);
+    if (tab === "newJobs") {
+      fetchJobs(user.userId, setItems, "");
+    } else {
+      fetchApplications(user.userId, "");
+    }
+  };
 
   //Turn pdf base64 string into text
   const TurnPdfToString = async (pdf) => {
@@ -526,77 +606,8 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
       setShowWarning(true);
     }
     setIsQualificationsLoading(false);
-  };
-  
-  
-  // Fetch user's applications
-  const fetchApplications = async (userId, searchTerm) => {
-    try {
-      const response = await DashboardController.fetchUserApplications(userId);
-      if (response) {
-        const applicationsWithJobDetails = await Promise.all(
-          response.map(async (application) => {
-            const jobDetails = await DashboardController.fetchJobDetails(application.jobID);
-            return { ...application, jobDetails };
-          })
-        );
-        if (searchTerm.trim() === "") {
-          setApplications(applicationsWithJobDetails);
-        } else { 
-          const searchWords = searchTerm.trim().toLowerCase().split(/\s+/);
-    
-          const filteredJobs = applicationsWithJobDetails.filter((job) => {
-            return searchWords.some((word) =>
-              job.jobDetails.title.toLowerCase().includes(word) ||
-              job.jobDetails.company.toLowerCase().includes(word) ||
-              job.jobDetails.location.toLowerCase().includes(word) ||
-              job.jobDetails.type.toLowerCase().includes(word) ||
-              job.jobDetails.description.toLowerCase().includes(word) ||
-              job.jobDetails.qualifications.toLowerCase().includes(word)
-            );
-          });   
-          setApplications(filteredJobs);
-        }     
-      }
-    } catch (error) {
-      console.error("Error fetching applications:", error);
-    }
   };  
 
-  // Checks if all form fields are filled
-  const checkFormValidity = () => {
-    const { title, company, location, type, applyBy, hiddenKeywords, description, qualifications } = newItem;
-    const allFieldsFilled =
-      title.trim() !== "" &&
-      company.trim() !== "" &&
-      location.trim() !== "" &&
-      type.trim() !== "" &&
-      applyBy.trim() !== "" &&
-      hiddenKeywords.trim() !== "" &&
-      description.trim() !== "" &&
-      qualifications.trim() !== "";
-  
-    const anyFieldChanged =
-      title !== initialItem.title ||
-      company !== initialItem.company ||
-      location !== initialItem.location ||
-      type !== initialItem.type ||
-      applyBy !== initialItem.applyBy ||
-      hiddenKeywords !== initialItem.hiddenKeywords ||
-      description !== initialItem.description ||
-      qualifications !== initialItem.qualifications;
-  
-    setIsFormValid(allFieldsFilled && anyFieldChanged);
-  };
-
-  // Call checkFormValidity whenever newItem changes
-  useEffect(() => {
-    checkFormValidity();
-  }, [newItem]);
-  
-  const allItems = items.filter(
-    (item) => !favoritedItems.some((fav) => fav._id === item._id),
-  );
   const displayedItems = selectedTab === "myApplications" ? applications : [...favoritedItems, ...allItems];
 
   return (
@@ -660,23 +671,15 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
         {role === "applicant" && (
           <div className="tab-bar">
             <div className="tab-container">
-              <button
+            <button
                 className={`tab-button ${selectedTab === "newJobs" ? "selected" : ""}`}
-                onClick={() => {
-                  setSelectedItem(null);
-                  setSelectedTab("newJobs");
-                  window.location.reload();
-                }}
+                onClick={() => handleTabChange("newJobs")}
               >
                 New Jobs
               </button>
               <button
                 className={`tab-button ${selectedTab === "myApplications" ? "selected" : ""}`}
-                onClick={() => {
-                  setSelectedItem(null);
-                  setSelectedTab("myApplications");
-                  window.location.reload();
-                }}
+                onClick={() => handleTabChange("myApplications")}
               >
                 My Applications
               </button>
