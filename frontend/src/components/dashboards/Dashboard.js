@@ -118,35 +118,73 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
     }
   }, [user, role]);
 
-   // Fetch user's applications
-   const fetchApplications = async (userId, searchTerm) => {
+  const fetchApplications = async (userId, searchTerm, filterTerm) => {
     try {
       const response = await DashboardController.fetchUserApplications(userId);
-      if (response) {
-        const applicationsWithJobDetails = await Promise.all(
-          response.map(async (application) => {
-            const jobDetails = await DashboardController.fetchJobDetails(application.jobID);
-            return { ...application, jobDetails };
-          })
+      if (!response) return;
+  
+      const applicationsWithJobDetails = await Promise.all(
+        response.map(async (application) => ({
+          ...application,
+          jobDetails: await DashboardController.fetchJobDetails(application.jobID),
+        }))
+      );
+  
+      let filteredApplications = applicationsWithJobDetails;
+  
+      const dateRanges = {
+        "In 1 week": 7,
+        "In 2 weeks": 14,
+        "In 1 month": 30,
+        "In 4 months": 120,
+        "1 week ago": -7,
+        "2 weeks ago": -14,
+        "1 month ago": -30,
+        "4 months ago": -120,
+      };
+  
+      const getDateRange = (days) => {
+        const currentDate = new Date();
+        return new Date(currentDate.getTime() + days * 24 * 60 * 60 * 1000);
+      };
+  
+      const filterByDate = (applications, dateKey, type) => {
+        const days = dateRanges[filterTerm[dateKey]];
+        if (!days) return applications;
+  
+        const targetDate = getDateRange(days);
+        return applications.filter((application) => {
+          const date = new Date(type === 'applyDate' ? application[type] : application.jobDetails[type]);
+          return type === 'applyBy' ? date >= new Date() && date <= targetDate : date >= targetDate && date <= new Date();
+        });
+      };
+  
+      if (filterTerm.jobType) {
+        filteredApplications = filteredApplications.filter(
+          (application) => application.jobDetails.type.toLowerCase() === filterTerm.jobType.toLowerCase()
         );
-        if (searchTerm.trim() === "") {
-          setApplications(applicationsWithJobDetails);
-        } else { 
-          const searchWords = searchTerm.trim().toLowerCase().split(/\s+/);
-    
-          const filteredJobs = applicationsWithJobDetails.filter((job) => {
-            return searchWords.some((word) =>
-              job.jobDetails.title.toLowerCase().includes(word) ||
-              job.jobDetails.company.toLowerCase().includes(word) ||
-              job.jobDetails.location.toLowerCase().includes(word) ||
-              job.jobDetails.type.toLowerCase().includes(word) ||
-              job.jobDetails.description.toLowerCase().includes(word) ||
-              job.jobDetails.qualifications.toLowerCase().includes(word)
-            );
-          });   
-          setApplications(filteredJobs);
-        }     
       }
+  
+      if (filterTerm.appliedDate) {
+        filteredApplications = filterByDate(filteredApplications, 'appliedDate', 'applyDate');
+      }
+  
+      if (filterTerm.createdDate) {
+        filteredApplications = filterByDate(filteredApplications, 'createdDate', 'createdDate');
+      }
+  
+      if (searchTerm.trim()) {
+        const searchWords = searchTerm.trim().toLowerCase().split(/\s+/);
+        filteredApplications = filteredApplications.filter((job) =>
+          searchWords.some((word) =>
+            ['title', 'company', 'location', 'type', 'description', 'qualifications'].some((field) =>
+              job.jobDetails[field].toLowerCase().includes(word)
+            )
+          )
+        );
+      }
+  
+      setApplications(filteredApplications);
     } catch (error) {
       console.error("Error fetching applications:", error);
     }
@@ -618,81 +656,6 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
     setShowWarning(true);
     setIsQualificationsLoading(false);
   };
-  
-  
-  const fetchApplications = async (userId, searchTerm, filterTerm) => {
-    try {
-      const response = await DashboardController.fetchUserApplications(userId);
-      if (!response) return;
-  
-      const applicationsWithJobDetails = await Promise.all(
-        response.map(async (application) => ({
-          ...application,
-          jobDetails: await DashboardController.fetchJobDetails(application.jobID),
-        }))
-      );
-  
-      let filteredApplications = applicationsWithJobDetails;
-  
-      const dateRanges = {
-        "In 1 week": 7,
-        "In 2 weeks": 14,
-        "In 1 month": 30,
-        "In 4 months": 120,
-        "1 week ago": -7,
-        "2 weeks ago": -14,
-        "1 month ago": -30,
-        "4 months ago": -120,
-      };
-  
-      const getDateRange = (days) => {
-        const currentDate = new Date();
-        return new Date(currentDate.getTime() + days * 24 * 60 * 60 * 1000);
-      };
-  
-      const filterByDate = (applications, dateKey, type) => {
-        const days = dateRanges[filterTerm[dateKey]];
-        if (!days) return applications;
-  
-        const targetDate = getDateRange(days);
-        return applications.filter((application) => {
-          const date = new Date(type === 'applyDate' ? application[type] : application.jobDetails[type]);
-          return type === 'applyBy' ? date >= new Date() && date <= targetDate : date >= targetDate && date <= new Date();
-        });
-      };
-  
-      if (filterTerm.jobType) {
-        filteredApplications = filteredApplications.filter(
-          (application) => application.jobDetails.type.toLowerCase() === filterTerm.jobType.toLowerCase()
-        );
-      }
-  
-      if (filterTerm.appliedDate) {
-        filteredApplications = filterByDate(filteredApplications, 'appliedDate', 'applyDate');
-      }
-  
-      if (filterTerm.createdDate) {
-        filteredApplications = filterByDate(filteredApplications, 'createdDate', 'createdDate');
-      }
-  
-      if (searchTerm.trim()) {
-        const searchWords = searchTerm.trim().toLowerCase().split(/\s+/);
-        filteredApplications = filteredApplications.filter((job) =>
-          searchWords.some((word) =>
-            ['title', 'company', 'location', 'type', 'description', 'qualifications'].some((field) =>
-              job.jobDetails[field].toLowerCase().includes(word)
-            )
-          )
-        );
-      }
-  
-      setApplications(filteredApplications);
-    } catch (error) {
-      console.error("Error fetching applications:", error);
-    }
-  };
-  
-
 
   const addFilterWord = (filterType, word) => {
     setFilterTerm(filterTerm => ({
@@ -701,42 +664,6 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
     }));
   };
 
-  // Checks if all form fields are filled
-  const checkFormValidity = () => {
-    const { title, company, location, type, applyBy, dateCreated, hiddenKeywords, description, qualifications } = newItem;
-    const allFieldsFilled =
-      title.trim() !== "" &&
-      company.trim() !== "" &&
-      location.trim() !== "" &&
-      type.trim() !== "" &&
-      applyBy.trim() !== "" &&
-      dateCreated.trim() !== "" &&
-      hiddenKeywords.trim() !== "" &&
-      description.trim() !== "" &&
-      qualifications.trim() !== "";
-  
-    const anyFieldChanged =
-      title !== initialItem.title ||
-      company !== initialItem.company ||
-      location !== initialItem.location ||
-      type !== initialItem.type ||
-      applyBy !== initialItem.applyBy ||
-      dateCreated !== initialItem.dateCreated ||
-      hiddenKeywords !== initialItem.hiddenKeywords ||
-      description !== initialItem.description ||
-      qualifications !== initialItem.qualifications;
-  
-    setIsFormValid(allFieldsFilled && anyFieldChanged);
-  };
-
-  // Call checkFormValidity whenever newItem changes
-  useEffect(() => {
-    checkFormValidity();
-  }, [newItem]);
-  
-  const allItems = items.filter(
-    (item) => !favoritedItems.some((fav) => fav._id === item._id),
-  );
   const displayedItems = selectedTab === "myApplications" ? applications : [...favoritedItems, ...allItems];
 
   return (

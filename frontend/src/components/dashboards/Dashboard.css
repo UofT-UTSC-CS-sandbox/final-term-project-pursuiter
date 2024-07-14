@@ -240,6 +240,7 @@
 
 .search-input {
   padding: 10px;
+  padding-left: 15px;
   font-size: 16px;
   height: 22px;
   width: 70vh;
@@ -261,6 +262,7 @@
   color: #1e1e1e;
   padding: 16px;
   font-size: 16px;
+  font-weight: normal;
   border: none;
   box-shadow: 0px 4px 4px 0px #1e1e1e40;
 }
