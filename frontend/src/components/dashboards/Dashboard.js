@@ -537,107 +537,75 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
   const fetchApplications = async (userId, searchTerm, filterTerm) => {
     try {
       const response = await DashboardController.fetchUserApplications(userId);
-      if (response) {
-        const applicationsWithJobDetails = await Promise.all(
-          response.map(async (application) => {
-            const jobDetails = await DashboardController.fetchJobDetails(application.jobID);
-            return { ...application, jobDetails };
-          })
+      if (!response) return;
+  
+      const applicationsWithJobDetails = await Promise.all(
+        response.map(async (application) => ({
+          ...application,
+          jobDetails: await DashboardController.fetchJobDetails(application.jobID),
+        }))
+      );
+  
+      let filteredApplications = applicationsWithJobDetails;
+  
+      const dateRanges = {
+        "In 1 week": 7,
+        "In 2 weeks": 14,
+        "In 1 month": 30,
+        "In 4 months": 120,
+        "1 week ago": -7,
+        "2 weeks ago": -14,
+        "1 month ago": -30,
+        "4 months ago": -120,
+      };
+  
+      const getDateRange = (days) => {
+        const currentDate = new Date();
+        return new Date(currentDate.getTime() + days * 24 * 60 * 60 * 1000);
+      };
+  
+      const filterByDate = (applications, dateKey, type) => {
+        const days = dateRanges[filterTerm[dateKey]];
+        if (!days) return applications;
+  
+        const targetDate = getDateRange(days);
+        return applications.filter((application) => {
+          const date = new Date(application.jobDetails[type]);
+          return type === 'applyBy' ? date >= new Date() && date <= targetDate : date >= targetDate && date <= new Date();
+        });
+      };
+  
+      if (filterTerm.jobType) {
+        filteredApplications = filteredApplications.filter(
+          (application) => application.jobDetails.type.toLowerCase() === filterTerm.jobType.toLowerCase()
         );
-
-        let filteredApplications = applicationsWithJobDetails;
-
-        // Filter by jobType if specified
-        if (filterTerm.jobType !== "") {
-          filteredApplications = filteredApplications.filter((application) => 
-            application.jobDetails.type.toLowerCase() === filterTerm.jobType.toLowerCase()
-          );
-        }
-
-        if (filterTerm.dueDate !== "") {
-          let currentDate = new Date();
-          let endDate = null;
-          console.log(filterTerm.dueDate);
-          switch (filterTerm.dueDate) {
-            case "In 1 week":
-              endDate = new Date(currentDate.getTime() + 7 * 24 * 60 * 60 * 1000);
-              break;
-            case "In 2 weeks":
-              endDate = new Date(currentDate.getTime() + 14 * 24 * 60 * 60 * 1000);
-              break;
-            case "In 1 month":
-              endDate = new Date(currentDate.getTime() + 30 * 24 * 60 * 60 * 1000);
-              break;
-            case "In 4 months":
-              endDate = new Date(currentDate.getTime() + 120 * 24 * 60 * 60 * 1000);
-              break;
-            default:
-              break;
-          }
-
-          filteredApplications = filteredApplications.filter((application) => {
-            const applyByDate = new Date(application.jobDetails.applyBy);
-          
-            if (endDate) {
-              return applyByDate >= currentDate && applyByDate <= endDate;
-            } 
-          });
-        }
-
-        if (filterTerm.createdDate !== "") {
-          let currentDate = new Date();
-          let startDate = null;
-          console.log(filterTerm.createdDate);
-          
-          switch (filterTerm.createdDate) {
-            case "1 week ago":
-              startDate = new Date(currentDate.getTime() - 7 * 24 * 60 * 60 * 1000);
-              break;
-            case "2 weeks ago":
-              startDate = new Date(currentDate.getTime() - 14 * 24 * 60 * 60 * 1000);
-              break;
-            case "1 month ago":
-              startDate = new Date(currentDate.getTime() - 30 * 24 * 60 * 60 * 1000);
-              break;
-            case "4 months ago":
-              startDate = new Date(currentDate.getTime() - 120 * 24 * 60 * 60 * 1000);
-              break;
-            default:
-              break;
-          }
-        
-          filteredApplications = filteredApplications.filter((application) => {
-            const createdDate = new Date(application.jobDetails.createdDate);
-            
-            if (startDate) {
-              return createdDate >= startDate && createdDate <= currentDate;
-            } 
-          });
-        }
-
-        // Filter by search term if specified
-        if (searchTerm.trim() !== "") {
-          const searchWords = searchTerm.trim().toLowerCase().split(/\s+/);
-
-          filteredApplications = filteredApplications.filter((job) => {
-            return searchWords.some((word) =>
-              job.jobDetails.title.toLowerCase().includes(word) ||
-              job.jobDetails.company.toLowerCase().includes(word) ||
-              job.jobDetails.location.toLowerCase().includes(word) ||
-              job.jobDetails.type.toLowerCase().includes(word) ||
-              job.jobDetails.description.toLowerCase().includes(word) ||
-              job.jobDetails.qualifications.toLowerCase().includes(word)
-            );
-          });
-        }
-      
-        setApplications(filteredApplications);
-          
       }
+  
+      if (filterTerm.dueDate) {
+        filteredApplications = filterByDate(filteredApplications, 'dueDate', 'applyBy');
+      }
+  
+      if (filterTerm.createdDate) {
+        filteredApplications = filterByDate(filteredApplications, 'createdDate', 'createdDate');
+      }
+  
+      if (searchTerm.trim()) {
+        const searchWords = searchTerm.trim().toLowerCase().split(/\s+/);
+        filteredApplications = filteredApplications.filter((job) =>
+          searchWords.some((word) =>
+            ['title', 'company', 'location', 'type', 'description', 'qualifications'].some((field) =>
+              job.jobDetails[field].toLowerCase().includes(word)
+            )
+          )
+        );
+      }
+  
+      setApplications(filteredApplications);
     } catch (error) {
       console.error("Error fetching applications:", error);
     }
-  };  
+  };
+  
 
 
   const addFilterWord = (filterType, word) => {
@@ -1352,48 +1320,78 @@ const fetchJobsForRecruiter = async (userId, setItems, searchTerm) => {
   }
 };
 
-const fetchJobsForApplicant = async (userId, setItems, searchTerm) => {
+const fetchJobsForApplicant = async (userId, setItems, searchTerm, filterTerm) => {
   try {
     const jobsResponse = await DashboardController.fetchJobs();
-    const applicationsResponse =
-      await DashboardController.fetchUserApplications(userId);
+    const applicationsResponse = await DashboardController.fetchUserApplications(userId);
+
     if (!applicationsResponse) {
       setItems(jobsResponse);
       return;
     }
-    const appliedJobIds = new Set();
-    applicationsResponse.forEach((application) => {
-      if (application.jobID) {
-        appliedJobIds.add(application.jobID);
-      } else {
-        console.error("Application does not contain jobID:", application);
-      }
-    });
-    const availableJobs = jobsResponse.filter(
-      (job) => !appliedJobIds.has(job._id),
-    );
-    if (searchTerm.trim() === "") {
-      setItems(availableJobs);
-    } else { 
-      const searchWords = searchTerm.trim().toLowerCase().split(/\s+/);
 
-      const filteredJobs = availableJobs.filter((job) => {
-        return searchWords.some((word) =>
-          job.title.toLowerCase().includes(word) ||
-          job.company.toLowerCase().includes(word) ||
-          job.location.toLowerCase().includes(word) ||
-          job.type.toLowerCase().includes(word) ||
-          job.description.toLowerCase().includes(word) ||
-          job.qualifications.toLowerCase().includes(word)
-        );
+    const appliedJobIds = new Set(applicationsResponse.map((application) => application.jobID));
+
+    let availableJobs = jobsResponse.filter((job) => !appliedJobIds.has(job._id));
+
+    const dateRanges = {
+      "In 1 week": 7,
+      "In 2 weeks": 14,
+      "In 1 month": 30,
+      "In 4 months": 120,
+      "1 week ago": -7,
+      "2 weeks ago": -14,
+      "1 month ago": -30,
+      "4 months ago": -120,
+    };
+
+    const getDateRange = (days) => {
+      const currentDate = new Date();
+      return new Date(currentDate.getTime() + days * 24 * 60 * 60 * 1000);
+    };
+
+    const filterByDate = (jobs, dateKey, type) => {
+      const days = dateRanges[filterTerm[dateKey]];
+      if (!days) return jobs;
+
+      const targetDate = getDateRange(days);
+      return jobs.filter((job) => {
+        const date = new Date(job[type]);
+        return type === 'applyBy' ? date >= new Date() && date <= targetDate : date >= targetDate && date <= new Date();
       });
-      setItems(filteredJobs);
+    };
+
+    if (filterTerm.jobType) {
+      availableJobs = availableJobs.filter(
+        (job) => job.type.toLowerCase() === filterTerm.jobType.toLowerCase()
+      );
     }
 
+    if (filterTerm.dueDate) {
+      availableJobs = filterByDate(availableJobs, 'dueDate', 'applyBy');
+    }
+
+    if (filterTerm.createdDate) {
+      availableJobs = filterByDate(availableJobs, 'createdDate', 'createdDate');
+    }
+
+    if (searchTerm.trim()) {
+      const searchWords = searchTerm.trim().toLowerCase().split(/\s+/);
+      availableJobs = availableJobs.filter((job) =>
+        searchWords.some((word) =>
+          ['title', 'company', 'location', 'type', 'description', 'qualifications'].some((field) =>
+            job[field].toLowerCase().includes(word)
+          )
+        )
+      );
+    }
+
+    setItems(availableJobs);
   } catch (error) {
     console.error("Error fetching jobs:", error);
   }
 };
+
 
 export {
   Dashboard as default,
