@@ -122,11 +122,10 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
     try {
       const response = await DashboardController.fetchUserApplications(userId);
       if (!response) return;
-  
       const applicationsWithJobDetails = await Promise.all(
-        response.map(async (application) => ({
-          ...application,
-          jobDetails: await DashboardController.fetchJobDetails(application.jobID),
+        response.map(async (application) => ({ ...application,
+          jobDetails: await 
+          DashboardController.fetchJobDetails(application.jobID),
         }))
       );
   
@@ -652,9 +651,9 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
       setQualified(false);
       setMissingQualifications(missingKeywords);
       setMasterResumeRecommendation("");
+      setShowWarning(true);
+      setIsQualificationsLoading(false);
     }
-    setShowWarning(true);
-    setIsQualificationsLoading(false);
   };
 
   const addFilterWord = (filterType, word) => {
@@ -1012,7 +1011,9 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
                       <h2>Missing Qualifications:</h2>
                       <ul>
                         {missingQualifications.map((qualification, index) => (
-                          <li key={index}>{qualification}</li>
+                          <p>
+                            <li key={index}>{qualification}</li>
+                          </p>
                         ))}
                       </ul>
                     </div>
