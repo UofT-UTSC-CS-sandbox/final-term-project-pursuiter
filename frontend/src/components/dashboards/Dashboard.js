@@ -2,6 +2,9 @@ import React, { useState, useEffect, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import { UserContext } from "../../contexts/UserContext";
 import { FaStar } from "react-icons/fa";
+import { FaXmark } from "react-icons/fa6";
+import { FaCaretDown } from 'react-icons/fa6'
+
 import Modal from "../modal/Modal";
 import UserController from "../../controllers/UserController";
 
@@ -654,9 +657,6 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
 
   return (
     <div className="dashboard-container">
-      <head>
-      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
-      </head>
       <div className="dashboard-content">
         {role === "recruiter" && (
           <button className="new-item-button" onClick={handleNewJob}>
@@ -685,7 +685,7 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
                     setSelectedItem(null);                   
                   }}
                 >
-                  <i class="fa-solid fa-xmark icon"></i>
+                  <div className="icon"><FaXmark/></div>
                 </button>
               )}
             </div>
@@ -694,7 +694,7 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
             { !filterTerm.jobType && (
               <div class="filter-dropdown">
                 <button class="dropbtn">
-                  Job Type <i class="fa-solid fa-caret-down icon"></i></button>
+                  Job Type <div class="icon"><FaCaretDown/></div></button>
                 <div class="dropdown-content" 
                     onClick={(e) => {addFilterWord("jobType", e.target.textContent);
                                      setSelectedItem(null);
@@ -711,14 +711,14 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
             )}
             {filterTerm.jobType && (
                 <button class="filter-display-btn" onClick={() => {setFilterTerm({...filterTerm, jobType: ''}); setSelectedItem(null);}}>
-                  {filterTerm.jobType} <i class="fa-solid fa-xmark icon"></i>
+                  {filterTerm.jobType} <div className="icon"><FaXmark/></div>
                 </button>
             )}
             {selectedTab === "myApplications" ? (
               !filterTerm.appliedDate ? (
                 <div class="filter-dropdown">
                   <button class="dropbtn">
-                    Applied <i class="fa-solid fa-caret-down icon"></i>
+                    Applied <div class="icon"><FaCaretDown/></div>
                   </button>
                   <div class="dropdown-content" onClick={(e) => {addFilterWord("appliedDate", e.target.textContent); setSelectedItem(null);}}>
                     <span>1 weeks ago</span>
@@ -729,14 +729,14 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
                 </div>
               ) : (
                 <button class="filter-display-btn" onClick={() => {setFilterTerm({...filterTerm, appliedDate: ''}); setSelectedItem(null);}}>
-                  {filterTerm.appliedDate} <i class="fa-solid fa-xmark icon"></i>
+                  {filterTerm.appliedDate} <div className="icon"><FaXmark/></div>
                 </button>
               )
             ) : (
               !filterTerm.dueDate ? (
                 <div class="filter-dropdown">
                   <button class="dropbtn">
-                    Job Due <i class="fa-solid fa-caret-down icon"></i>
+                    Job Due <div class="icon"><FaCaretDown/></div>
                   </button>
                   <div class="dropdown-content" onClick={(e) => {addFilterWord("dueDate", e.target.textContent); setSelectedItem(null);}}>
                     <span>In 1 week</span>
@@ -747,14 +747,14 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
                 </div>
               ) : (
                 <button class="filter-display-btn" onClick={() => {setFilterTerm({...filterTerm, dueDate: ''}); setSelectedItem(null);}}>
-                  {filterTerm.dueDate} <i class="fa-solid fa-xmark icon"></i>
+                  {filterTerm.dueDate} <div className="icon"><FaXmark/></div>
                 </button>
               )
             )}
             { !filterTerm.createdDate && (
               <div class="filter-dropdown">
                 <button class="dropbtn">
-                  Job Created <i class="fa-solid fa-caret-down icon"></i>
+                  Job Created <div class="icon"><FaCaretDown/></div>
                 </button>
                 <div class="dropdown-content" onClick={(e) => {addFilterWord("createdDate", e.target.textContent); setSelectedItem(null);}}>
                   <span>1 week ago</span>
@@ -766,7 +766,7 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
             )}
             {filterTerm.createdDate && (
                 <button class="filter-display-btn" onClick={() => {setFilterTerm({...filterTerm, createdDate: ''}); setSelectedItem(null);}}>
-                  {filterTerm.createdDate} <i class="fa-solid fa-xmark icon"></i>
+                  {filterTerm.createdDate} <div className="icon"><FaXmark/></div>
                 </button>
             )}
           </div>

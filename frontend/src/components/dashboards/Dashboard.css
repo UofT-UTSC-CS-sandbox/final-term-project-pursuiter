@@ -237,9 +237,9 @@
   font-size: 16px;
   height: 22px;
   width: 70vh;
-  border-radius: 20px;
-  border: 1px solid #e7e7e7;
+  border: none;
   background: #e7e7e7;
+  border-radius: 20px;
   box-shadow: 0px 4px 4px 0px #1e1e1e40;
 }
 
@@ -356,6 +356,7 @@
 }
 
 .icon {
+  display: inline-flex;
   font-size: 20px;
   margin-left: 10px;
   cursor: pointer; 
