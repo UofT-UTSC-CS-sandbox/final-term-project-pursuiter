@@ -16,7 +16,7 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
   const [items, setItems] = useState([]);
   const [showItemForm, setShowItemForm] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
-  const [filterTerm, setFilterTerm] = useState({ jobType: "", applyBy: "" });
+  const [filterTerm, setFilterTerm] = useState({ jobType: "", dueDate: "", createdDate: ""});
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [itemToDelete, setItemToDelete] = useState(null);
   const [editMode, setEditMode] = useState(false);
@@ -27,6 +27,7 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
     location: "",
     type: "",
     applyBy: "",
+    dateCreated: "",
     hiddenKeywords: "",
     description: "",
     qualifications: "",
@@ -57,6 +58,7 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
       location: recruiterInfo.address || "",
       type: "",
       applyBy: "",
+      dateCreated: new Date().toISOString().slice(0, 10) || "",
       hiddenKeywords: "",
       description: "",
       qualifications: "",
@@ -72,6 +74,7 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
     location: "",
     type: "",
     applyBy: "",
+    dateCreated: "",
     hiddenKeywords: "",
     description: "",
     qualifications: "",
@@ -179,6 +182,7 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
         location: "",
         type: "",
         applyBy: "",
+        dateCreated: "",
         hiddenKeywords: "",
         description: "",
         qualifications: "",
@@ -199,6 +203,7 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
       location: item.location,
       type: item.type,
       applyBy: item.applyBy,
+      dateCreated: item.dateCreated,
       hiddenKeywords: item.hiddenKeywords,
       description: item.description,
       qualifications: item.qualifications,
@@ -209,6 +214,7 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
       location: item.location,
       type: item.type,
       applyBy: item.applyBy,
+      dateCreated: item.dateCreated,
       hiddenKeywords: item.hiddenKeywords,
       description: item.description,
       qualifications: item.qualifications,
@@ -543,28 +549,87 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
 
         // Filter by jobType if specified
         if (filterTerm.jobType !== "") {
-          console.log("Selected Job Type in fetch:", filterTerm.jobType);
-
           filteredApplications = filteredApplications.filter((application) => 
             application.jobDetails.type.toLowerCase() === filterTerm.jobType.toLowerCase()
           );
         }
 
-        // Filter by search term if specified
-      if (searchTerm.trim() !== "") {
-        const searchWords = searchTerm.trim().toLowerCase().split(/\s+/);
+        if (filterTerm.dueDate !== "") {
+          let currentDate = new Date();
+          let endDate = null;
+          console.log(filterTerm.dueDate);
+          switch (filterTerm.dueDate) {
+            case "In 1 week":
+              endDate = new Date(currentDate.getTime() + 7 * 24 * 60 * 60 * 1000);
+              break;
+            case "In 2 weeks":
+              endDate = new Date(currentDate.getTime() + 14 * 24 * 60 * 60 * 1000);
+              break;
+            case "In 1 month":
+              endDate = new Date(currentDate.getTime() + 30 * 24 * 60 * 60 * 1000);
+              break;
+            case "In 4 months":
+              endDate = new Date(currentDate.getTime() + 120 * 24 * 60 * 60 * 1000);
+              break;
+            default:
+              break;
+          }
 
-        filteredApplications = filteredApplications.filter((job) => {
-          return searchWords.some((word) =>
-            job.jobDetails.title.toLowerCase().includes(word) ||
-            job.jobDetails.company.toLowerCase().includes(word) ||
-            job.jobDetails.location.toLowerCase().includes(word) ||
-            job.jobDetails.type.toLowerCase().includes(word) ||
-            job.jobDetails.description.toLowerCase().includes(word) ||
-            job.jobDetails.qualifications.toLowerCase().includes(word)
-          );
-        });
-      }
+          filteredApplications = filteredApplications.filter((application) => {
+            const applyByDate = new Date(application.jobDetails.applyBy);
+          
+            if (endDate) {
+              return applyByDate >= currentDate && applyByDate <= endDate;
+            } 
+          });
+        }
+
+        if (filterTerm.createdDate !== "") {
+          let currentDate = new Date();
+          let startDate = null;
+          console.log(filterTerm.createdDate);
+          
+          switch (filterTerm.createdDate) {
+            case "1 week ago":
+              startDate = new Date(currentDate.getTime() - 7 * 24 * 60 * 60 * 1000);
+              break;
+            case "2 weeks ago":
+              startDate = new Date(currentDate.getTime() - 14 * 24 * 60 * 60 * 1000);
+              break;
+            case "1 month ago":
+              startDate = new Date(currentDate.getTime() - 30 * 24 * 60 * 60 * 1000);
+              break;
+            case "4 months ago":
+              startDate = new Date(currentDate.getTime() - 120 * 24 * 60 * 60 * 1000);
+              break;
+            default:
+              break;
+          }
+        
+          filteredApplications = filteredApplications.filter((application) => {
+            const createdDate = new Date(application.jobDetails.createdDate);
+            
+            if (startDate) {
+              return createdDate >= startDate && createdDate <= currentDate;
+            } 
+          });
+        }
+
+        // Filter by search term if specified
+        if (searchTerm.trim() !== "") {
+          const searchWords = searchTerm.trim().toLowerCase().split(/\s+/);
+
+          filteredApplications = filteredApplications.filter((job) => {
+            return searchWords.some((word) =>
+              job.jobDetails.title.toLowerCase().includes(word) ||
+              job.jobDetails.company.toLowerCase().includes(word) ||
+              job.jobDetails.location.toLowerCase().includes(word) ||
+              job.jobDetails.type.toLowerCase().includes(word) ||
+              job.jobDetails.description.toLowerCase().includes(word) ||
+              job.jobDetails.qualifications.toLowerCase().includes(word)
+            );
+          });
+        }
       
         setApplications(filteredApplications);
           
@@ -584,13 +649,14 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
 
   // Checks if all form fields are filled
   const checkFormValidity = () => {
-    const { title, company, location, type, applyBy, hiddenKeywords, description, qualifications } = newItem;
+    const { title, company, location, type, applyBy, dateCreated, hiddenKeywords, description, qualifications } = newItem;
     const allFieldsFilled =
       title.trim() !== "" &&
       company.trim() !== "" &&
       location.trim() !== "" &&
       type.trim() !== "" &&
       applyBy.trim() !== "" &&
+      dateCreated.trim() !== "" &&
       hiddenKeywords.trim() !== "" &&
       description.trim() !== "" &&
       qualifications.trim() !== "";
@@ -601,6 +667,7 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
       location !== initialItem.location ||
       type !== initialItem.type ||
       applyBy !== initialItem.applyBy ||
+      dateCreated !== initialItem.dateCreated ||
       hiddenKeywords !== initialItem.hiddenKeywords ||
       description !== initialItem.description ||
       qualifications !== initialItem.qualifications;
@@ -640,11 +707,6 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
                 value={searchTerm}
                 onChange={(e) => {
                   setSearchTerm(e.target.value);
-                  if (selectedTab === "newJobs") {
-                    fetchJobs(user.userId, setItems, e.target.value, filterTerm);
-                  } else {
-                    fetchApplications(user.userId, e.target.value, filterTerm);
-                  }
                   setSelectedItem(null);
                 }}
               />
@@ -653,12 +715,7 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
                   className="clear-button"
                   onClick={() => {
                     setSearchTerm("");
-                    if (selectedTab === "newJobs") {
-                      fetchJobs(user.userId, setItems, "", filterTerm);
-                    } else {
-                      fetchApplications(user.userId, "", filterTerm);
-                    }
-                    setSelectedItem(null);                    
+                    setSelectedItem(null);                   
                   }}
                 >
                   <i class="fa-solid fa-xmark icon"></i>
@@ -673,14 +730,7 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
                   Job Type <i class="fa-solid fa-caret-down icon"></i></button>
                 <div class="dropdown-content" 
                     onClick={(e) => {addFilterWord("jobType", e.target.textContent);
-                                      addFilterWord("jobType", e.target.textContent);
-                                      console.log("Selected Job Type:", filterTerm.jobType);
-                                      // if (selectedTab === "newJobs") {
-                                      //   fetchJobs(user.userId, setItems, searchTerm, filterTerm);
-                                      // } else {
-                                      //   fetchApplications(user.userId, searchTerm, filterTerm);
-                                      // }
-                                      // setSelectedItem(null);
+                                     setSelectedItem(null);
                     }}>
                   <span>Full-time</span>
                   <span>Part-time</span>
@@ -689,37 +739,50 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
                   <span>Contract</span>
                   <span>Freelance</span>
                   <span>Apprenticeship</span>
-                  <span>On-call</span>
                 </div>
               </div>
             )}
             {filterTerm.jobType && (
-                <button class="filter-display-btn" onClick={() => {setFilterTerm({...filterTerm, jobType: ''});
-                                                                  console.log("Selected Job Type after emptying:", filterTerm.jobType);
-                                                                  if (selectedTab === "newJobs") {
-                                                                    fetchJobs(user.userId, setItems, searchTerm, filterTerm);
-                                                                  } else {
-                                                                    fetchApplications(user.userId, searchTerm, filterTerm);
-                                                                  }
-                                                                  setSelectedItem(null);
-                }}>
+                <button class="filter-display-btn" onClick={() => {setFilterTerm({...filterTerm, jobType: ''}); setSelectedItem(null);}}>
                   {filterTerm.jobType} <i class="fa-solid fa-xmark icon"></i>
                 </button>
             )}
-            <div class="filter-dropdown">
-              <button class="dropbtn">
-                Type <i class="fa-solid fa-caret-down icon"></i></button>
-              <div class="dropdown-content" >
-                <span>Full-time</span>
-                <span>Part-time</span>
-                <span>Internship</span>
-                <span>Co-op</span>
-                <span>Contract</span>
-                <span>Freelance</span>
-                <span>Apprenticeship</span>
-                <span>On-call</span>
+            { !filterTerm.dueDate && (
+              <div class="filter-dropdown">
+                <button class="dropbtn">
+                  Due <i class="fa-solid fa-caret-down icon"></i>
+                </button>
+                <div class="dropdown-content" onClick={(e) => {addFilterWord("dueDate", e.target.textContent); setSelectedItem(null);}}>
+                  <span>In 1 week</span>
+                  <span>In 2 weeks</span>
+                  <span>In 1 month</span>
+                  <span>In 4 months</span>
+                </div>
               </div>
-            </div>
+            )}
+            {filterTerm.dueDate && (
+                <button class="filter-display-btn" onClick={() => {setFilterTerm({...filterTerm, dueDate: ''}); setSelectedItem(null);}}>
+                  {filterTerm.dueDate} <i class="fa-solid fa-xmark icon"></i>
+                </button>
+            )}
+            { !filterTerm.createdDate && (
+              <div class="filter-dropdown">
+                <button class="dropbtn">
+                  Created <i class="fa-solid fa-caret-down icon"></i>
+                </button>
+                <div class="dropdown-content" onClick={(e) => {addFilterWord("createdDate", e.target.textContent); setSelectedItem(null);}}>
+                  <span>1 week ago</span>
+                  <span>2 weeks ago</span>
+                  <span>1 month ago</span>
+                  <span>4 months ago</span>
+                </div>
+              </div>
+            )}
+            {filterTerm.createdDate && (
+                <button class="filter-display-btn" onClick={() => {setFilterTerm({...filterTerm, createdDate: ''}); setSelectedItem(null);}}>
+                  {filterTerm.createdDate} <i class="fa-solid fa-xmark icon"></i>
+                </button>
+            )}
           </div>
         </div>
         {role === "applicant" && (
@@ -792,7 +855,7 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
                   <div className="dashboard-location">{item.location}</div>
                   <div className="dashboard-type">{item.type}</div>
                   <div className="dashboard-apply-by">
-                    <strong>Closing Date:</strong> {item.applyBy}
+                    <strong>Apply by:</strong> {item.applyBy}
                   </div>
                   <div
                     className={`favorite-icon ${isFavorited(item) ? "favorited" : ""}`}
