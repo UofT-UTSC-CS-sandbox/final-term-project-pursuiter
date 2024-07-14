@@ -591,6 +591,7 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
       setQualified(true);
       setMissingQualifications([]);
       setShowWarning(false);
+      setIsQualificationsLoading(false);
       const formattedData = await formatResumeData(
         qualifications,
         jobDescription,
@@ -604,8 +605,8 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
       setMissingQualifications(missingKeywords);
       setMasterResumeRecommendation("");
       setShowWarning(true);
+      setIsQualificationsLoading(false);
     }
-    setIsQualificationsLoading(false);
   };  
 
   const displayedItems = selectedTab === "myApplications" ? applications : [...favoritedItems, ...allItems];
