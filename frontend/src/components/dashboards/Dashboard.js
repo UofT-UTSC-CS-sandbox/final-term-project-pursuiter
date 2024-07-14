@@ -967,6 +967,9 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
                         <p>{selectedItem.status}</p>
                       </div>
                       <div className="dashboard-detail-section">
+                        <strong>Applied Date:</strong> {selectedItem.applyDate}
+                      </div>
+                      <div className="dashboard-detail-section">
                         <h2>Resume:</h2>
                         {selectedItem.resumeData ? (
                           <iframe
@@ -977,9 +980,6 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
                         ) : (
                           "Resume not available"
                         )}
-                      </div>
-                      <div className="dashboard-detail-section">
-                        <strong>Applied Date:</strong> {selectedItem.applyDate}
                       </div>
                     </>
                 ) : (
@@ -1379,10 +1379,10 @@ const fetchJobsForApplicant = async (userId, setItems, searchTerm, filterTerm) =
       "In 2 weeks": 14,
       "In 1 month": 30,
       "In 4 months": 120,
-      "1 week ago": -7,
-      "2 weeks ago": -14,
-      "1 month ago": -30,
-      "4 months ago": -120,
+      "1 week ago": -8,
+      "2 weeks ago": -15,
+      "1 month ago": -31,
+      "4 months ago": -121,
     };
 
     const getDateRange = (days) => {
