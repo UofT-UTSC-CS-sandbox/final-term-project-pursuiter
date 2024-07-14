@@ -61,7 +61,7 @@ function ApplicantList() {
 
     fetchApplicants();
     fetchJobDetails();
-  }, [jobId]);
+  }, [jobId, searchTerm]);
 
   // Handle favorite
   const handleFavorite = (applicant) => {
@@ -76,9 +76,15 @@ function ApplicantList() {
 
   const isFavorited = (applicant) => favoritedApplicants.includes(applicant);
 
-  const filteredApplicants = applicants.filter((applicant) =>
-    applicant.fullName.toLowerCase().includes(searchTerm.toLowerCase()),
-  );
+  const filteredApplicants = applicants.filter((applicant) => {
+    const searchWords = searchTerm.trim().toLowerCase().split(/\s+/);
+    return searchWords.some((word) =>
+      applicant.fullName.toLowerCase().includes(word) ||
+      applicant.email.toLowerCase().includes(word) ||
+      applicant.applicantSummary.longSummary.toLowerCase().includes(word) ||
+      applicant.applicantSummary.shortSummary.toLowerCase().includes(word)
+    );
+  });
 
   // Handle select applicant
   const handleSelectApplicant = async (applicant) => {
@@ -177,14 +183,26 @@ function ApplicantList() {
         <div className="aesthetic-bar"></div>
         <div className="search-and-filters">
           <div className="search">
-            <input
-              type="text"
-              className="search-input"
-              placeholder="Search by experience, keywords..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
-            <button className="search-button">Search</button>
+            <div className="search-container">
+              <input
+                  type="text"
+                  className="search-input"
+                  placeholder="Search by experience, keywords..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                />
+                {searchTerm && (
+                  <button
+                    className="clear-button"
+                    onClick={() => {
+                      setSearchTerm("");
+                      setSelectedApplicant(null);                    
+                    }}
+                  >
+                    X
+                  </button>
+                )}
+            </div>
           </div>
           <div className="filter-buttons">
             <p>Filter by:</p>
