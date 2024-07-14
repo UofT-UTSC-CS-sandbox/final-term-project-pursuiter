@@ -16,7 +16,7 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
   const [items, setItems] = useState([]);
   const [showItemForm, setShowItemForm] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
-  const [filterTerm, setFilterTerm] = useState({ jobType: "", dueDate: "", createdDate: ""});
+  const [filterTerm, setFilterTerm] = useState({ jobType: "", dueDate: "", createdDate: "", appliedDate: ""});
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [itemToDelete, setItemToDelete] = useState(null);
   const [editMode, setEditMode] = useState(false);
@@ -533,7 +533,6 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
   };
   
   
-  // Fetch user's applications
   const fetchApplications = async (userId, searchTerm, filterTerm) => {
     try {
       const response = await DashboardController.fetchUserApplications(userId);
@@ -570,7 +569,7 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
   
         const targetDate = getDateRange(days);
         return applications.filter((application) => {
-          const date = new Date(application.jobDetails[type]);
+          const date = new Date(type === 'applyDate' ? application[type] : application.jobDetails[type]);
           return type === 'applyBy' ? date >= new Date() && date <= targetDate : date >= targetDate && date <= new Date();
         });
       };
@@ -581,8 +580,8 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
         );
       }
   
-      if (filterTerm.dueDate) {
-        filteredApplications = filterByDate(filteredApplications, 'dueDate', 'applyBy');
+      if (filterTerm.appliedDate) {
+        filteredApplications = filterByDate(filteredApplications, 'appliedDate', 'applyDate');
       }
   
       if (filterTerm.createdDate) {
@@ -715,28 +714,47 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
                   {filterTerm.jobType} <i class="fa-solid fa-xmark icon"></i>
                 </button>
             )}
-            { !filterTerm.dueDate && (
-              <div class="filter-dropdown">
-                <button class="dropbtn">
-                  Due <i class="fa-solid fa-caret-down icon"></i>
-                </button>
-                <div class="dropdown-content" onClick={(e) => {addFilterWord("dueDate", e.target.textContent); setSelectedItem(null);}}>
-                  <span>In 1 week</span>
-                  <span>In 2 weeks</span>
-                  <span>In 1 month</span>
-                  <span>In 4 months</span>
+            {selectedTab === "myApplications" ? (
+              !filterTerm.appliedDate ? (
+                <div class="filter-dropdown">
+                  <button class="dropbtn">
+                    Applied <i class="fa-solid fa-caret-down icon"></i>
+                  </button>
+                  <div class="dropdown-content" onClick={(e) => {addFilterWord("appliedDate", e.target.textContent); setSelectedItem(null);}}>
+                    <span>1 weeks ago</span>
+                    <span>2 weeks ago</span>
+                    <span>1 month ago</span>
+                    <span>4 months ago</span>
+                  </div>
                 </div>
-              </div>
-            )}
-            {filterTerm.dueDate && (
+              ) : (
+                <button class="filter-display-btn" onClick={() => {setFilterTerm({...filterTerm, appliedDate: ''}); setSelectedItem(null);}}>
+                  {filterTerm.appliedDate} <i class="fa-solid fa-xmark icon"></i>
+                </button>
+              )
+            ) : (
+              !filterTerm.dueDate ? (
+                <div class="filter-dropdown">
+                  <button class="dropbtn">
+                    Job Due <i class="fa-solid fa-caret-down icon"></i>
+                  </button>
+                  <div class="dropdown-content" onClick={(e) => {addFilterWord("dueDate", e.target.textContent); setSelectedItem(null);}}>
+                    <span>In 1 week</span>
+                    <span>In 2 weeks</span>
+                    <span>In 1 month</span>
+                    <span>In 4 months</span>
+                  </div>
+                </div>
+              ) : (
                 <button class="filter-display-btn" onClick={() => {setFilterTerm({...filterTerm, dueDate: ''}); setSelectedItem(null);}}>
                   {filterTerm.dueDate} <i class="fa-solid fa-xmark icon"></i>
                 </button>
+              )
             )}
             { !filterTerm.createdDate && (
               <div class="filter-dropdown">
                 <button class="dropbtn">
-                  Created <i class="fa-solid fa-caret-down icon"></i>
+                  Job Created <i class="fa-solid fa-caret-down icon"></i>
                 </button>
                 <div class="dropdown-content" onClick={(e) => {addFilterWord("createdDate", e.target.textContent); setSelectedItem(null);}}>
                   <span>1 week ago</span>

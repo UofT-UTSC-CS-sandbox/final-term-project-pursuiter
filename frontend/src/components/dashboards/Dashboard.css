@@ -229,6 +229,7 @@
   align-items: flex-start;
   margin-bottom: 20px;
   width: 90vh; 
+  margin-right: 10px;
 }
 
 .search-input {
@@ -294,7 +295,6 @@
 .filter-display-btn {
   background-color: #680025;
   color: #fffbfb;
-  /* padding: 16px; */
   font-size: 16px;
   border: none;
   box-shadow: 0px 4px 4px 0px #1e1e1e40;
@@ -303,19 +303,7 @@
 .filter-display-btn:hover {
   background-color: #680025;
   color: #E7E7E7;
-  /* padding: 16px; */
-  /* font-size: 16px; */
-  /* border: none; */
-  /* box-shadow: 0px 4px 4px 0px #1e1e1e40; */
 }
-
-/* .fa-xmark {
-  color:#505050;
-}
-
-.fa-xmark:hover{
-  color:#1e1e1e;
-} */
 
 
 /************************************
