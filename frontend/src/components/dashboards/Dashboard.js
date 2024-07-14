@@ -336,27 +336,34 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
 
   //Turn pdf base64 string into text
   const TurnPdfToString = async (pdf) => {
-    const base64String = pdf.split(",")[1];
-    const pdfData = atob(base64String);
-
-    const pdfArray = new Uint8Array(pdfData.length);
-    for (let i = 0; i < pdfData.length; i++) {
-      pdfArray[i] = pdfData.charCodeAt(i);
+    try {
+      const base64String = pdf.split(",")[1];
+      if (!base64String) throw new Error("Invalid PDF base64 string");
+  
+      const pdfData = atob(base64String);
+      const pdfArray = new Uint8Array(pdfData.length);
+      for (let i = 0; i < pdfData.length; i++) {
+        pdfArray[i] = pdfData.charCodeAt(i);
+      }
+  
+      const loadingTask = pdfjsLib.getDocument({ data: pdfArray });
+      const pdfDocument = await loadingTask.promise;
+  
+      let fullText = "";
+      for (let pageNum = 1; pageNum <= pdfDocument.numPages; pageNum++) {
+        const page = await pdfDocument.getPage(pageNum);
+        const textContent = await page.getTextContent();
+        const pageText = textContent.items.map((item) => item.str).join(" ");
+        fullText += pageText + " ";
+      }
+  
+      return fullText.trim();
+    } catch (error) {
+      console.error("Error turning PDF to string:", error);
+      return "";
     }
-
-    const loadingTask = pdfjsLib.getDocument({ data: pdfArray });
-    const pdfDocument = await loadingTask.promise;
-
-    let fullText = "";
-    for (let pageNum = 1; pageNum <= pdfDocument.numPages; pageNum++) {
-      const page = await pdfDocument.getPage(pageNum);
-      const textContent = await page.getTextContent();
-      const pageText = textContent.items.map((item) => item.str).join(" ");
-      fullText += pageText + " ";
-    }
-
-    return fullText.trim();
   };
+  
 
   // Format the application data for the API call for the Compatibility Score
   const formatScoreData = async (
@@ -800,7 +807,7 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
                 </div>
               </div>
               <div className="dashboard-detail-body">
-              {showWarning && (
+              {showWarning && selectedTab === "newJobs" &&(
                   <div className="warning-message">
                     Warning: You do not meet the minimum qualifications for this job and can only apply to the waitlist.
                   </div>
