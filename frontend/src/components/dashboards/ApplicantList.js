@@ -4,6 +4,8 @@ import { UserContext } from "../../contexts/UserContext";
 import DashboardController from "../../controllers/DashboardController";
 import "./Dashboard.css";
 import { FaStar } from "react-icons/fa";
+import { FaXmark } from "react-icons/fa6";
+import { FaCaretDown } from 'react-icons/fa6'
 
 function ApplicantList() {
   const { jobId } = useParams();
@@ -15,6 +17,8 @@ function ApplicantList() {
   const [favoritedApplicants, setFavoritedApplicants] = useState([]);
   const [selectedResume, setSelectedResume] = useState(null);
   const [applicationDetails, setApplicationDetails] = useState(null);
+  const [filterTerm, setFilterTerm] = useState({appliedDate: ""});
+  
   const { user, logoutUser } = useContext(UserContext);
   const progressBarRef = useRef(null);
   const [status, setStatus] = useState("");
@@ -25,7 +29,9 @@ function ApplicantList() {
     const fetchApplicants = async () => {
       try {
         const response = await DashboardController.fetchApplicants(jobId);
-        const applicantsWithScores = await Promise.all(
+        if (!response) return;
+        
+        let filteredApplicants = await Promise.all(
           response.map(async (applicant) => {
             const applicationDetails =
               await DashboardController.fetchApplicationDetails(
@@ -43,8 +49,67 @@ function ApplicantList() {
             };
           }),
         );
-        applicantsWithScores.sort((a, b) => b.totalScore - a.totalScore);
-        setApplicants(applicantsWithScores);
+        filteredApplicants.sort((a, b) => b.totalScore - a.totalScore);
+
+        const dateRanges = {
+          "In 1 week": 7,
+          "In 2 weeks": 14,
+          "In 1 month": 30,
+          "In 4 months": 120,
+          "1 week ago": -8,
+          "2 weeks ago": -15,
+          "1 month ago": -31,
+          "4 months ago": -121,
+        };
+    
+        const getDateRange = (days) => {
+          const currentDate = new Date();
+          return new Date(currentDate.getTime() + days * 24 * 60 * 60 * 1000);
+        };
+    
+        const filterByDate = (applicants, dateKey, type) => {
+          const days = dateRanges[filterTerm[dateKey]];
+          if (!days) return applicants;
+    
+          const targetDate = getDateRange(days);
+          return applicants.filter((applicant) => {
+            const date = new Date(applicant.applicantSummary[type]);
+            return type === 'applyBy' ? date >= new Date() && date <= targetDate : date >= targetDate && date <= new Date();
+          });
+        };
+    
+        if (filterTerm.appliedDate) {
+          filteredApplicants = filterByDate(filteredApplicants, 'appliedDate', 'applyDate');
+        }
+
+        const filterByScore = (applicants, scoreKey) => {
+          const scoreRange = filterTerm[scoreKey];
+          if (!scoreRange) return applicants;
+
+          const [min, max] = scoreRange.split('-').map(Number);
+          return applicants.filter((applicant) => {
+            const score = applicant.totalScore;
+            return score >= min && score <= max;
+          });
+        };
+
+        if (filterTerm.totalScore) {
+          filteredApplicants = filterByScore(filteredApplicants, 'totalScore');
+        }
+
+        if (searchTerm.trim()) {
+          filteredApplicants = filteredApplicants.filter((applicant) => {
+            const searchWords = searchTerm.trim().toLowerCase().split(/\s+/);
+            return searchWords.some((word) =>
+              applicant.fullName.toLowerCase().includes(word) ||
+              applicant.email.toLowerCase().includes(word) ||
+              applicant.applicantSummary.longSummary.toLowerCase().includes(word) ||
+              applicant.applicantSummary.shortSummary.toLowerCase().includes(word)
+            );
+          });
+        }
+
+        setApplicants(filteredApplicants);
       } catch (error) {
         console.error("Error fetching applicants:", error);
       }
@@ -61,7 +126,7 @@ function ApplicantList() {
 
     fetchApplicants();
     fetchJobDetails();
-  }, [jobId, searchTerm]);
+  }, [jobId, searchTerm, filterTerm]);
 
   // Handle favorite
   const handleFavorite = (applicant) => {
@@ -76,15 +141,7 @@ function ApplicantList() {
 
   const isFavorited = (applicant) => favoritedApplicants.includes(applicant);
 
-  const filteredApplicants = applicants.filter((applicant) => {
-    const searchWords = searchTerm.trim().toLowerCase().split(/\s+/);
-    return searchWords.some((word) =>
-      applicant.fullName.toLowerCase().includes(word) ||
-      applicant.email.toLowerCase().includes(word) ||
-      applicant.applicantSummary.longSummary.toLowerCase().includes(word) ||
-      applicant.applicantSummary.shortSummary.toLowerCase().includes(word)
-    );
-  });
+  const filteredApplicants = applicants;
 
   // Handle select applicant
   const handleSelectApplicant = async (applicant) => {
@@ -158,6 +215,13 @@ function ApplicantList() {
     }
   }, [selectedApplicant, progressBarWidth]);
 
+  const addFilterWord = (filterType, word) => {
+    setFilterTerm(filterTerm => ({
+      ...filterTerm,
+      [filterType]: word
+    }));
+  };
+
   return (
     <div className="dashboard-container">
       <div className="dashboard-content">
@@ -198,18 +262,49 @@ function ApplicantList() {
                       setSearchTerm("");
                       setSelectedApplicant(null);                    
                     }}
-                  >
-                    X
+                  ><div className="icon"><FaXmark/></div>
                   </button>
                 )}
             </div>
           </div>
-          <div className="filter-buttons">
-            <p>Filter by:</p>
-            <button className="filter-button">Experience</button>
-            <button className="filter-button">Education</button>
-            <button className="filter-button">Keywords</button>
-            <button className="filter-button">Skills</button>
+          <div className="filter-dropdowns">
+            { !filterTerm.appliedDate && (
+              <div class="filter-dropdown">
+                <button class="dropbtn">
+                  Applied <div class="icon"><FaCaretDown/></div>
+                </button>
+                <div class="dropdown-content" onClick={(e) => {addFilterWord("appliedDate", e.target.textContent); setSelectedApplicant(null);}}>
+                  <span>1 weeks ago</span>
+                  <span>2 weeks ago</span>
+                  <span>1 month ago</span>
+                  <span>4 months ago</span>
+                </div>
+              </div>
+            )}
+            {filterTerm.appliedDate && (
+              <button class="filter-display-btn" onClick={() => {setFilterTerm({...filterTerm, appliedDate: ''}); setSelectedApplicant(null);}}>
+                {filterTerm.appliedDate} <div className="icon"><FaXmark/></div>
+              </button>
+            )}
+            { !filterTerm.totalScore && (
+              <div class="filter-dropdown">
+                <button class="dropbtn">
+                  Score <div class="icon"><FaCaretDown/></div>
+                </button>
+                <div class="dropdown-content" onClick={(e) => {addFilterWord("totalScore", e.target.textContent); setSelectedApplicant(null);}}>
+                  <span>9-10</span>
+                  <span>7-8</span>
+                  <span>5-6</span>
+                  <span>3-4</span>
+                  <span>1-2</span>
+                </div>
+              </div>
+            )}
+            {filterTerm.totalScore && (
+              <button class="filter-display-btn" onClick={() => {setFilterTerm({...filterTerm, totalScore: ''}); setSelectedApplicant(null);}}>
+                {filterTerm.totalScore} <div className="icon"><FaXmark/></div>
+              </button>
+            )}
           </div>
         </div>
         <div className="dashboard-listings">
@@ -296,6 +391,7 @@ function ApplicantList() {
                   applicationDetails.qualificationsScore !== undefined &&
                   applicationDetails.jobDescriptionScore !== undefined ? (
                     <>
+                      <div className="dashboard-detail-container">
                       <div className="dashboard-detail-section">
                         <h2>
                           Qualifications Score:
@@ -334,6 +430,7 @@ function ApplicantList() {
                           {applicationDetails.jobDescriptionScore.description}
                         </p>
                       </div>
+                      </div>
                     </>
                   ) : (
                     <div className="dashboard-detail-section">
@@ -369,6 +466,10 @@ function ApplicantList() {
                     </select>
                   </div>
                   <div className="dashboard-detail-section">
+                    <h2>Applied Date:</h2>
+                    <p>{selectedApplicant.applyDate}</p>
+                  </div>
+                  <div className="dashboard-detail-section">
                     <h2>Resume:</h2>
                     {selectedResume ? (
                       <iframe
@@ -379,9 +480,6 @@ function ApplicantList() {
                     ) : (
                       "Resume not available"
                     )}
-                  </div>
-                  <div className="dashboard-detail-section">
-                    <strong>Applied Date:</strong> {selectedApplicant.applyDate}
                   </div>
                 </div>
               </>
