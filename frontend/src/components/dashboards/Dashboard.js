@@ -33,6 +33,7 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
   });
   const [applications, setApplications] = useState([]);
   const [resumeFile, setResumeFile] = useState(null);
+  const [coverLetterFile, setCoverLetterFile] = useState(null);
   const [resumeState, setResumeState] = useState("Missing");
   const [masterResume, setMasterResume] = useState("loading");
   const [MasterResumeRecommendation, setMasterResumeRecommendation] =
@@ -289,6 +290,9 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
         setResumeRecommendation("");
         setResumeState("Attached");
       }
+      else if (fileType === "cover letter") {
+        setCoverLetterFile(reader.result);
+      }
     };
     reader.readAsDataURL(file);
   };
@@ -334,6 +338,7 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
           applicantID: user.userId,
           jobID: selectedItem._id,
           resumeData: resumeFile,
+          coverLetterData: coverLetterFile,
           applyDate: new Date().toISOString().slice(0, 10),
           totalScore: scoreResponseJson.totalScore,
           qualificationsScore: {
@@ -858,6 +863,18 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
                         )}
                       </div>
                       <div className="dashboard-detail-section">
+                        <h2>Cover Letter:</h2>
+                        {selectedItem.coverLetterData ? (
+                          <iframe
+                            src={selectedItem.coverLetterData}
+                            className="resume-iframe"
+                            title="Cover Letter"
+                          ></iframe>
+                        ) : (
+                          "Cover letter not available"
+                        )}
+                      </div>
+                      <div className="dashboard-detail-section">
                         <strong>Applied Date:</strong> {selectedItem.applyDate}
                       </div>
                     </>
@@ -1002,6 +1019,15 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
           onChange={handleInputChange}
           required
         />
+        <label>
+          <input
+            type="checkbox"
+            name="coverLetterRequired"
+            checked={newItem.coverLetterRequired}
+            onChange={handleInputChange}
+          />
+          Cover letter required
+        </label>
         <textarea
           name="description"
           placeholder="Job Description"
@@ -1045,6 +1071,12 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
             type="file"
             accept=".pdf"
             onChange={(event) => handleFileChange(event, "resume")}
+          />
+          <p>Upload cover letter: </p>
+          <input
+            type="file"
+            accept=".pdf"
+            onChange={(event) => handleFileChange(event, "cover letter")}
           />
           {qualified && (
             <div className="ai-feedback-section">

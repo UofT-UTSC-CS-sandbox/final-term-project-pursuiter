@@ -14,6 +14,7 @@ function ApplicantList() {
   const [jobDetails, setJobDetails] = useState({});
   const [favoritedApplicants, setFavoritedApplicants] = useState([]);
   const [selectedResume, setSelectedResume] = useState(null);
+  const [selectedCoverLetter, setSelectedCoverLetter] = useState(null);
   const [applicationDetails, setApplicationDetails] = useState(null);
   const { user, logoutUser } = useContext(UserContext);
   const progressBarRef = useRef(null);
@@ -90,6 +91,9 @@ function ApplicantList() {
   const handleSelectApplicant = async (applicant) => {
     setSelectedApplicant(applicant);
     setSelectedResume(applicant.resumeData);
+    if (applicant.coverLetterData) {
+      setSelectedCoverLetter(applicant.coverLetterData);
+    } 
     await fetchApplicationDetails(applicant._id, jobId);
   };
 
@@ -378,6 +382,16 @@ function ApplicantList() {
                       ></iframe>
                     ) : (
                       "Resume not available"
+                    )}
+                  </div>
+                  <div className="dashboard-detail-section">
+                    <h2>Cover Letter:</h2>
+                    {selectedCoverLetter && (
+                      <iframe
+                        src={selectedCoverLetter}
+                        className="resume-iframe"
+                        title="Cover Letter"
+                      ></iframe>
                     )}
                   </div>
                   <div className="dashboard-detail-section">
