@@ -17,7 +17,7 @@ function ApplicantList() {
   const [favoritedApplicants, setFavoritedApplicants] = useState([]);
   const [selectedResume, setSelectedResume] = useState(null);
   const [applicationDetails, setApplicationDetails] = useState(null);
-  const [filterTerm, setFilterTerm] = useState({appliedDate: ""});
+  const [filterTerm, setFilterTerm] = useState({appliedDate: "", totalScore: ""});
   
   const { user, logoutUser } = useContext(UserContext);
   const progressBarRef = useRef(null);
@@ -52,10 +52,6 @@ function ApplicantList() {
         filteredApplicants.sort((a, b) => b.totalScore - a.totalScore);
 
         const dateRanges = {
-          "In 1 week": 7,
-          "In 2 weeks": 14,
-          "In 1 month": 30,
-          "In 4 months": 120,
           "1 week ago": -8,
           "2 weeks ago": -15,
           "1 month ago": -31,
@@ -67,19 +63,19 @@ function ApplicantList() {
           return new Date(currentDate.getTime() + days * 24 * 60 * 60 * 1000);
         };
     
-        const filterByDate = (applicants, dateKey, type) => {
-          const days = dateRanges[filterTerm[dateKey]];
+        const filterByDate = (applicants) => {
+          const days = dateRanges[filterTerm['appliedDate']];
           if (!days) return applicants;
     
           const targetDate = getDateRange(days);
           return applicants.filter((applicant) => {
-            const date = new Date(applicant.applicantSummary[type]);
-            return type === 'applyBy' ? date >= new Date() && date <= targetDate : date >= targetDate && date <= new Date();
+            const date = new Date(applicant.applyDate);
+            return date >= targetDate && date <= new Date();
           });
         };
     
         if (filterTerm.appliedDate) {
-          filteredApplicants = filterByDate(filteredApplicants, 'appliedDate', 'applyDate');
+          filteredApplicants = filterByDate(filteredApplicants);
         }
 
         const filterByScore = (applicants, scoreKey) => {
@@ -274,7 +270,7 @@ function ApplicantList() {
                   Applied <div class="icon"><FaCaretDown/></div>
                 </button>
                 <div class="dropdown-content" onClick={(e) => {addFilterWord("appliedDate", e.target.textContent); setSelectedApplicant(null);}}>
-                  <span>1 weeks ago</span>
+                  <span>1 week ago</span>
                   <span>2 weeks ago</span>
                   <span>1 month ago</span>
                   <span>4 months ago</span>
