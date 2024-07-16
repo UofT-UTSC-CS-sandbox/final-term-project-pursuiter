@@ -2,6 +2,9 @@ import React, { useState, useEffect, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import { UserContext } from "../../contexts/UserContext";
 import { FaStar } from "react-icons/fa";
+import { FaXmark } from "react-icons/fa6";
+import { FaCaretDown } from 'react-icons/fa6'
+
 import Modal from "../modal/Modal";
 import UserController from "../../controllers/UserController";
 
@@ -16,6 +19,7 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
   const [items, setItems] = useState([]);
   const [showItemForm, setShowItemForm] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
+  const [filterTerm, setFilterTerm] = useState({ jobType: "", dueDate: "", createdDate: "", appliedDate: ""});
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [itemToDelete, setItemToDelete] = useState(null);
   const [editMode, setEditMode] = useState(false);
@@ -26,6 +30,7 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
     location: "",
     type: "",
     applyBy: "",
+    dateCreated: "",
     hiddenKeywords: "",
     description: "",
     qualifications: "",
@@ -57,6 +62,7 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
       location: recruiterInfo.address || "",
       type: "",
       applyBy: "",
+      dateCreated: new Date().toISOString().slice(0, 10) || "",
       hiddenKeywords: "",
       description: "",
       qualifications: "",
@@ -72,6 +78,7 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
     location: "",
     type: "",
     applyBy: "",
+    dateCreated: "",
     hiddenKeywords: "",
     description: "",
     qualifications: "",
@@ -82,10 +89,10 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
   useEffect(() => {
     if (user) {
       if (selectedTab === "myApplications") {
-        fetchApplications(user.userId, searchTerm);
+        fetchApplications(user.userId, searchTerm, filterTerm);
       } else {
         fetchFavoritedJobs(user.userId, setFavoritedItems);
-        fetchJobs(user.userId, setItems, searchTerm);
+        fetchJobs(user.userId, setItems, searchTerm, filterTerm);
 
         UserController.fetchUserInformation(user.userId)
           .then((userInfo) => {
@@ -97,7 +104,7 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
           });
       }
     }
-  }, [user, fetchFavoritedJobs, fetchJobs, selectedTab]);
+  }, [user, fetchFavoritedJobs, fetchJobs, selectedTab, searchTerm, filterTerm]);
   
   // Fetch recruiter information
   useEffect(() => {
@@ -112,35 +119,72 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
     }
   }, [user, role]);
 
-   // Fetch user's applications
-   const fetchApplications = async (userId, searchTerm) => {
+  const fetchApplications = async (userId, searchTerm, filterTerm) => {
     try {
       const response = await DashboardController.fetchUserApplications(userId);
-      if (response) {
-        const applicationsWithJobDetails = await Promise.all(
-          response.map(async (application) => {
-            const jobDetails = await DashboardController.fetchJobDetails(application.jobID);
-            return { ...application, jobDetails };
-          })
+      if (!response) return;
+      const applicationsWithJobDetails = await Promise.all(
+        response.map(async (application) => ({ ...application,
+          jobDetails: await 
+          DashboardController.fetchJobDetails(application.jobID),
+        }))
+      );
+  
+      let filteredApplications = applicationsWithJobDetails;
+  
+      const dateRanges = {
+        "In 1 week": 7,
+        "In 2 weeks": 14,
+        "In 1 month": 30,
+        "In 4 months": 120,
+        "1 week ago": -8,
+        "2 weeks ago": -15,
+        "1 month ago": -31,
+        "4 months ago": -121,
+      };
+  
+      const getDateRange = (days) => {
+        const currentDate = new Date();
+        return new Date(currentDate.getTime() + days * 24 * 60 * 60 * 1000);
+      };
+  
+      const filterByDate = (applications, dateKey, type) => {
+        const days = dateRanges[filterTerm[dateKey]];
+        if (!days) return applications;
+  
+        const targetDate = getDateRange(days);
+        return applications.filter((application) => {
+          const date = new Date(type === 'applyDate' ? application[type] : application.jobDetails[type]);
+          return type === 'applyBy' ? date >= new Date() && date <= targetDate : date >= targetDate && date <= new Date();
+        });
+      };
+  
+      if (filterTerm.jobType) {
+        filteredApplications = filteredApplications.filter(
+          (application) => application.jobDetails.type.toLowerCase() === filterTerm.jobType.toLowerCase()
         );
-        if (searchTerm.trim() === "") {
-          setApplications(applicationsWithJobDetails);
-        } else { 
-          const searchWords = searchTerm.trim().toLowerCase().split(/\s+/);
-    
-          const filteredJobs = applicationsWithJobDetails.filter((job) => {
-            return searchWords.some((word) =>
-              job.jobDetails.title.toLowerCase().includes(word) ||
-              job.jobDetails.company.toLowerCase().includes(word) ||
-              job.jobDetails.location.toLowerCase().includes(word) ||
-              job.jobDetails.type.toLowerCase().includes(word) ||
-              job.jobDetails.description.toLowerCase().includes(word) ||
-              job.jobDetails.qualifications.toLowerCase().includes(word)
-            );
-          });   
-          setApplications(filteredJobs);
-        }     
       }
+  
+      if (filterTerm.appliedDate) {
+        filteredApplications = filterByDate(filteredApplications, 'appliedDate', 'applyDate');
+      }
+  
+      if (filterTerm.createdDate) {
+        filteredApplications = filterByDate(filteredApplications, 'createdDate', 'createdDate');
+      }
+  
+      if (searchTerm.trim()) {
+        const searchWords = searchTerm.trim().toLowerCase().split(/\s+/);
+        filteredApplications = filteredApplications.filter((job) =>
+          searchWords.some((word) =>
+            ['title', 'company', 'location', 'type', 'description', 'qualifications'].some((field) =>
+              job.jobDetails[field].toLowerCase().includes(word)
+            )
+          )
+        );
+      }
+  
+      setApplications(filteredApplications);
     } catch (error) {
       console.error("Error fetching applications:", error);
     }
@@ -207,6 +251,7 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
         location: "",
         type: "",
         applyBy: "",
+        dateCreated: "",
         hiddenKeywords: "",
         description: "",
         qualifications: "",
@@ -227,6 +272,7 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
       location: item.location,
       type: item.type,
       applyBy: item.applyBy,
+      dateCreated: item.dateCreated,
       hiddenKeywords: item.hiddenKeywords,
       description: item.description,
       qualifications: item.qualifications,
@@ -237,6 +283,7 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
       location: item.location,
       type: item.type,
       applyBy: item.applyBy,
+      dateCreated: item.dateCreated,
       hiddenKeywords: item.hiddenKeywords,
       description: item.description,
       qualifications: item.qualifications,
@@ -413,9 +460,9 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
     setSelectedItem(null);
     setSelectedTab(tab);
     if (tab === "newJobs") {
-      fetchJobs(user.userId, setItems, "");
+      fetchJobs(user.userId, setItems, "", filterTerm);
     } else {
-      fetchApplications(user.userId, "");
+      fetchApplications(user.userId, "", filterTerm);
     }
   };
 
@@ -612,7 +659,14 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
       setShowWarning(true);
       setIsQualificationsLoading(false);
     }
-  };  
+  };
+
+  const addFilterWord = (filterType, word) => {
+    setFilterTerm(filterTerm => ({
+      ...filterTerm,
+      [filterType]: word
+    }));
+  };
 
   const displayedItems = selectedTab === "myApplications" ? applications : [...favoritedItems, ...allItems];
 
@@ -640,11 +694,6 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
                 value={searchTerm}
                 onChange={(e) => {
                   setSearchTerm(e.target.value);
-                  if (selectedTab === "newJobs") {
-                    fetchJobs(user.userId, setItems, e.target.value);
-                  } else {
-                    fetchApplications(user.userId, e.target.value);
-                  }
                   setSelectedItem(null);
                 }}
               />
@@ -653,25 +702,93 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
                   className="clear-button"
                   onClick={() => {
                     setSearchTerm("");
-                    if (selectedTab === "newJobs") {
-                      fetchJobs(user.userId, setItems, "");
-                    } else {
-                      fetchApplications(user.userId, "");
-                    }
-                    setSelectedItem(null);                    
+                    setSelectedItem(null);                   
                   }}
                 >
-                  X
+                  <div className="icon"><FaXmark/></div>
                 </button>
               )}
             </div>
           </div>
-          <div className="filter-buttons">
-            <p>Filter by:</p>
-            <button className="filter-button">Experience</button>
-            <button className="filter-button">Education</button>
-            <button className="filter-button">Keywords</button>
-            <button className="filter-button">Skills</button>
+          <div className="filter-dropdowns">
+            { !filterTerm.jobType && (
+              <div class="filter-dropdown">
+                <button class="dropbtn">
+                  Job Type <div class="icon"><FaCaretDown/></div></button>
+                <div class="dropdown-content" 
+                    onClick={(e) => {addFilterWord("jobType", e.target.textContent);
+                                     setSelectedItem(null);
+                    }}>
+                  <span>Full-time</span>
+                  <span>Part-time</span>
+                  <span>Internship</span>
+                  <span>Co-op</span>
+                  <span>Contract</span>
+                  <span>Freelance</span>
+                  <span>Apprenticeship</span>
+                </div>
+              </div>
+            )}
+            {filterTerm.jobType && (
+                <button class="filter-display-btn" onClick={() => {setFilterTerm({...filterTerm, jobType: ''}); setSelectedItem(null);}}>
+                  {filterTerm.jobType} <div className="icon"><FaXmark/></div>
+                </button>
+            )}
+            {selectedTab === "myApplications" ? (
+              !filterTerm.appliedDate ? (
+                <div class="filter-dropdown">
+                  <button class="dropbtn">
+                    Applied <div class="icon"><FaCaretDown/></div>
+                  </button>
+                  <div class="dropdown-content" onClick={(e) => {addFilterWord("appliedDate", e.target.textContent); setSelectedItem(null);}}>
+                    <span>1 weeks ago</span>
+                    <span>2 weeks ago</span>
+                    <span>1 month ago</span>
+                    <span>4 months ago</span>
+                  </div>
+                </div>
+              ) : (
+                <button class="filter-display-btn" onClick={() => {setFilterTerm({...filterTerm, appliedDate: ''}); setSelectedItem(null);}}>
+                  {filterTerm.appliedDate} <div className="icon"><FaXmark/></div>
+                </button>
+              )
+            ) : (
+              !filterTerm.dueDate ? (
+                <div class="filter-dropdown">
+                  <button class="dropbtn">
+                    Job Due <div class="icon"><FaCaretDown/></div>
+                  </button>
+                  <div class="dropdown-content" onClick={(e) => {addFilterWord("dueDate", e.target.textContent); setSelectedItem(null);}}>
+                    <span>In 1 week</span>
+                    <span>In 2 weeks</span>
+                    <span>In 1 month</span>
+                    <span>In 4 months</span>
+                  </div>
+                </div>
+              ) : (
+                <button class="filter-display-btn" onClick={() => {setFilterTerm({...filterTerm, dueDate: ''}); setSelectedItem(null);}}>
+                  {filterTerm.dueDate} <div className="icon"><FaXmark/></div>
+                </button>
+              )
+            )}
+            { !filterTerm.createdDate && (
+              <div class="filter-dropdown">
+                <button class="dropbtn">
+                  Job Created <div class="icon"><FaCaretDown/></div>
+                </button>
+                <div class="dropdown-content" onClick={(e) => {addFilterWord("createdDate", e.target.textContent); setSelectedItem(null);}}>
+                  <span>1 week ago</span>
+                  <span>2 weeks ago</span>
+                  <span>1 month ago</span>
+                  <span>4 months ago</span>
+                </div>
+              </div>
+            )}
+            {filterTerm.createdDate && (
+                <button class="filter-display-btn" onClick={() => {setFilterTerm({...filterTerm, createdDate: ''}); setSelectedItem(null);}}>
+                  {filterTerm.createdDate} <div className="icon"><FaXmark/></div>
+                </button>
+            )}
           </div>
         </div>
         {role === "applicant" && (
@@ -743,7 +860,7 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
                   <div className="dashboard-location">{item.location}</div>
                   <div className="dashboard-type">{item.type}</div>
                   <div className="dashboard-apply-by">
-                    <strong>Closing Date:</strong> {item.applyBy}
+                    <strong>Apply by:</strong> {item.applyBy}
                   </div>
                   <div
                     className={`favorite-icon ${isFavorited(item) ? "favorited" : ""}`}
@@ -839,6 +956,10 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
                         <p>{selectedItem.jobDetails.type}</p>
                       </div>
                       <div className="dashboard-detail-section">
+                        <h2>Date Created:</h2>
+                        <p>{selectedItem.jobDetails.createdDate}</p>
+                      </div>
+                      <div className="dashboard-detail-section">
                         <h2>Description:</h2>
                         <p>{selectedItem.jobDetails.description}</p>
                       </div>
@@ -849,6 +970,10 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
                       <div className="dashboard-detail-section">
                         <h2>Status:</h2>
                         <p>{selectedItem.status}</p>
+                      </div>
+                      <div className="dashboard-detail-section">
+                        <h2>Applied Date:</h2>
+                        <p>{selectedItem.applyDate}</p>
                       </div>
                       <div className="dashboard-detail-section">
                         <h2>Resume:</h2>
@@ -893,6 +1018,10 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
                       <p>{selectedItem.type}</p>
                     </div>
                     <div className="dashboard-detail-section">
+                        <h2>Date Created:</h2>
+                        <p>{selectedItem.createdDate}</p>
+                      </div>
+                    <div className="dashboard-detail-section">
                       <h2>Description:</h2>
                       <p>{selectedItem.description}</p>
                     </div>
@@ -911,7 +1040,9 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
                       <h2>Missing Qualifications:</h2>
                       <ul>
                         {missingQualifications.map((qualification, index) => (
-                          <li key={index}>{qualification}</li>
+                          <p>
+                            <li key={index}>{qualification}</li>
+                          </p>
                         ))}
                       </ul>
                     </div>
@@ -1236,77 +1367,143 @@ const fetchFavoritedJobs = async (userId, setFavoritedItems) => {
   }
 };
 
-const fetchJobsForRecruiter = async (userId, setItems, searchTerm) => {
+const fetchJobsForRecruiter = async (userId, setItems, searchTerm, filterTerm) => {
   try {
     const response = await DashboardController.fetchJobs();
-    const availableJobs = response.filter(
+    let availableJobs = response.filter(
       (job) => job.recruiterID.toString() === userId,
     );
-    if (searchTerm.trim() === "") {
-      setItems(availableJobs);
-    } else { 
-      const searchWords = searchTerm.trim().toLowerCase().split(/\s+/);
 
-      const filteredJobs = availableJobs.filter((job) => {
-        return searchWords.some((word) =>
-          job.title.toLowerCase().includes(word) ||
-          job.company.toLowerCase().includes(word) ||
-          job.location.toLowerCase().includes(word) ||
-          job.type.toLowerCase().includes(word) ||
-          job.description.toLowerCase().includes(word) ||
-          job.qualifications.toLowerCase().includes(word) ||
-          job.hiddenKeywords.toLowerCase().includes(word)
-        );
+    const dateRanges = {
+      "In 1 week": 7,
+      "In 2 weeks": 14,
+      "In 1 month": 30,
+      "In 4 months": 120,
+      "1 week ago": -8,
+      "2 weeks ago": -15,
+      "1 month ago": -31,
+      "4 months ago": -121,
+    };
+
+    const getDateRange = (days) => {
+      const currentDate = new Date();
+      return new Date(currentDate.getTime() + days * 24 * 60 * 60 * 1000);
+    };
+
+    const filterByDate = (jobs, dateKey, type) => {
+      const days = dateRanges[filterTerm[dateKey]];
+      if (!days) return jobs;
+
+      const targetDate = getDateRange(days);
+      return jobs.filter((job) => {
+        const date = new Date(job[type]);
+        return type === 'applyBy' ? date >= new Date() && date <= targetDate : date >= targetDate && date <= new Date();
       });
-      setItems(filteredJobs);
+    };
+
+    if (filterTerm && filterTerm.jobType) {
+      availableJobs = availableJobs.filter(
+        (job) => job.type.toLowerCase() === filterTerm.jobType.toLowerCase()
+      );
     }
+
+    if (filterTerm && filterTerm.dueDate) {
+      availableJobs = filterByDate(availableJobs, 'dueDate', 'applyBy');
+    }
+
+    if (filterTerm && filterTerm.createdDate) {
+      availableJobs = filterByDate(availableJobs, 'createdDate', 'createdDate');
+    }
+
+    if (searchTerm.trim()) {
+      const searchWords = searchTerm.trim().toLowerCase().split(/\s+/);
+      availableJobs = availableJobs.filter((job) =>
+        searchWords.some((word) =>
+          ['title', 'company', 'location', 'type', 'description', 'qualifications', 'hiddenKeywords'].some((field) =>
+            job[field] && job[field].toLowerCase().includes(word)
+          )
+        )
+      );
+    }
+
+    setItems(availableJobs);
   } catch (error) {
     console.error("Error fetching jobs:", error);
   }
 };
 
-const fetchJobsForApplicant = async (userId, setItems, searchTerm) => {
+const fetchJobsForApplicant = async (userId, setItems, searchTerm, filterTerm) => {
   try {
     const jobsResponse = await DashboardController.fetchJobs();
-    const applicationsResponse =
-      await DashboardController.fetchUserApplications(userId);
+    const applicationsResponse = await DashboardController.fetchUserApplications(userId);
+
     if (!applicationsResponse) {
       setItems(jobsResponse);
       return;
     }
-    const appliedJobIds = new Set();
-    applicationsResponse.forEach((application) => {
-      if (application.jobID) {
-        appliedJobIds.add(application.jobID);
-      } else {
-        console.error("Application does not contain jobID:", application);
-      }
-    });
-    const availableJobs = jobsResponse.filter(
-      (job) => !appliedJobIds.has(job._id),
-    );
-    if (searchTerm.trim() === "") {
-      setItems(availableJobs);
-    } else { 
-      const searchWords = searchTerm.trim().toLowerCase().split(/\s+/);
 
-      const filteredJobs = availableJobs.filter((job) => {
-        return searchWords.some((word) =>
-          job.title.toLowerCase().includes(word) ||
-          job.company.toLowerCase().includes(word) ||
-          job.location.toLowerCase().includes(word) ||
-          job.type.toLowerCase().includes(word) ||
-          job.description.toLowerCase().includes(word) ||
-          job.qualifications.toLowerCase().includes(word)
-        );
+    const appliedJobIds = new Set(applicationsResponse.map((application) => application.jobID));
+
+    let availableJobs = jobsResponse.filter((job) => !appliedJobIds.has(job._id));
+
+    const dateRanges = {
+      "In 1 week": 7,
+      "In 2 weeks": 14,
+      "In 1 month": 30,
+      "In 4 months": 120,
+      "1 week ago": -8,
+      "2 weeks ago": -15,
+      "1 month ago": -31,
+      "4 months ago": -121,
+    };
+
+    const getDateRange = (days) => {
+      const currentDate = new Date();
+      return new Date(currentDate.getTime() + days * 24 * 60 * 60 * 1000);
+    };
+
+    const filterByDate = (jobs, dateKey, type) => {
+      const days = dateRanges[filterTerm[dateKey]];
+      if (!days) return jobs;
+
+      const targetDate = getDateRange(days);
+      return jobs.filter((job) => {
+        const date = new Date(job[type]);
+        return type === 'applyBy' ? date >= new Date() && date <= targetDate : date >= targetDate && date <= new Date();
       });
-      setItems(filteredJobs);
+    };
+
+    if (filterTerm.jobType) {
+      availableJobs = availableJobs.filter(
+        (job) => job.type.toLowerCase() === filterTerm.jobType.toLowerCase()
+      );
     }
 
+    if (filterTerm.dueDate) {
+      availableJobs = filterByDate(availableJobs, 'dueDate', 'applyBy');
+    }
+
+    if (filterTerm.createdDate) {
+      availableJobs = filterByDate(availableJobs, 'createdDate', 'createdDate');
+    }
+
+    if (searchTerm.trim()) {
+      const searchWords = searchTerm.trim().toLowerCase().split(/\s+/);
+      availableJobs = availableJobs.filter((job) =>
+        searchWords.some((word) =>
+          ['title', 'company', 'location', 'type', 'description', 'qualifications'].some((field) =>
+            job[field].toLowerCase().includes(word)
+          )
+        )
+      );
+    }
+
+    setItems(availableJobs);
   } catch (error) {
     console.error("Error fetching jobs:", error);
   }
 };
+
 
 export {
   Dashboard as default,
