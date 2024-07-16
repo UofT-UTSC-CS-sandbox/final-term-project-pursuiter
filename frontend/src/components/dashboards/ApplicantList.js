@@ -360,10 +360,35 @@ function ApplicantList() {
                     {selectedApplicant.fullName}
                   </div>
                 </div>
+
                 <div className="dashboard-detail-body">
-                  <div className="dashboard-detail-section">
-                    <strong>Email:</strong> {selectedApplicant.email}
+                  <div className="dashboard-detail-container">
+                    <div className="dashboard-detail-section">
+                      <h2>Email:</h2>
+                      <p>{selectedApplicant.email}</p>
+                    </div>
+                    <div className="dashboard-detail-section">
+                      <h2>Status:</h2>
+                      <select className="dropdown"
+                        value={status}
+                        onChange={(e) => handleStatusChange(e.target.value)}
+                        disabled={isStatusLoading}
+                      >
+                        <option value="Applied">Pending Review</option>
+                        <option value="Review">Under Review</option>
+                        <option value="Interview">Interview</option>
+                        <option value="Offer">Offer</option>
+                        <option value="Hired">Hired</option>
+                        <option value="Rejected">Rejected</option>
+                      </select>
+                    </div>
+                    <div className="dashboard-detail-section">
+                      <h2>Applied Date:</h2>
+                      <p>{selectedApplicant.applyDate}</p>
+                    </div>
                   </div>
+                
+                  
                   <div className="dashboard-detail-section">
                     <h2>AI Generated Compatibility:</h2>
                     {applicationDetails &&
@@ -437,6 +462,20 @@ function ApplicantList() {
                       <p>Scores not stored on the database</p>
                     </div>
                   )}
+
+                  <div className="dashboard-detail-section">
+                    <h2>Resume:</h2>
+                    {selectedResume ? (
+                      <iframe
+                        src={selectedResume}
+                        className="resume-iframe"
+                        title="Resume"
+                      ></iframe>
+                    ) : (
+                      "Resume not available"
+                    )}
+                  </div>
+
                   {applicationDetails &&
                   applicationDetails.applicantSummary.longSummary !==
                     undefined ? (
@@ -450,49 +489,18 @@ function ApplicantList() {
                       </p>
                     </div>
                   ) : null}
+
                   <div className="dashboard-detail-section">
-                    <h2>Status:</h2>
-                    <select className="dropdown"
-                      value={status}
-                      onChange={(e) => handleStatusChange(e.target.value)}
-                      disabled={isStatusLoading}
-                    >
-                      <option value="Applied">Pending Review</option>
-                      <option value="Review">Under Review</option>
-                      <option value="Interview">Interview</option>
-                      <option value="Offer">Offer</option>
-                      <option value="Hired">Hired</option>
-                      <option value="Rejected">Rejected</option>
-                    </select>
-                  </div>
-                  <div className="dashboard-detail-section">
-                    <h2>Applied Date:</h2>
-                    <p>{selectedApplicant.applyDate}</p>
-                  </div>
-                  <div className="dashboard-detail-section">
-                    <h2>Resume:</h2>
-                    {selectedResume ? (
-                      <iframe
-                        src={selectedResume}
-                        className="resume-iframe"
-                        title="Resume"
-                      ></iframe>
-                    ) : (
-                      "Resume not available"
-                    )}
-                  </div>
-                  <div className="dashboard-detail-section">
-                    <h2>Cover Letter:</h2>
                     {selectedCoverLetter && (
-                      <iframe
-                        src={selectedCoverLetter}
-                        className="resume-iframe"
-                        title="Cover Letter"
-                      ></iframe>
+                      <div>
+                        <h2>Cover Letter:</h2>
+                        <iframe
+                          src={selectedCoverLetter}
+                          className="resume-iframe"
+                          title="Cover Letter"
+                        ></iframe>
+                      </div>
                     )}
-                  </div>
-                  <div className="dashboard-detail-section">
-                    <strong>Applied Date:</strong> {selectedApplicant.applyDate}
                   </div>
                 </div>
               </>

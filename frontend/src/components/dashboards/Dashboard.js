@@ -40,6 +40,7 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
   const [resumeFile, setResumeFile] = useState(null);
   const [coverLetterFile, setCoverLetterFile] = useState(null);
   const [resumeState, setResumeState] = useState("Missing");
+  const [coverLetterState, setCoverLetterState] = useState("Missing");
   const [masterResume, setMasterResume] = useState("loading");
   const [MasterResumeRecommendation, setMasterResumeRecommendation] =
     useState("Loading...");
@@ -59,7 +60,7 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
     setNewItem({
       title: "",
       company: recruiterInfo.companyName || "",
-      location: recruiterInfo.address || "",
+      location: recruiterInfo.address.split(',').slice(-2).join(',').trim() || "",
       type: "",
       applyBy: "",
       dateCreated: new Date().toISOString().slice(0, 10) || "",
@@ -339,6 +340,7 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
       }
       else if (fileType === "cover letter") {
         setCoverLetterFile(reader.result);
+        setCoverLetterState("Attached");
       }
     };
     reader.readAsDataURL(file);
@@ -349,6 +351,8 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
     e.preventDefault();
     if (resumeFile === null) {
       setResumeState("Missing");
+    } else if (selectedItem?.coverLetterRequired && coverLetterFile === null) {
+      setCoverLetterState("Missing");
     } else {
       setIsSubmitting(true);
       setSubmissionStatus("Submitting application");
@@ -551,14 +555,20 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
   // Format the application data for the API call for the Applicant Description
   const formatDescData = async (qualifications, jobDescription, resumeFile) => {
     const resumeText = await TurnPdfToString(resumeFile);
+    let coverLetterText = "";
+    if (coverLetterFile) {
+      coverLetterText = await TurnPdfToString(coverLetterFile);
+    }
     return `
       Instructions:
       - Evaluate the resume based on the job posting qualifications and job description below.
-      - For longSummary: Provide a concise description of the applicant, emphasizing the key skills and experiences that align with the 
-        job requirements. Highlight the most relevant qualifications that demonstrate the applicant's fit for the position.
-        Keep the description to a couple of sentences. Add spacing often, using a newline character. Include a
-        sentence at the bottom that summarizes how well the applicant aligns with the job posting. 
-      - For shortSummary: Provide a short summary of the applicant's qualifications and experience that align with the job posting.
+      - For longSummary: Use the Cover Letter, if not empty. Otherwise, use the Resume. Provide a concise description of the applicant,
+        emphasizing the key skills and experiences that align with the job requirements. Do not list their skills, and instead judge
+        their character based on the information provided. Highlight the most relevant qualifications that demonstrate the applicant's
+        fit for the position or the ways in which they stand out from other applicants. 
+        Keep the description to a couple of sentences, no more than 100 words. Add spacing every 1-2 sentences, using a newline character. Include a
+        brutally honest sentence at the bottom that summarizes how well the applicant aligns with the job posting. 
+      - For shortSummary: Use the Resume. Provide a short summary of the applicant's qualifications and experience that align with the job posting.
         It must be no longer than 12 words and in the following format. Use no more than three bullet points and separate each bullet
         point with the newline character.
         Example: '• 3 years with Python
@@ -581,6 +591,9 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
 
       Resume:
       ${resumeText}
+
+      Cover Letter:
+      ${coverLetterText}
     `;
   };
 
@@ -987,21 +1000,20 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
                           "Resume not available"
                         )}
                       </div>
-                      <div className="dashboard-detail-section">
-                        <h2>Cover Letter:</h2>
-                        {selectedItem.coverLetterData ? (
-                          <iframe
-                            src={selectedItem.coverLetterData}
-                            className="resume-iframe"
-                            title="Cover Letter"
-                          ></iframe>
-                        ) : (
-                          "Cover letter not available"
-                        )}
-                      </div>
-                      <div className="dashboard-detail-section">
-                        <strong>Applied Date:</strong> {selectedItem.applyDate}
-                      </div>
+                      {selectedItem.coverLetterData && (
+                        <div className="dashboard-detail-section">
+                          <h2>Cover Letter:</h2>
+                          {selectedItem.coverLetterData ? (
+                            <iframe
+                              src={selectedItem.coverLetterData}
+                              className="resume-iframe"
+                              title="Cover Letter"
+                            ></iframe>
+                          ) : (
+                            "Cover letter not available"
+                          )}
+                        </div>
+                      )} 
                     </>
                 ) : (
                   <>
@@ -1154,7 +1166,6 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
           <input
             type="checkbox"
             name="coverLetterRequired"
-            checked={newItem.coverLetterRequired}
             onChange={handleInputChange}
           />
           Cover letter required
@@ -1203,12 +1214,16 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
             accept=".pdf"
             onChange={(event) => handleFileChange(event, "resume")}
           />
-          <p>Upload cover letter: </p>
-          <input
-            type="file"
-            accept=".pdf"
-            onChange={(event) => handleFileChange(event, "cover letter")}
-          />
+          {selectedItem?.coverLetterRequired && (
+            <p>Upload cover letter: </p>
+          )}
+          {selectedItem?.coverLetterRequired && (
+            <input
+              type="file"
+              accept=".pdf"
+              onChange={(event) => handleFileChange(event, "cover letter")}
+            />
+          )}
           {qualified && (
             <div className="ai-feedback-section">
               <div className="ai-feedback-header">
@@ -1275,7 +1290,7 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
           <button
             type="submit"
             className="resume-submit-button"
-            disabled={resumeState !== "Attached"}
+            disabled={resumeState !== "Attached" || (selectedItem.coverLetterRequired && coverLetterState !== "Attached")}
           >
             {" "}
             Submit
@@ -1289,6 +1304,7 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
               setIsGenerateButtonClicked(false);
               setResumeFile(null);
               setResumeState("Missing");
+              setCoverLetterState("Missing");
             }}
             disabled={isSubmitting}
           >
@@ -1304,6 +1320,7 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
           setIsGenerateButtonClicked(false);
           setResumeFile(null);
           setResumeState("Missing");
+          setCoverLetterState("Missing");
         }}
       >
         <div className="modal-header">
@@ -1317,6 +1334,7 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
                 setResumeFile(null);
                 setResumeRecommendation("");
                 setResumeState("Missing");
+                setCoverLetterState("Missing");
               }}
             >
               X
