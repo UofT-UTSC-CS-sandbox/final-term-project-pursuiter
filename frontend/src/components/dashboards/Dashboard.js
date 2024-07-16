@@ -1332,30 +1332,66 @@ const fetchFavoritedJobs = async (userId, setFavoritedItems) => {
   }
 };
 
-const fetchJobsForRecruiter = async (userId, setItems, searchTerm) => {
+const fetchJobsForRecruiter = async (userId, setItems, searchTerm, filterTerm) => {
   try {
     const response = await DashboardController.fetchJobs();
-    const availableJobs = response.filter(
+    let availableJobs = response.filter(
       (job) => job.recruiterID.toString() === userId,
     );
-    if (searchTerm.trim() === "") {
-      setItems(availableJobs);
-    } else { 
-      const searchWords = searchTerm.trim().toLowerCase().split(/\s+/);
 
-      const filteredJobs = availableJobs.filter((job) => {
-        return searchWords.some((word) =>
-          job.title.toLowerCase().includes(word) ||
-          job.company.toLowerCase().includes(word) ||
-          job.location.toLowerCase().includes(word) ||
-          job.type.toLowerCase().includes(word) ||
-          job.description.toLowerCase().includes(word) ||
-          job.qualifications.toLowerCase().includes(word) ||
-          job.hiddenKeywords.toLowerCase().includes(word)
-        );
+    const dateRanges = {
+      "In 1 week": 7,
+      "In 2 weeks": 14,
+      "In 1 month": 30,
+      "In 4 months": 120,
+      "1 week ago": -8,
+      "2 weeks ago": -15,
+      "1 month ago": -31,
+      "4 months ago": -121,
+    };
+
+    const getDateRange = (days) => {
+      const currentDate = new Date();
+      return new Date(currentDate.getTime() + days * 24 * 60 * 60 * 1000);
+    };
+
+    const filterByDate = (jobs, dateKey, type) => {
+      const days = dateRanges[filterTerm[dateKey]];
+      if (!days) return jobs;
+
+      const targetDate = getDateRange(days);
+      return jobs.filter((job) => {
+        const date = new Date(job[type]);
+        return type === 'applyBy' ? date >= new Date() && date <= targetDate : date >= targetDate && date <= new Date();
       });
-      setItems(filteredJobs);
+    };
+
+    if (filterTerm && filterTerm.jobType) {
+      availableJobs = availableJobs.filter(
+        (job) => job.type.toLowerCase() === filterTerm.jobType.toLowerCase()
+      );
     }
+
+    if (filterTerm && filterTerm.dueDate) {
+      availableJobs = filterByDate(availableJobs, 'dueDate', 'applyBy');
+    }
+
+    if (filterTerm && filterTerm.createdDate) {
+      availableJobs = filterByDate(availableJobs, 'createdDate', 'createdDate');
+    }
+
+    if (searchTerm.trim()) {
+      const searchWords = searchTerm.trim().toLowerCase().split(/\s+/);
+      availableJobs = availableJobs.filter((job) =>
+        searchWords.some((word) =>
+          ['title', 'company', 'location', 'type', 'description', 'qualifications', 'hiddenKeywords'].some((field) =>
+            job[field] && job[field].toLowerCase().includes(word)
+          )
+        )
+      );
+    }
+
+    setItems(availableJobs);
   } catch (error) {
     console.error("Error fetching jobs:", error);
   }

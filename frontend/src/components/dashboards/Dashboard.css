@@ -109,6 +109,11 @@
   margin-bottom: 30px;
 }
 
+.dashboard-detail-container {
+  display: flex;
+  justify-content:space-evenly;
+}
+
 .dashboard-item {
   display: flex;
   flex-direction: column;
@@ -313,7 +318,6 @@
   background-color: #680025;
   color: #E7E7E7;
 }
-
 
 /************************************
  * Tooltip
