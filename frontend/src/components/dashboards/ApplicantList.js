@@ -146,7 +146,9 @@ function ApplicantList() {
     setSelectedResume(applicant.resumeData);
     if (applicant.coverLetterData) {
       setSelectedCoverLetter(applicant.coverLetterData);
-    } 
+    } else {
+      setSelectedCoverLetter(null);
+    }
     await fetchApplicationDetails(applicant._id, jobId);
   };
 
