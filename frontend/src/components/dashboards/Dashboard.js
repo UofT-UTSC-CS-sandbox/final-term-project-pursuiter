@@ -83,6 +83,7 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
     qualifications: "",
   });
   const [showWarning, setShowWarning] = useState(false);
+  const [isCooldown, setIsCooldown] = useState(false);
 
   // Fetch jobs and favorited jobs
   useEffect(() => {
@@ -349,6 +350,10 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
   // Handle application submission
   const handleApplicationSubmit = async (e) => {
     e.preventDefault();
+    if (isCooldown) {
+      console.warn("Cooldown period active. Please wait before making more requests.");
+      return;
+    }
     if (resumeFile === null) {
       setResumeState("Missing");
     } else {
@@ -411,7 +416,7 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
         setSubmissionStatus("Application submitted successfully!");
   
         await DashboardController.removeFavoriteJob(user.userId, selectedItem._id);
-
+  
         setFavoritedItems((prevFavoritedItems) =>
           prevFavoritedItems.filter((fav) => fav._id !== selectedItem._id),
         );
@@ -425,7 +430,13 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
         }, 100);
       } catch (error) {
         console.error("Error submitting application:", error);
-        setSubmissionStatus("Error submitting application.");
+        if (error.message.includes("Too Many Requests")) {
+          setSubmissionStatus("Error generating. Please try again.");
+          setIsCooldown(true);
+          setTimeout(() => setIsCooldown(false), 60000);
+        } else {
+          setSubmissionStatus("Error submitting application.");
+        }
       } finally {
         setIsSubmitting(false);
       }
@@ -630,6 +641,11 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
     qualifications,
     jobDescription
   ) => {
+    if (isCooldown) {
+      console.warn("Cooldown period active. Please wait before making more requests.");
+      return;
+    }
+  
     setIsQualificationsLoading(true);
   
     if (masterResume === null) {
@@ -661,9 +677,20 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
         jobDescription,
         resumeText
       );
-      const resumeResponse =
-        await DashboardController.fetchGeminiResponse(formattedData);
-      setMasterResumeRecommendation(resumeResponse.response);
+      try {
+        const resumeResponse =
+          await DashboardController.fetchGeminiResponse(formattedData);
+        setMasterResumeRecommendation(resumeResponse.response);
+      } catch (error) {
+        console.error("Error generating feedback:", error);
+        if (error.message.includes("Too Many Requests")) {
+          setMasterResumeRecommendation("Error generating. Please try again.");
+          setIsCooldown(true);
+          setTimeout(() => setIsCooldown(false), 60000);
+        } else {
+          setMasterResumeRecommendation("Error generating feedback.");
+        }
+      }
     } else {
       setQualified(false);
       setMissingQualifications(missingKeywords);
@@ -671,7 +698,7 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
       setShowWarning(true);
       setIsQualificationsLoading(false);
     }
-  };
+  };  
 
   const addFilterWord = (filterType, word) => {
     setFilterTerm(filterTerm => ({
