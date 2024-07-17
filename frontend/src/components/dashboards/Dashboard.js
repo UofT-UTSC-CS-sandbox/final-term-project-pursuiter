@@ -257,6 +257,8 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
         recruiterID: "",
       });
       setShowItemForm(false);
+      setSubmissionStatus("New job added. Refreshing...");
+      setShowConfirmation(true);
       window.location.reload();
     } catch (error) {
       console.error("Error submitting item:", error);
@@ -1011,7 +1013,14 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
                     </div>
                     {role === "recruiter" && (
                       <div className="dashboard-detail-section">
-                        <h2>Hidden Keywords:</h2>
+                        <h2>Hidden Keywords:
+                          <span className="tooltip-container">
+                            <span className="tooltip-icon">?</span>
+                            <span className="tooltip tooltip-modal">
+                              Hidden Keywords are used to filter out applicants who do not meet the minimum qualifications for the job. Resumes missing ANY of these keywords are waitlisted.
+                            </span>
+                          </span>
+                        </h2>
                         <p>{selectedItem.hiddenKeywords}</p>
                       </div>
                     )}
@@ -1100,7 +1109,9 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
         />
         <select
           name="type"
+          className="new-item-form"
           value={newItem.type}
+          placeholder="Job Type"
           onChange={handleInputChange}
           required
         >
@@ -1122,10 +1133,10 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
           onChange={handleInputChange}
           required
         />
-        <input
+        <textarea
           type="text"
           name="hiddenKeywords"
-          placeholder="Hidden Keywords"
+          placeholder="Hidden Keywords: Resumes missing ANY of these keywords are waitlisted. Separate with commas."
           value={newItem.hiddenKeywords}
           onChange={handleInputChange}
           required

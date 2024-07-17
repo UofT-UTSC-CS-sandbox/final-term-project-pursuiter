@@ -188,12 +188,17 @@
   display: flex;
   flex-direction: column;
   gap: 10px;
-  margin-bottom: 20px;
+}
+
+.new-item-form select {
+  font-family: "Poppins", sans-serif;
+  font-size: 16px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
 }
 
 .new-item-form input,
-.new-item-form textarea,
-.new-item-form select {
+.new-item-form textarea {
   font-family: "Poppins", sans-serif;
   padding: 10px;
   font-size: 16px;
