@@ -811,64 +811,69 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
             </div>
             {displayedItems.map((item, index) => (
               <div
-              key={index}
-              className={`dashboard-item ${item.type === 'waitlist' ? 'waitlist-item' : ''}`}
-              onClick={() => {
-                setSelectedItem(item);
-                setQualified(false);
-                setMasterResumeRecommendation("Loading...");
-                if (selectedTab === "myApplications") {
-                  handleQualificationsCheck(
-                    item.jobDetails.hiddenKeywords,
-                    masterResume,
-                    item.jobDetails.qualifications,
-                    item.jobDetails.description
-                  );
-                } else {
-                  handleQualificationsCheck(
-                    item.hiddenKeywords,
-                    masterResume,
-                    item.qualifications,
-                    item.description
-                  );
-                }
-              }}
-            >
-              {selectedTab === "myApplications" ? (
-                <>
-                  <div className="dashboard-title">
-                    {item.jobDetails.title}
-                    {item.type === "waitlist" && (
-                      <div className="dashboard-waitlist">
-                        Waitlisted
-                      </div>
-                    )}
-                  </div>
-                  <div className="dashboard-company">{item.jobDetails.company}</div>
-                  <div className="dashboard-location">{item.jobDetails.location}</div>
-                  <div className="dashboard-type">{item.jobDetails.type}</div>
-                </>
-              ) : (
-                <>
-                  <div className="dashboard-title">{item.title}</div>
-                  <div className="dashboard-company">{item.company}</div>
-                  <div className="dashboard-location">{item.location}</div>
-                  <div className="dashboard-type">{item.type}</div>
-                  <div className="dashboard-apply-by">
-                    <strong>Apply by:</strong> {item.applyBy}
-                  </div>
-                  <div
-                    className={`favorite-icon ${isFavorited(item) ? "favorited" : ""}`}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleFavorite(item);
-                    }}
-                  >
-                    <FaStar />
-                  </div>
-                </>
-              )}
-            </div>
+                key={index}
+                className={`dashboard-item ${item.type === 'waitlist' ? 'waitlist-item' : ''}`}
+                onClick={() => {
+                  setSelectedItem(item);
+                  setQualified(false);
+                  setMasterResumeRecommendation("Loading...");
+                  if (selectedTab === "myApplications") {
+                    handleQualificationsCheck(
+                      item.jobDetails.hiddenKeywords,
+                      masterResume,
+                      item.jobDetails.qualifications,
+                      item.jobDetails.description
+                    );
+                  } else {
+                    handleQualificationsCheck(
+                      item.hiddenKeywords,
+                      masterResume,
+                      item.qualifications,
+                      item.description
+                    );
+                  }
+                }}
+              >
+                {selectedTab === "myApplications" ? (
+                  <>
+                    <div className="dashboard-title">
+                      {item.jobDetails.title}
+                      {item.type === "waitlist" && (
+                        <div className="dashboard-waitlist">
+                          {item.status === "Pending Review" ? "Waitlisted" : item.status}
+                        </div>
+                      )}
+                      {item.type === "application" && (
+                        <div className="dashboard-waitlist">
+                          {item.status}
+                        </div>
+                      )}
+                    </div>
+                    <div className="dashboard-company">{item.jobDetails.company}</div>
+                    <div className="dashboard-location">{item.jobDetails.location}</div>
+                    <div className="dashboard-type">{item.jobDetails.type}</div>
+                  </>
+                ) : (
+                  <>
+                    <div className="dashboard-title">{item.title}</div>
+                    <div className="dashboard-company">{item.company}</div>
+                    <div className="dashboard-location">{item.location}</div>
+                    <div className="dashboard-type">{item.type}</div>
+                    <div className="dashboard-apply-by">
+                      <strong>Apply by:</strong> {item.applyBy}
+                    </div>
+                    <div
+                      className={`favorite-icon ${isFavorited(item) ? "favorited" : ""}`}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleFavorite(item);
+                      }}
+                    >
+                      <FaStar />
+                    </div>
+                  </>
+                )}
+              </div>
             ))}
           </div>
           <div className="dashboard-detail">

@@ -11,7 +11,7 @@ const UserProvider = ({ children }) => {
   });
 
   const [selectedTab, setSelectedTab] = useState(() => {
-    return Cookies.get("selectedTab") || "newJobs";
+    return Cookies.get("selectedTab") || "applications";
   });
 
   useEffect(() => {
@@ -30,7 +30,7 @@ const UserProvider = ({ children }) => {
     try {
       const user = await UserController.loginUser(email, password);
       setUser(user);
-      setSelectedTab("newJobs");
+      setSelectedTab("applications");
       return user;
     } catch (error) {
       throw error;
