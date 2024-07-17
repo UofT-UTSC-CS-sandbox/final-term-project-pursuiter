@@ -1419,73 +1419,65 @@ const fetchJobsForRecruiter = async (userId, setItems, searchTerm, filterTerm) =
   }
 };
 
-const fetchJobsForApplicant = async (userId, setItems, searchTerm, filterTerm) => {
+const fetchJobsForApplicant = async (userId, setItems, searchTerm) => {
   try {
     const jobsResponse = await DashboardController.fetchJobs();
     const applicationsResponse = await DashboardController.fetchUserApplications(userId);
+    const userInfo = await UserController.fetchUserInformation(userId);
 
     if (!applicationsResponse) {
       setItems(jobsResponse);
       return;
     }
 
-    const appliedJobIds = new Set(applicationsResponse.map((application) => application.jobID));
+    const appliedJobIds = new Set();
+    applicationsResponse.forEach((application) => {
+      if (application.jobID) {
+        appliedJobIds.add(application.jobID);
+      } else {
+        console.error("Application does not contain jobID:", application);
+      }
+    });
 
-    let availableJobs = jobsResponse.filter((job) => !appliedJobIds.has(job._id));
+    const availableJobs = jobsResponse.filter(
+      (job) => !appliedJobIds.has(job._id)
+    );
 
-    const dateRanges = {
-      "In 1 week": 7,
-      "In 2 weeks": 14,
-      "In 1 month": 30,
-      "In 4 months": 120,
-      "1 week ago": -8,
-      "2 weeks ago": -15,
-      "1 month ago": -31,
-      "4 months ago": -121,
-    };
+    const positionsWanted = userInfo.positions.split(',').map(position => position.trim().toLowerCase());
 
-    const getDateRange = (days) => {
-      const currentDate = new Date();
-      return new Date(currentDate.getTime() + days * 24 * 60 * 60 * 1000);
-    };
-
-    const filterByDate = (jobs, dateKey, type) => {
-      const days = dateRanges[filterTerm[dateKey]];
-      if (!days) return jobs;
-
-      const targetDate = getDateRange(days);
-      return jobs.filter((job) => {
-        const date = new Date(job[type]);
-        return type === 'applyBy' ? date >= new Date() && date <= targetDate : date >= targetDate && date <= new Date();
+    const calculateJobSimilarity = (job, positionsWanted) => {
+      const jobContent = `${job.title.toLowerCase()} ${job.description.toLowerCase()} ${job.qualifications.toLowerCase()}`;
+      let score = 0;
+      positionsWanted.forEach((keyword) => {
+        if (jobContent.includes(keyword)) {
+          score += 1;
+        }
       });
+      return score;
     };
 
-    if (filterTerm.jobType) {
-      availableJobs = availableJobs.filter(
-        (job) => job.type.toLowerCase() === filterTerm.jobType.toLowerCase()
-      );
-    }
+    const sortedJobs = availableJobs.sort((a, b) => {
+      const similarityA = calculateJobSimilarity(a, positionsWanted);
+      const similarityB = calculateJobSimilarity(b, positionsWanted);
+      return similarityB - similarityA;
+    });
 
-    if (filterTerm.dueDate) {
-      availableJobs = filterByDate(availableJobs, 'dueDate', 'applyBy');
-    }
-
-    if (filterTerm.createdDate) {
-      availableJobs = filterByDate(availableJobs, 'createdDate', 'createdDate');
-    }
-
-    if (searchTerm.trim()) {
+    if (searchTerm.trim() === "") {
+      setItems(sortedJobs);
+    } else {
       const searchWords = searchTerm.trim().toLowerCase().split(/\s+/);
-      availableJobs = availableJobs.filter((job) =>
-        searchWords.some((word) =>
-          ['title', 'company', 'location', 'type', 'description', 'qualifications'].some((field) =>
-            job[field].toLowerCase().includes(word)
-          )
-        )
-      );
+      const filteredJobs = sortedJobs.filter((job) => {
+        return searchWords.some((word) =>
+          job.title.toLowerCase().includes(word) ||
+          job.company.toLowerCase().includes(word) ||
+          job.location.toLowerCase().includes(word) ||
+          job.type.toLowerCase().includes(word) ||
+          job.description.toLowerCase().includes(word) ||
+          job.qualifications.toLowerCase().includes(word)
+        );
+      });
+      setItems(filteredJobs);
     }
-
-    setItems(availableJobs);
   } catch (error) {
     console.error("Error fetching jobs:", error);
   }

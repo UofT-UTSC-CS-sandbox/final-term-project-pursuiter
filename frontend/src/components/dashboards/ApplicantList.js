@@ -44,7 +44,7 @@ function ApplicantList() {
               applicantSummary: applicationDetails
                 ? applicationDetails.applicantSummary
                 : {},
-              type: applicationDetails ? applicationDetails.type : "application", // Add type from applicationDetails
+              type: applicationDetails ? applicationDetails.type : "application",
             };
           }),
         );
