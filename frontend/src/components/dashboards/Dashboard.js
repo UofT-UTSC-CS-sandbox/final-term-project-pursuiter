@@ -35,7 +35,7 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
     description: "",
     qualifications: "",
     recruiterID: "",
-    coverLetterRequired: false,
+    coverLetterRequired: "",
   });
   const [applications, setApplications] = useState([]);
   const [resumeFile, setResumeFile] = useState(null);
@@ -69,7 +69,7 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
       description: "",
       qualifications: "",
       recruiterID: user.userId,
-      coverLetterRequired: false,
+      coverLetterRequired: "",
     });
     setEditMode(false);
     setShowItemForm(true);
@@ -218,7 +218,7 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
   // Handle input change on add/edit jobs
   const handleInputChange = (e) => {
     const target = e.target;
-    const value = target.type === 'checkbox' ? target.checked : target.value;
+    const value = target.value;
     const name = target.name;
     setNewItem((prevItem) => ({
       ...prevItem,
@@ -261,7 +261,7 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
         description: "",
         qualifications: "",
         recruiterID: "",
-        coverLetterRequired: false,
+        coverLetterRequired: "",
       });
       setShowItemForm(false);
       window.location.reload();
@@ -358,7 +358,7 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
     e.preventDefault();
     if (resumeFile === null) {
       setResumeState("Missing");
-    } else if ((selectedItem?.coverLetterRequired == true) && coverLetterFile === null) {
+    } else if ((selectedItem?.coverLetterRequired == "Required") && coverLetterFile === null) {
       setCoverLetterState("Missing");
     } else {
       setIsSubmitting(true);
@@ -442,7 +442,8 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
       applyBy.trim() !== "" &&
       hiddenKeywords.trim() !== "" &&
       description.trim() !== "" &&
-      qualifications.trim() !== "";
+      qualifications.trim() !== "" &&
+      coverLetterRequired.trim() !== "";
   
     const anyFieldChanged =
       title !== initialItem.title ||
@@ -1144,7 +1145,7 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
           onChange={handleInputChange}
           required
         >
-          <option value="">Select Job Type</option>
+          <option value="">Job Type</option>
           <option value="Full-time">Full-time</option>
           <option value="Part-time">Part-time</option>
           <option value="Internship">Internship</option>
@@ -1170,15 +1171,17 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
           onChange={handleInputChange}
           required
         />
-        <label>
-          <input
-            type="checkbox"
-            name="coverLetterRequired"
-            checked={newItem.coverLetterRequired}
-            onChange={handleInputChange} 
-          />
-          Cover letter required
-        </label>
+        <select
+          name="coverLetterRequired"
+          value={newItem.coverLetterRequired}
+          onChange={handleInputChange}
+          required
+        >
+          <option value="">Cover Letter Requirement</option>
+          <option value="None">None</option>
+          <option value="Optional">Optional</option>
+          <option value="Required">Required</option>
+        </select>
         <textarea
           name="description"
           placeholder="Job Description"
@@ -1223,16 +1226,21 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
             accept=".pdf"
             onChange={(event) => handleFileChange(event, "resume")}
           />
-          {selectedItem?.coverLetterRequired == true ? (
+          
+          {selectedItem?.coverLetterRequired === "Required" ? (
             <p>Upload cover letter: </p>
-          ) : (
+          ) : selectedItem?.coverLetterRequired === "Optional" ? (
             <p>Upload cover letter (optional): </p>
-          )}
-          <input
-            type="file"
-            accept=".pdf"
-            onChange={(event) => handleFileChange(event, "cover letter")}
-          />  
+          ) : null}
+
+          {selectedItem?.coverLetterRequired === "Required" || selectedItem?.coverLetterRequired === "Optional" ? (
+            <input
+              type="file"
+              accept=".pdf"
+              onChange={(event) => handleFileChange(event, "cover letter")}
+            />
+          ) : null}
+
           {qualified && (
             <div className="ai-feedback-section">
               <div className="ai-feedback-header">
@@ -1299,7 +1307,7 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
           <button
             type="submit"
             className="resume-submit-button"
-            disabled={resumeState !== "Attached" || ((selectedItem.coverLetterRequired == true) && coverLetterState !== "Attached")}
+            disabled={resumeState !== "Attached" || ((selectedItem.coverLetterRequired == "Required") && coverLetterState !== "Attached")}
           >
             {" "}
             Submit
