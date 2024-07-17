@@ -96,7 +96,7 @@ function ApplicantList() {
         if (searchTerm.trim()) {
           filteredApplicants = filteredApplicants.filter((applicant) => {
             const searchWords = searchTerm.trim().toLowerCase().split(/\s+/);
-            return searchWords.some((word) =>
+            return searchWords.every((word) =>
               applicant.fullName.toLowerCase().includes(word) ||
               applicant.email.toLowerCase().includes(word) ||
               applicant.applicantSummary.longSummary.toLowerCase().includes(word) ||
