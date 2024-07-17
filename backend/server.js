@@ -478,6 +478,7 @@ app.get("/applications/:jobId", async (req, res) => {
         ...applicant,
         applyDate: application ? application.applyDate : null,
         resumeData: application ? application.resumeData : null,
+        coverLetterData: application ? application.coverLetterData : null,
       };
     });
     res.json(applicantsWithDetails);
