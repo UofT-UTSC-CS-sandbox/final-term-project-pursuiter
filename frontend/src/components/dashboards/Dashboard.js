@@ -182,20 +182,6 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
           )
         );
       }
-
-      // if (searchTerm.trim()) {
-      //   const searchWords = searchTerm.trim().toLowerCase().split(/\s+/);
-      //   availableJobs = availableJobs.filter((job) => 
-      //     searchWords.every(word =>
-      //       job.jobDetails.title.toLowerCase().includes(word) ||
-      //       job.jobDetails.company.toLowerCase().includes(word) ||
-      //       job.jobDetails.location.toLowerCase().includes(word) ||
-      //       job.jobDetails.type.toLowerCase().includes(word) ||
-      //       job.jobDetails.description.toLowerCase().includes(word) ||
-      //       job.jobDetails.qualifications.toLowerCase().includes(word)
-      //     )
-      //   );
-      // }
   
       setApplications(filteredApplications);
     } catch (error) {
