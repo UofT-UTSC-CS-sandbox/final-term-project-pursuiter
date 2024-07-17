@@ -36,6 +36,7 @@ describe("Application Process", () => {
       applicantID: applicant,
       jobID: job,
       resumeData: "Base64EncodedResumeData",
+      coverLetterData: "Base64EncodedCoverLetterData",
       applyDate: new Date().toISOString(),
     };
 
@@ -55,6 +56,10 @@ describe("Application Process", () => {
     expect(application).to.have.property(
       "resumeData",
       "Base64EncodedResumeData",
+    );
+    expect(application).to.have.property(
+      "coverLetterData",
+      "Base64EncodeCoverLetterData",
     );
 
     // Check for default status
