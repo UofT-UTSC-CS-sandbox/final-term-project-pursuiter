@@ -35,10 +35,13 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
     description: "",
     qualifications: "",
     recruiterID: "",
+    coverLetterRequired: "",
   });
   const [applications, setApplications] = useState([]);
   const [resumeFile, setResumeFile] = useState(null);
+  const [coverLetterFile, setCoverLetterFile] = useState(null);
   const [resumeState, setResumeState] = useState("Missing");
+  const [coverLetterState, setCoverLetterState] = useState("Missing");
   const [masterResume, setMasterResume] = useState("loading");
   const [MasterResumeRecommendation, setMasterResumeRecommendation] =
     useState("Loading...");
@@ -58,7 +61,7 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
     setNewItem({
       title: "",
       company: recruiterInfo.companyName || "",
-      location: recruiterInfo.address || "",
+      location: recruiterInfo.address.split(',').slice(-2).join(',').trim() || "",
       type: "",
       applyBy: "",
       dateCreated: new Date().toISOString().slice(0, 10) || "",
@@ -66,6 +69,7 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
       description: "",
       qualifications: "",
       recruiterID: user.userId,
+      coverLetterRequired: "",
     });
     setEditMode(false);
     setShowItemForm(true);
@@ -213,7 +217,9 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
 
   // Handle input change on add/edit jobs
   const handleInputChange = (e) => {
-    const { name, value } = e.target;
+    const target = e.target;
+    const value = target.value;
+    const name = target.name;
     setNewItem((prevItem) => ({
       ...prevItem,
       [name]: value,
@@ -255,6 +261,7 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
         description: "",
         qualifications: "",
         recruiterID: "",
+        coverLetterRequired: "",
       });
       setShowItemForm(false);
       setSubmissionStatus("New job added. Refreshing...");
@@ -277,6 +284,7 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
       hiddenKeywords: item.hiddenKeywords,
       description: item.description,
       qualifications: item.qualifications,
+      coverLetterRequired: item.coverLetterRequired,
     });
     setNewItem({
       title: item.title,
@@ -289,6 +297,7 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
       description: item.description,
       qualifications: item.qualifications,
       recruiterID: item.recruiterID,
+      coverLetterRequired: item.coverLetterRequired,
     });
     setSelectedItem(item);
     setEditMode(true);
@@ -338,6 +347,10 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
         setResumeRecommendation("");
         setResumeState("Attached");
       }
+      else if (fileType === "cover letter") {
+        setCoverLetterFile(reader.result);
+        setCoverLetterState("Attached");
+      }
     };
     reader.readAsDataURL(file);
   };
@@ -347,6 +360,8 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
     e.preventDefault();
     if (resumeFile === null) {
       setResumeState("Missing");
+    } else if ((selectedItem?.coverLetterRequired == "Required") && coverLetterFile === null) {
+      setCoverLetterState("Missing");
     } else {
       setIsSubmitting(true);
       setSubmissionStatus("Submitting application");
@@ -383,6 +398,7 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
           applicantID: user.userId,
           jobID: selectedItem._id,
           resumeData: resumeFile,
+          coverLetterData: coverLetterFile,
           applyDate: new Date().toISOString().slice(0, 10),
           totalScore: scoreResponseJson.totalScore,
           qualificationsScore: {
@@ -419,7 +435,7 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
 
   // Checks if all form fields are filled
   const checkFormValidity = () => {
-    const { title, company, location, type, applyBy, hiddenKeywords, description, qualifications } = newItem;
+    const { title, company, location, type, applyBy, hiddenKeywords, description, qualifications, coverLetterRequired} = newItem;
     const allFieldsFilled =
       title.trim() !== "" &&
       company.trim() !== "" &&
@@ -428,7 +444,8 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
       applyBy.trim() !== "" &&
       hiddenKeywords.trim() !== "" &&
       description.trim() !== "" &&
-      qualifications.trim() !== "";
+      qualifications.trim() !== "" &&
+      coverLetterRequired.trim() !== "";
   
     const anyFieldChanged =
       title !== initialItem.title ||
@@ -438,7 +455,8 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
       applyBy !== initialItem.applyBy ||
       hiddenKeywords !== initialItem.hiddenKeywords ||
       description !== initialItem.description ||
-      qualifications !== initialItem.qualifications;
+      qualifications !== initialItem.qualifications ||
+      coverLetterRequired !== initialItem.coverLetterRequired;
   
     setIsFormValid(allFieldsFilled && anyFieldChanged);
   };
@@ -548,14 +566,20 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
   // Format the application data for the API call for the Applicant Description
   const formatDescData = async (qualifications, jobDescription, resumeFile) => {
     const resumeText = await TurnPdfToString(resumeFile);
+    let coverLetterText = "";
+    if (coverLetterFile) {
+      coverLetterText = await TurnPdfToString(coverLetterFile);
+    }
     return `
       Instructions:
       - Evaluate the resume based on the job posting qualifications and job description below.
-      - For longSummary: Provide a concise description of the applicant, emphasizing the key skills and experiences that align with the 
-        job requirements. Highlight the most relevant qualifications that demonstrate the applicant's fit for the position.
-        Keep the description to a couple of sentences. Add spacing often, using a newline character. Include a
-        sentence at the bottom that summarizes how well the applicant aligns with the job posting. 
-      - For shortSummary: Provide a short summary of the applicant's qualifications and experience that align with the job posting.
+      - For longSummary: Use the Cover Letter, if not empty. Otherwise, use the Resume. Provide a concise description of the applicant,
+        emphasizing the key skills and experiences that align with the job requirements. Do not list their skills, and instead judge
+        their character based on the information provided. Highlight the most relevant qualifications that demonstrate the applicant's
+        fit for the position or the ways in which they stand out from other applicants. 
+        Keep the description to a couple of sentences, no more than 70 words. Add spacing every 1-2 sentences, using a newline character. Include a
+        brutally honest sentence at the bottom that summarizes how well the applicant aligns with the job posting. 
+      - For shortSummary: Use the Resume. Provide a short summary of the applicant's qualifications and experience that align with the job posting.
         It must be no longer than 12 words and in the following format. Use no more than three bullet points and separate each bullet
         point with the newline character.
         Example: '• 3 years with Python
@@ -578,6 +602,9 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
 
       Resume:
       ${resumeText}
+
+      Cover Letter:
+      ${coverLetterText}
     `;
   };
 
@@ -984,6 +1011,20 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
                           "Resume not available"
                         )}
                       </div>
+                      {selectedItem.coverLetterData && (
+                        <div className="dashboard-detail-section">
+                          <h2>Cover Letter:</h2>
+                          {selectedItem.coverLetterData ? (
+                            <iframe
+                              src={selectedItem.coverLetterData}
+                              className="resume-iframe"
+                              title="Cover Letter"
+                            ></iframe>
+                          ) : (
+                            "Cover letter not available"
+                          )}
+                        </div>
+                      )} 
                     </>
                 ) : (
                   <>
@@ -1115,7 +1156,7 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
           onChange={handleInputChange}
           required
         >
-          <option value="">Select Job Type</option>
+          <option value="">Job Type</option>
           <option value="Full-time">Full-time</option>
           <option value="Part-time">Part-time</option>
           <option value="Internship">Internship</option>
@@ -1141,6 +1182,17 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
           onChange={handleInputChange}
           required
         />
+        <select
+          name="coverLetterRequired"
+          value={newItem.coverLetterRequired}
+          onChange={handleInputChange}
+          required
+        >
+          <option value="">Cover Letter Requirement</option>
+          <option value="None">None</option>
+          <option value="Optional">Optional</option>
+          <option value="Required">Required</option>
+        </select>
         <textarea
           name="description"
           placeholder="Job Description"
@@ -1185,6 +1237,21 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
             accept=".pdf"
             onChange={(event) => handleFileChange(event, "resume")}
           />
+          
+          {selectedItem?.coverLetterRequired === "Required" ? (
+            <p>Upload cover letter: </p>
+          ) : selectedItem?.coverLetterRequired === "Optional" ? (
+            <p>Upload cover letter (optional): </p>
+          ) : null}
+
+          {selectedItem?.coverLetterRequired === "Required" || selectedItem?.coverLetterRequired === "Optional" ? (
+            <input
+              type="file"
+              accept=".pdf"
+              onChange={(event) => handleFileChange(event, "cover letter")}
+            />
+          ) : null}
+
           {qualified && (
             <div className="ai-feedback-section">
               <div className="ai-feedback-header">
@@ -1251,7 +1318,7 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
           <button
             type="submit"
             className="resume-submit-button"
-            disabled={resumeState !== "Attached"}
+            disabled={resumeState !== "Attached" || ((selectedItem.coverLetterRequired == "Required") && coverLetterState !== "Attached")}
           >
             {" "}
             Submit
@@ -1265,6 +1332,7 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
               setIsGenerateButtonClicked(false);
               setResumeFile(null);
               setResumeState("Missing");
+              setCoverLetterState("Missing");
             }}
             disabled={isSubmitting}
           >
@@ -1280,6 +1348,7 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
           setIsGenerateButtonClicked(false);
           setResumeFile(null);
           setResumeState("Missing");
+          setCoverLetterState("Missing");
         }}
       >
         <div className="modal-header">
@@ -1293,6 +1362,7 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
                 setResumeFile(null);
                 setResumeRecommendation("");
                 setResumeState("Missing");
+                setCoverLetterState("Missing");
               }}
             >
               X
