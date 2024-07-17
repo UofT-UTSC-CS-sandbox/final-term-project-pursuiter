@@ -198,7 +198,7 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
       } else {
         await DashboardController.addFavoriteJob(user.userId, item._id);
       }
-
+  
       setFavoritedItems((prevFavorites) => {
         if (isFav) {
           return prevFavorites.filter((fav) => fav._id !== item._id);
@@ -206,10 +206,16 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
           return [item, ...prevFavorites];
         }
       });
+  
+      if (isFav) {
+        setItems((prevItems) =>
+          prevItems.filter((prevItem) => prevItem._id !== item._id)
+        );
+      }
     } catch (error) {
       console.error("Error updating favorites:", error);
     }
-  };
+  };  
 
   // Handle input change on add/edit jobs
   const handleInputChange = (e) => {
@@ -397,12 +403,23 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
           },
           type: qualified ? "application" : "waitlist",
         };
-        const response =
-          await DashboardController.applyForJob(applicationToSubmit);
+        
+        const response = await DashboardController.applyForJob(applicationToSubmit);
         setApplications((prevApplications) => [response, ...prevApplications]);
         setShowApplicationForm(false);
         setResumeState("Missing");
         setSubmissionStatus("Application submitted successfully!");
+  
+        await DashboardController.removeFavoriteJob(user.userId, selectedItem._id);
+
+        setFavoritedItems((prevFavoritedItems) =>
+          prevFavoritedItems.filter((fav) => fav._id !== selectedItem._id),
+        );
+  
+        setItems((prevItems) =>
+          prevItems.filter((item) => item._id !== selectedItem._id)
+        );
+  
         setTimeout(() => {
           window.location.reload();
         }, 100);
@@ -413,7 +430,7 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
         setIsSubmitting(false);
       }
     }
-  };
+  };  
 
   // Checks if all form fields are filled
   const checkFormValidity = () => {
