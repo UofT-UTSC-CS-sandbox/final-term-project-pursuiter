@@ -35,6 +35,7 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
     description: "",
     qualifications: "",
     recruiterID: "",
+    coverLetterRequired: false,
   });
   const [applications, setApplications] = useState([]);
   const [resumeFile, setResumeFile] = useState(null);
@@ -68,6 +69,7 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
       description: "",
       qualifications: "",
       recruiterID: user.userId,
+      coverLetterRequired: false,
     });
     setEditMode(false);
     setShowItemForm(true);
@@ -215,7 +217,9 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
 
   // Handle input change on add/edit jobs
   const handleInputChange = (e) => {
-    const { name, value } = e.target;
+    const target = e.target;
+    const value = target.type === 'checkbox' ? target.checked : target.value;
+    const name = target.name;
     setNewItem((prevItem) => ({
       ...prevItem,
       [name]: value,
@@ -257,6 +261,7 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
         description: "",
         qualifications: "",
         recruiterID: "",
+        coverLetterRequired: false,
       });
       setShowItemForm(false);
       window.location.reload();
@@ -277,6 +282,7 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
       hiddenKeywords: item.hiddenKeywords,
       description: item.description,
       qualifications: item.qualifications,
+      coverLetterRequired: item.coverLetterRequired,
     });
     setNewItem({
       title: item.title,
@@ -289,6 +295,7 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
       description: item.description,
       qualifications: item.qualifications,
       recruiterID: item.recruiterID,
+      coverLetterRequired: item.coverLetterRequired,
     });
     setSelectedItem(item);
     setEditMode(true);
@@ -351,7 +358,7 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
     e.preventDefault();
     if (resumeFile === null) {
       setResumeState("Missing");
-    } else if (selectedItem?.coverLetterRequired && coverLetterFile === null) {
+    } else if ((selectedItem?.coverLetterRequired == true) && coverLetterFile === null) {
       setCoverLetterState("Missing");
     } else {
       setIsSubmitting(true);
@@ -426,7 +433,7 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
 
   // Checks if all form fields are filled
   const checkFormValidity = () => {
-    const { title, company, location, type, applyBy, hiddenKeywords, description, qualifications } = newItem;
+    const { title, company, location, type, applyBy, hiddenKeywords, description, qualifications, coverLetterRequired} = newItem;
     const allFieldsFilled =
       title.trim() !== "" &&
       company.trim() !== "" &&
@@ -445,7 +452,8 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
       applyBy !== initialItem.applyBy ||
       hiddenKeywords !== initialItem.hiddenKeywords ||
       description !== initialItem.description ||
-      qualifications !== initialItem.qualifications;
+      qualifications !== initialItem.qualifications ||
+      coverLetterRequired !== initialItem.coverLetterRequired;
   
     setIsFormValid(allFieldsFilled && anyFieldChanged);
   };
@@ -566,7 +574,7 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
         emphasizing the key skills and experiences that align with the job requirements. Do not list their skills, and instead judge
         their character based on the information provided. Highlight the most relevant qualifications that demonstrate the applicant's
         fit for the position or the ways in which they stand out from other applicants. 
-        Keep the description to a couple of sentences, no more than 100 words. Add spacing every 1-2 sentences, using a newline character. Include a
+        Keep the description to a couple of sentences, no more than 70 words. Add spacing every 1-2 sentences, using a newline character. Include a
         brutally honest sentence at the bottom that summarizes how well the applicant aligns with the job posting. 
       - For shortSummary: Use the Resume. Provide a short summary of the applicant's qualifications and experience that align with the job posting.
         It must be no longer than 12 words and in the following format. Use no more than three bullet points and separate each bullet
@@ -1166,7 +1174,8 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
           <input
             type="checkbox"
             name="coverLetterRequired"
-            onChange={handleInputChange}
+            checked={newItem.coverLetterRequired}
+            onChange={handleInputChange} 
           />
           Cover letter required
         </label>
@@ -1214,16 +1223,16 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
             accept=".pdf"
             onChange={(event) => handleFileChange(event, "resume")}
           />
-          {selectedItem?.coverLetterRequired && (
+          {selectedItem?.coverLetterRequired == true ? (
             <p>Upload cover letter: </p>
+          ) : (
+            <p>Upload cover letter (optional): </p>
           )}
-          {selectedItem?.coverLetterRequired && (
-            <input
-              type="file"
-              accept=".pdf"
-              onChange={(event) => handleFileChange(event, "cover letter")}
-            />
-          )}
+          <input
+            type="file"
+            accept=".pdf"
+            onChange={(event) => handleFileChange(event, "cover letter")}
+          />  
           {qualified && (
             <div className="ai-feedback-section">
               <div className="ai-feedback-header">
@@ -1290,7 +1299,7 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
           <button
             type="submit"
             className="resume-submit-button"
-            disabled={resumeState !== "Attached" || (selectedItem.coverLetterRequired && coverLetterState !== "Attached")}
+            disabled={resumeState !== "Attached" || ((selectedItem.coverLetterRequired == true) && coverLetterState !== "Attached")}
           >
             {" "}
             Submit
