@@ -181,7 +181,7 @@
 }
 
 /************************************
- * Forms
+ * Modals
  *************************************/
 
 .new-item-form {
@@ -204,6 +204,10 @@
   font-size: 16px;
   border: 1px solid #ddd;
   border-radius: 5px;
+}
+
+.modal-section {
+  padding-bottom: 20px;
 }
 
 /************************************
@@ -232,6 +236,10 @@
 .clear-button:hover {
   color: #505050;
   background-color: transparent;
+}
+
+.submit-button.create-confirm-submit-button {
+  margin-bottom: 10px;
 }
 
 .search-and-filters {

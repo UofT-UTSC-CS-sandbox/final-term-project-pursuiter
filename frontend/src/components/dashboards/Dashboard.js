@@ -47,8 +47,7 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
   const [MasterResumeRecommendation, setMasterResumeRecommendation] =
     useState("Loading...");
   const [qualified, setQualified] = useState(false);
-  const { user, selectedTab, setSelectedTab } = useContext(UserContext);
-  // const { updateUser } = useContext(UserContext);
+  const { user, setUser, selectedTab, setSelectedTab } = useContext(UserContext);
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [showApplicationForm, setShowApplicationForm] = useState(false);
   const [ResumeRecommendation, setResumeRecommendation] = useState("");
@@ -228,45 +227,56 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
     }));
   };
 
-  const handleCreateJob = async () => {
+  const handleCreateJob = async (updateConfirm) => {
     try {
       const response = await DashboardController.postJob({ ...newItem, recruiterID: user.userId });
+  
       setItems((prevItems) => [response, ...prevItems]);
-      setShowCreateConfirm(false); 
+  
+      setNewItem({
+        title: "",
+        company: "",
+        location: "",
+        type: "",
+        applyBy: "",
+        dateCreated: "",
+        hiddenKeywords: "",
+        description: "",
+        qualifications: "",
+        recruiterID: "",
+        coverLetterRequired: "",
+      });
+  
+      setShowItemForm(false);
+      setSubmissionStatus("New job added successfully.");
+  
+      if (updateConfirm) {
+        try {
+          const updatedUser = await updateCreateConfirm(user, false);
+          setUser(updatedUser);
+          setSubmissionStatus("New job added and user settings updated successfully.");
+        } catch (updateError) {
+          console.error("Failed to update user createConfirm:", updateError);
+          if (user.createConfirm) {
+            setSubmissionStatus("New job added successfully, but failed to update user settings. Changes will take effect on next login.");
+          } else {
+            setSubmissionStatus("New job added successfully, but failed to update user settings.");
+          }
+        }
+      }
 
-      // user.confirmation = true;
-      // alert("user.collecition is: " + user.confirmation);
-
-      // const updatedUser = {
-      //   email: user.email,
-      //   userId: user.userId,
-      //   masterResume: resumeFile,
-      //   confirmation: true,
-      // };
-      // const updatedUserInfo = await UserController.updateUser(updatedUser);
-
+      setShowCreateConfirm(false);
+      setShowConfirmation(true);
+      setTimeout(() => {
+        window.location.reload();
+      }, 200);
+  
     } catch (error) {
-      console.error("Failed to create job", error);
+      console.error("Failed to create job:", error);
+      setSubmissionStatus("Failed to create job. Please try again.");
+      setShowConfirmation(true);
     }
-
-    setNewItem({
-      title: "",
-      company: "",
-      location: "",
-      type: "",
-      applyBy: "",
-      dateCreated: "",
-      hiddenKeywords: "",
-      description: "",
-      qualifications: "",
-      recruiterID: "",
-      coverLetterRequired: "",
-    });
-    
-    setSubmissionStatus("New job added. Refreshing...");
-    setShowConfirmation(true);
-    window.location.reload();
-  };
+  };  
 
   // Handle form submission for add/edit jobs
   const handleSubmit = async (e) => {
@@ -288,39 +298,42 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
         setSelectedItem(null);
         window.location.reload();
       } else {
-        // const isConfirmed = window.confirm("Are you sure you want to create this job?");
-        // if (isConfirmed) {
-        //   const response = await DashboardController.postJob(itemToSubmit);
-        //   setItems((prevItems) => [response, ...prevItems]);
-        // } else {
-        //   // If not confirmed, simply return to stop the job creation
-        //   return;
-        // }
-        setShowItemForm(false);
-        setShowCreateConfirm(true);
+        if (user.createConfirm) {
+          setShowCreateConfirm(true);
+          setShowItemForm(false);
+        } else {
+          handleCreateJob();
+        }
       }
-
-      // setNewItem({
-      //   title: "",
-      //   company: "",
-      //   location: "",
-      //   type: "",
-      //   applyBy: "",
-      //   dateCreated: "",
-      //   hiddenKeywords: "",
-      //   description: "",
-      //   qualifications: "",
-      //   recruiterID: "",
-      //   coverLetterRequired: "",
-      // });
-      // setShowItemForm(false);
-      // setSubmissionStatus("New job added. Refreshing...");
-      // setShowConfirmation(true);
-      // window.location.reload();
     } catch (error) {
       console.error("Error submitting item:", error);
     }
-  };
+  };  
+
+  // Update createConfirm
+  const updateCreateConfirm = async (user, createConfirm) => {
+    try {
+      const updatedUser = { 
+        email: user.email,
+        fullName: user.fullName,
+        address: user.address,
+        positions: user.positions,
+        companyName: user.companyName,
+        userType: user.userType,
+        userId: user.userId,
+        masterResume: user.masterResume,
+        createConfirm
+      };
+      console.log(updatedUser);
+      console.log(createConfirm);
+      const response = await UserController.updateUser(updatedUser);
+      console.log(response);
+      return response;
+    } catch (error) {
+      console.error("Error updating createConfirm:", error);
+      throw error;
+    }
+  };  
 
   // Handle edit job
   const handleEdit = (item) => {
@@ -786,10 +799,10 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
           </div>
           <div className="filter-dropdowns">
             { !filterTerm.jobType && (
-              <div class="filter-dropdown">
-                <button class="dropbtn">
-                  Job Type <div class="icon"><FaCaretDown/></div></button>
-                <div class="dropdown-content" 
+              <div className="filter-dropdown">
+                <button className="dropbtn">
+                  Job Type <div className="icon"><FaCaretDown/></div></button>
+                <div className="dropdown-content" 
                     onClick={(e) => {addFilterWord("jobType", e.target.textContent);
                                      setSelectedItem(null);
                     }}>
@@ -804,17 +817,17 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
               </div>
             )}
             {filterTerm.jobType && (
-                <button class="filter-display-btn" onClick={() => {setFilterTerm({...filterTerm, jobType: ''}); setSelectedItem(null);}}>
+                <button className="filter-display-btn" onClick={() => {setFilterTerm({...filterTerm, jobType: ''}); setSelectedItem(null);}}>
                   {filterTerm.jobType} <div className="icon"><FaXmark/></div>
                 </button>
             )}
             {selectedTab === "myApplications" ? (
               !filterTerm.appliedDate ? (
-                <div class="filter-dropdown">
-                  <button class="dropbtn">
-                    Applied <div class="icon"><FaCaretDown/></div>
+                <div className="filter-dropdown">
+                  <button className="dropbtn">
+                    Applied <div className="icon"><FaCaretDown/></div>
                   </button>
-                  <div class="dropdown-content" onClick={(e) => {addFilterWord("appliedDate", e.target.textContent); setSelectedItem(null);}}>
+                  <div className="dropdown-content" onClick={(e) => {addFilterWord("appliedDate", e.target.textContent); setSelectedItem(null);}}>
                     <span>1 weeks ago</span>
                     <span>2 weeks ago</span>
                     <span>1 month ago</span>
@@ -822,17 +835,17 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
                   </div>
                 </div>
               ) : (
-                <button class="filter-display-btn" onClick={() => {setFilterTerm({...filterTerm, appliedDate: ''}); setSelectedItem(null);}}>
+                <button className="filter-display-btn" onClick={() => {setFilterTerm({...filterTerm, appliedDate: ''}); setSelectedItem(null);}}>
                   {filterTerm.appliedDate} <div className="icon"><FaXmark/></div>
                 </button>
               )
             ) : (
               !filterTerm.dueDate ? (
-                <div class="filter-dropdown">
-                  <button class="dropbtn">
-                    Job Due <div class="icon"><FaCaretDown/></div>
+                <div className="filter-dropdown">
+                  <button className="dropbtn">
+                    Job Due <div className="icon"><FaCaretDown/></div>
                   </button>
-                  <div class="dropdown-content" onClick={(e) => {addFilterWord("dueDate", e.target.textContent); setSelectedItem(null);}}>
+                  <div className="dropdown-content" onClick={(e) => {addFilterWord("dueDate", e.target.textContent); setSelectedItem(null);}}>
                     <span>In 1 week</span>
                     <span>In 2 weeks</span>
                     <span>In 1 month</span>
@@ -840,17 +853,17 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
                   </div>
                 </div>
               ) : (
-                <button class="filter-display-btn" onClick={() => {setFilterTerm({...filterTerm, dueDate: ''}); setSelectedItem(null);}}>
+                <button className="filter-display-btn" onClick={() => {setFilterTerm({...filterTerm, dueDate: ''}); setSelectedItem(null);}}>
                   {filterTerm.dueDate} <div className="icon"><FaXmark/></div>
                 </button>
               )
             )}
             { !filterTerm.createdDate && (
-              <div class="filter-dropdown">
-                <button class="dropbtn">
-                  Job Created <div class="icon"><FaCaretDown/></div>
+              <div className="filter-dropdown">
+                <button className="dropbtn">
+                  Job Created <div className="icon"><FaCaretDown/></div>
                 </button>
-                <div class="dropdown-content" onClick={(e) => {addFilterWord("createdDate", e.target.textContent); setSelectedItem(null);}}>
+                <div className="dropdown-content" onClick={(e) => {addFilterWord("createdDate", e.target.textContent); setSelectedItem(null);}}>
                   <span>1 week ago</span>
                   <span>2 weeks ago</span>
                   <span>1 month ago</span>
@@ -859,7 +872,7 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
               </div>
             )}
             {filterTerm.createdDate && (
-                <button class="filter-display-btn" onClick={() => {setFilterTerm({...filterTerm, createdDate: ''}); setSelectedItem(null);}}>
+                <button className="filter-display-btn" onClick={() => {setFilterTerm({...filterTerm, createdDate: ''}); setSelectedItem(null);}}>
                   {filterTerm.createdDate} <div className="icon"><FaXmark/></div>
                 </button>
             )}
@@ -1449,14 +1462,26 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
           </button>
         </div>
       </Modal>
-      <Modal show={showCreateConfirm} onClose={() => setShowCreateConfirm(false)} title="Confirm New Job">
-        <p>Are you sure you want to create this job? All applicants without ALL hidden keywords in their resume will be waitlisted</p>
-        <div className="delete-modal">
-          <button className="delete-button" onClick={handleCreateJob}>Submit</button>
-          <button className="delete-button" onClick={handleCreateJob}>Submit and don't show again</button>
-          <button className="cancel-button" onClick={() => {setShowCreateConfirm(false); setShowItemForm(true);}}>Cancel</button>
+      {showCreateConfirm && (
+      <Modal 
+        show={true} 
+        onClose={() => setShowCreateConfirm(false)} 
+        title="Confirm New Job">
+        <div className="modal-section">
+          <div className="modal-section">
+            <p>Are you sure you want to create this job?</p>
+          </div>
+          <div className="modal-section">
+            <p>All applicants without <strong>ALL</strong> hidden keywords in their resume will be waitlisted</p>
+          </div>
+        </div>
+        <div className="create-modal">
+          <button className="submit-button create-confirm-submit-button" onClick={() => handleCreateJob(false)}>Submit</button>
+          <button className="submit-button create-confirm-submit-button" onClick={() => handleCreateJob(true)}>Submit and don't show again</button>
+          <button className="cancel-button create-confirm-submit-button" onClick={() => { setShowCreateConfirm(false); setShowItemForm(true); }}>Cancel</button>
         </div>
       </Modal>
+    )}
     </div>
   );
 };

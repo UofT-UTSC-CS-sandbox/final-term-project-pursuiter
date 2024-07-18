@@ -32,6 +32,7 @@ const UserController = {
     address,
     positions,
     masterResume,
+    createConfirm,
   }) => {
     try {
       const response = await fetch(`${API_URL}/signup`, {
@@ -48,6 +49,7 @@ const UserController = {
           address,
           positions,
           masterResume,
+          createConfirm
         }),
       });
       if (!response.ok) {
@@ -82,6 +84,7 @@ const UserController = {
     userType,
     userId,
     masterResume,
+    createConfirm
   }) => {
     try {
       const response = await fetch(`${API_URL}/updateUser`, {
@@ -99,6 +102,7 @@ const UserController = {
           userType,
           userId,
           masterResume,
+          createConfirm,
         }),
       });
       if (!response.ok) {
