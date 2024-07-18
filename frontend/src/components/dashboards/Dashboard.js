@@ -21,6 +21,7 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [filterTerm, setFilterTerm] = useState({ jobType: "", dueDate: "", createdDate: "", appliedDate: ""});
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [showCreateConfirm, setShowCreateConfirm] = useState(false);
   const [itemToDelete, setItemToDelete] = useState(null);
   const [editMode, setEditMode] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -47,6 +48,7 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
     useState("Loading...");
   const [qualified, setQualified] = useState(false);
   const { user, selectedTab, setSelectedTab } = useContext(UserContext);
+  // const { updateUser } = useContext(UserContext);
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [showApplicationForm, setShowApplicationForm] = useState(false);
   const [ResumeRecommendation, setResumeRecommendation] = useState("");
@@ -226,6 +228,46 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
     }));
   };
 
+  const handleCreateJob = async () => {
+    try {
+      const response = await DashboardController.postJob({ ...newItem, recruiterID: user.userId });
+      setItems((prevItems) => [response, ...prevItems]);
+      setShowCreateConfirm(false); 
+
+      // user.confirmation = true;
+      // alert("user.collecition is: " + user.confirmation);
+
+      // const updatedUser = {
+      //   email: user.email,
+      //   userId: user.userId,
+      //   masterResume: resumeFile,
+      //   confirmation: true,
+      // };
+      // const updatedUserInfo = await UserController.updateUser(updatedUser);
+
+    } catch (error) {
+      console.error("Failed to create job", error);
+    }
+
+    setNewItem({
+      title: "",
+      company: "",
+      location: "",
+      type: "",
+      applyBy: "",
+      dateCreated: "",
+      hiddenKeywords: "",
+      description: "",
+      qualifications: "",
+      recruiterID: "",
+      coverLetterRequired: "",
+    });
+    
+    setSubmissionStatus("New job added. Refreshing...");
+    setShowConfirmation(true);
+    window.location.reload();
+  };
+
   // Handle form submission for add/edit jobs
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -246,27 +288,35 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
         setSelectedItem(null);
         window.location.reload();
       } else {
-        const response = await DashboardController.postJob(itemToSubmit);
-        setItems((prevItems) => [response, ...prevItems]);
+        // const isConfirmed = window.confirm("Are you sure you want to create this job?");
+        // if (isConfirmed) {
+        //   const response = await DashboardController.postJob(itemToSubmit);
+        //   setItems((prevItems) => [response, ...prevItems]);
+        // } else {
+        //   // If not confirmed, simply return to stop the job creation
+        //   return;
+        // }
+        setShowItemForm(false);
+        setShowCreateConfirm(true);
       }
 
-      setNewItem({
-        title: "",
-        company: "",
-        location: "",
-        type: "",
-        applyBy: "",
-        dateCreated: "",
-        hiddenKeywords: "",
-        description: "",
-        qualifications: "",
-        recruiterID: "",
-        coverLetterRequired: "",
-      });
-      setShowItemForm(false);
-      setSubmissionStatus("New job added. Refreshing...");
-      setShowConfirmation(true);
-      window.location.reload();
+      // setNewItem({
+      //   title: "",
+      //   company: "",
+      //   location: "",
+      //   type: "",
+      //   applyBy: "",
+      //   dateCreated: "",
+      //   hiddenKeywords: "",
+      //   description: "",
+      //   qualifications: "",
+      //   recruiterID: "",
+      //   coverLetterRequired: "",
+      // });
+      // setShowItemForm(false);
+      // setSubmissionStatus("New job added. Refreshing...");
+      // setShowConfirmation(true);
+      // window.location.reload();
     } catch (error) {
       console.error("Error submitting item:", error);
     }
@@ -360,7 +410,7 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
     e.preventDefault();
     if (resumeFile === null) {
       setResumeState("Missing");
-    } else if ((selectedItem?.coverLetterRequired == "Required") && coverLetterFile === null) {
+    } else if ((selectedItem?.coverLetterRequired === "Required") && coverLetterFile === null) {
       setCoverLetterState("Missing");
     } else {
       setIsSubmitting(true);
@@ -442,7 +492,7 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
       location.trim() !== "" &&
       type.trim() !== "" &&
       applyBy.trim() !== "" &&
-      hiddenKeywords.trim() !== "" &&
+      // hiddenKeywords.trim() !== "" &&
       description.trim() !== "" &&
       qualifications.trim() !== "" &&
       coverLetterRequired.trim() !== "";
@@ -1052,7 +1102,7 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
                       <h2>Qualifications:</h2>
                       <p>{selectedItem.qualifications}</p>
                     </div>
-                    {role === "recruiter" && (
+                    {role === "recruiter" && selectedItem.hiddenKeywords !== "" && (
                       <div className="dashboard-detail-section">
                         <h2>Hidden Keywords:
                           <span className="tooltip-container">
@@ -1177,10 +1227,9 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
         <textarea
           type="text"
           name="hiddenKeywords"
-          placeholder="Hidden Keywords: Resumes missing ANY of these keywords are waitlisted. Separate with commas."
+          placeholder="Hidden Keywords (optional): Resumes missing ANY of these keywords are waitlisted. Separate with commas."
           value={newItem.hiddenKeywords}
           onChange={handleInputChange}
-          required
         />
         <select
           name="coverLetterRequired"
@@ -1318,7 +1367,7 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
           <button
             type="submit"
             className="resume-submit-button"
-            disabled={resumeState !== "Attached" || ((selectedItem.coverLetterRequired == "Required") && coverLetterState !== "Attached")}
+            disabled={resumeState !== "Attached" || ((selectedItem.coverLetterRequired === "Required") && coverLetterState !== "Attached")}
           >
             {" "}
             Submit
@@ -1398,6 +1447,14 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
           >
             Cancel
           </button>
+        </div>
+      </Modal>
+      <Modal show={showCreateConfirm} onClose={() => setShowCreateConfirm(false)} title="Confirm New Job">
+        <p>Are you sure you want to create this job? All applicants without ALL hidden keywords in their resume will be waitlisted</p>
+        <div className="delete-modal">
+          <button className="delete-button" onClick={handleCreateJob}>Submit</button>
+          <button className="delete-button" onClick={handleCreateJob}>Submit and don't show again</button>
+          <button className="cancel-button" onClick={() => {setShowCreateConfirm(false); setShowItemForm(true);}}>Cancel</button>
         </div>
       </Modal>
     </div>

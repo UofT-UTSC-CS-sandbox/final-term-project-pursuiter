@@ -75,6 +75,7 @@ const UserProvider = ({ children }) => {
     userType,
     userId,
     masterResume,
+    // confirmation
   ) => {
     try {
       const updatedUser = await UserController.updateUser(
@@ -87,6 +88,7 @@ const UserProvider = ({ children }) => {
         userType,
         userId,
         masterResume,
+        // confirmation
       );
       setUser(updatedUser);
       return updatedUser;

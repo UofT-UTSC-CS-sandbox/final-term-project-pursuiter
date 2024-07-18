@@ -213,6 +213,7 @@ app.put("/updateUser", async (req, res) => {
     companyName,
     userType,
     masterResume,
+    // confirmation,
   } = req.body;
   try {
     const user = await db.collection("users").findOne({ email });
@@ -236,6 +237,7 @@ app.put("/updateUser", async (req, res) => {
       if (companyName) updatedUser.companyName = companyName;
       if (userType) updatedUser.userType = userType;
       if (masterResume) updatedUser.masterResume = masterResume;
+      // if (confirmation) updatedUser.confirmation = confirmation;
       await db.collection("users").updateOne({ email }, { $set: updatedUser });
       res.json({
         message: "Update successful",
@@ -246,6 +248,7 @@ app.put("/updateUser", async (req, res) => {
         companyName: updatedUser.companyName,
         userType: updatedUser.userType,
         masterResume: updatedUser.masterResume,
+        // confirmation: updatedUser.confirmation,
       });
     } else {
       res.status(404).json({ message: "User not found" });
