@@ -204,6 +204,7 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
       } else {
         await DashboardController.addFavoriteJob(user.userId, item._id);
       }
+      fetchJobs(user.userId, setItems, searchTerm, filterTerm);
   
       setFavoritedItems((prevFavorites) => {
         if (isFav) {
