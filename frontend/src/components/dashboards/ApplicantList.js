@@ -96,7 +96,7 @@ function ApplicantList() {
         if (searchTerm.trim()) {
           filteredApplicants = filteredApplicants.filter((applicant) => {
             const searchWords = searchTerm.trim().toLowerCase().split(/\s+/);
-            return searchWords.some((word) =>
+            return searchWords.every((word) =>
               applicant.fullName.toLowerCase().includes(word) ||
               applicant.email.toLowerCase().includes(word) ||
               applicant.applicantSummary.longSummary.toLowerCase().includes(word) ||
@@ -287,11 +287,11 @@ function ApplicantList() {
           </div>
           <div className="filter-dropdowns">
             { !filterTerm.appliedDate && (
-              <div class="filter-dropdown">
-                <button class="dropbtn">
-                  Applied <div class="icon"><FaCaretDown/></div>
+              <div className="filter-dropdown">
+                <button className="dropbtn">
+                  Applied <div className="icon"><FaCaretDown/></div>
                 </button>
-                <div class="dropdown-content" onClick={(e) => {addFilterWord("appliedDate", e.target.textContent); setSelectedApplicant(null);}}>
+                <div className="dropdown-content" onClick={(e) => {addFilterWord("appliedDate", e.target.textContent); setSelectedApplicant(null);}}>
                   <span>1 week ago</span>
                   <span>2 weeks ago</span>
                   <span>1 month ago</span>
@@ -300,16 +300,16 @@ function ApplicantList() {
               </div>
             )}
             {filterTerm.appliedDate && (
-              <button class="filter-display-btn" onClick={() => {setFilterTerm({...filterTerm, appliedDate: ''}); setSelectedApplicant(null);}}>
+              <button className="filter-display-btn" onClick={() => {setFilterTerm({...filterTerm, appliedDate: ''}); setSelectedApplicant(null);}}>
                 {filterTerm.appliedDate} <div className="icon"><FaXmark/></div>
               </button>
             )}
             { !filterTerm.totalScore && (
-              <div class="filter-dropdown">
-                <button class="dropbtn">
-                  Score <div class="icon"><FaCaretDown/></div>
+              <div className="filter-dropdown">
+                <button className="dropbtn">
+                  Score <div className="icon"><FaCaretDown/></div>
                 </button>
-                <div class="dropdown-content" onClick={(e) => {addFilterWord("totalScore", e.target.textContent); setSelectedApplicant(null);}}>
+                <div className="dropdown-content" onClick={(e) => {addFilterWord("totalScore", e.target.textContent); setSelectedApplicant(null);}}>
                   <span>9-10</span>
                   <span>7-8</span>
                   <span>5-6</span>
@@ -319,7 +319,7 @@ function ApplicantList() {
               </div>
             )}
             {filterTerm.totalScore && (
-              <button class="filter-display-btn" onClick={() => {setFilterTerm({...filterTerm, totalScore: ''}); setSelectedApplicant(null);}}>
+              <button className="filter-display-btn" onClick={() => {setFilterTerm({...filterTerm, totalScore: ''}); setSelectedApplicant(null);}}>
                 {filterTerm.totalScore} <div className="icon"><FaXmark/></div>
               </button>
             )}

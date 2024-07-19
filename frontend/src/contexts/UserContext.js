@@ -51,6 +51,7 @@ const UserProvider = ({ children }) => {
     address,
     positions,
     masterResume,
+    createConfirm,
   ) => {
     try {
       const user = await UserController.signupUser(
@@ -62,6 +63,7 @@ const UserProvider = ({ children }) => {
         address,
         positions,
         masterResume,
+        createConfirm,
       );
       setUser(user);
       setSelectedTab(userType === "applicant" ? "newJobs" : "applications");
@@ -81,6 +83,7 @@ const UserProvider = ({ children }) => {
     userType,
     userId,
     masterResume,
+    createConfirm,
   ) => {
     try {
       const updatedUser = await UserController.updateUser(
@@ -93,6 +96,7 @@ const UserProvider = ({ children }) => {
         userType,
         userId,
         masterResume,
+        createConfirm,
       );
       setUser(updatedUser);
       return updatedUser;

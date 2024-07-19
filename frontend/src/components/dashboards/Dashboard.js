@@ -21,6 +21,7 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [filterTerm, setFilterTerm] = useState({ jobType: "", dueDate: "", createdDate: "", appliedDate: ""});
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [showCreateConfirm, setShowCreateConfirm] = useState(false);
   const [itemToDelete, setItemToDelete] = useState(null);
   const [editMode, setEditMode] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -46,7 +47,7 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
   const [MasterResumeRecommendation, setMasterResumeRecommendation] =
     useState("Loading...");
   const [qualified, setQualified] = useState(false);
-  const { user, selectedTab, setSelectedTab } = useContext(UserContext);
+  const { user, setUser, selectedTab, setSelectedTab } = useContext(UserContext);
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [showApplicationForm, setShowApplicationForm] = useState(false);
   const [ResumeRecommendation, setResumeRecommendation] = useState("");
@@ -180,7 +181,7 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
       if (searchTerm.trim()) {
         const searchWords = searchTerm.trim().toLowerCase().split(/\s+/);
         filteredApplications = filteredApplications.filter((job) =>
-          searchWords.some((word) =>
+          searchWords.every((word) =>
             ['title', 'company', 'location', 'type', 'description', 'qualifications'].some((field) =>
               job.jobDetails[field].toLowerCase().includes(word)
             )
@@ -233,6 +234,57 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
     }));
   };
 
+  const handleCreateJob = async (updateConfirm) => {
+    try {
+      const response = await DashboardController.postJob({ ...newItem, recruiterID: user.userId });
+  
+      setItems((prevItems) => [response, ...prevItems]);
+  
+      setNewItem({
+        title: "",
+        company: "",
+        location: "",
+        type: "",
+        applyBy: "",
+        dateCreated: "",
+        hiddenKeywords: "",
+        description: "",
+        qualifications: "",
+        recruiterID: "",
+        coverLetterRequired: "",
+      });
+  
+      setShowItemForm(false);
+      setSubmissionStatus("New job added successfully.");
+  
+      if (updateConfirm) {
+        try {
+          const updatedUser = await updateCreateConfirm(user, false);
+          setUser(updatedUser);
+          setSubmissionStatus("New job added and user settings updated successfully.");
+        } catch (updateError) {
+          console.error("Failed to update user createConfirm:", updateError);
+          if (user.createConfirm) {
+            setSubmissionStatus("New job added successfully, but failed to update user settings. Changes will take effect on next login.");
+          } else {
+            setSubmissionStatus("New job added successfully, but failed to update user settings.");
+          }
+        }
+      }
+
+      setShowCreateConfirm(false);
+      setShowConfirmation(true);
+      setTimeout(() => {
+        window.location.reload();
+      }, 200);
+  
+    } catch (error) {
+      console.error("Failed to create job:", error);
+      setSubmissionStatus("Failed to create job. Please try again.");
+      setShowConfirmation(true);
+    }
+  };  
+
   // Handle form submission for add/edit jobs
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -253,29 +305,42 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
         setSelectedItem(null);
         window.location.reload();
       } else {
-        const response = await DashboardController.postJob(itemToSubmit);
-        setItems((prevItems) => [response, ...prevItems]);
+        if (user.createConfirm) {
+          setShowCreateConfirm(true);
+          setShowItemForm(false);
+        } else {
+          handleCreateJob();
+        }
       }
-
-      setNewItem({
-        title: "",
-        company: "",
-        location: "",
-        type: "",
-        applyBy: "",
-        dateCreated: "",
-        hiddenKeywords: "",
-        description: "",
-        qualifications: "",
-        recruiterID: "",
-        coverLetterRequired: "",
-      });
-      setShowItemForm(false);
-      window.location.reload();
     } catch (error) {
       console.error("Error submitting item:", error);
     }
-  };
+  };  
+
+  // Update createConfirm
+  const updateCreateConfirm = async (user, createConfirm) => {
+    try {
+      const updatedUser = { 
+        email: user.email,
+        fullName: user.fullName,
+        address: user.address,
+        positions: user.positions,
+        companyName: user.companyName,
+        userType: user.userType,
+        userId: user.userId,
+        masterResume: user.masterResume,
+        createConfirm
+      };
+      console.log(updatedUser);
+      console.log(createConfirm);
+      const response = await UserController.updateUser(updatedUser);
+      console.log(response);
+      return response;
+    } catch (error) {
+      console.error("Error updating createConfirm:", error);
+      throw error;
+    }
+  };  
 
   // Handle edit job
   const handleEdit = (item) => {
@@ -369,7 +434,7 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
     }
     if (resumeFile === null) {
       setResumeState("Missing");
-    } else if ((selectedItem?.coverLetterRequired == "Required") && coverLetterFile === null) {
+    } else if ((selectedItem?.coverLetterRequired === "Required") && coverLetterFile === null) {
       setCoverLetterState("Missing");
     } else {
       setIsSubmitting(true);
@@ -468,7 +533,7 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
       location.trim() !== "" &&
       type.trim() !== "" &&
       applyBy.trim() !== "" &&
-      hiddenKeywords.trim() !== "" &&
+      // hiddenKeywords.trim() !== "" &&
       description.trim() !== "" &&
       qualifications.trim() !== "" &&
       coverLetterRequired.trim() !== "";
@@ -778,10 +843,10 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
           </div>
           <div className="filter-dropdowns">
             { !filterTerm.jobType && (
-              <div class="filter-dropdown">
-                <button class="dropbtn">
-                  Job Type <div class="icon"><FaCaretDown/></div></button>
-                <div class="dropdown-content" 
+              <div className="filter-dropdown">
+                <button className="dropbtn">
+                  Job Type <div className="icon"><FaCaretDown/></div></button>
+                <div className="dropdown-content" 
                     onClick={(e) => {addFilterWord("jobType", e.target.textContent);
                                      setSelectedItem(null);
                     }}>
@@ -796,17 +861,17 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
               </div>
             )}
             {filterTerm.jobType && (
-                <button class="filter-display-btn" onClick={() => {setFilterTerm({...filterTerm, jobType: ''}); setSelectedItem(null);}}>
+                <button className="filter-display-btn" onClick={() => {setFilterTerm({...filterTerm, jobType: ''}); setSelectedItem(null);}}>
                   {filterTerm.jobType} <div className="icon"><FaXmark/></div>
                 </button>
             )}
             {selectedTab === "myApplications" ? (
               !filterTerm.appliedDate ? (
-                <div class="filter-dropdown">
-                  <button class="dropbtn">
-                    Applied <div class="icon"><FaCaretDown/></div>
+                <div className="filter-dropdown">
+                  <button className="dropbtn">
+                    Applied <div className="icon"><FaCaretDown/></div>
                   </button>
-                  <div class="dropdown-content" onClick={(e) => {addFilterWord("appliedDate", e.target.textContent); setSelectedItem(null);}}>
+                  <div className="dropdown-content" onClick={(e) => {addFilterWord("appliedDate", e.target.textContent); setSelectedItem(null);}}>
                     <span>1 weeks ago</span>
                     <span>2 weeks ago</span>
                     <span>1 month ago</span>
@@ -814,17 +879,17 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
                   </div>
                 </div>
               ) : (
-                <button class="filter-display-btn" onClick={() => {setFilterTerm({...filterTerm, appliedDate: ''}); setSelectedItem(null);}}>
+                <button className="filter-display-btn" onClick={() => {setFilterTerm({...filterTerm, appliedDate: ''}); setSelectedItem(null);}}>
                   {filterTerm.appliedDate} <div className="icon"><FaXmark/></div>
                 </button>
               )
             ) : (
               !filterTerm.dueDate ? (
-                <div class="filter-dropdown">
-                  <button class="dropbtn">
-                    Job Due <div class="icon"><FaCaretDown/></div>
+                <div className="filter-dropdown">
+                  <button className="dropbtn">
+                    Job Due <div className="icon"><FaCaretDown/></div>
                   </button>
-                  <div class="dropdown-content" onClick={(e) => {addFilterWord("dueDate", e.target.textContent); setSelectedItem(null);}}>
+                  <div className="dropdown-content" onClick={(e) => {addFilterWord("dueDate", e.target.textContent); setSelectedItem(null);}}>
                     <span>In 1 week</span>
                     <span>In 2 weeks</span>
                     <span>In 1 month</span>
@@ -832,17 +897,17 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
                   </div>
                 </div>
               ) : (
-                <button class="filter-display-btn" onClick={() => {setFilterTerm({...filterTerm, dueDate: ''}); setSelectedItem(null);}}>
+                <button className="filter-display-btn" onClick={() => {setFilterTerm({...filterTerm, dueDate: ''}); setSelectedItem(null);}}>
                   {filterTerm.dueDate} <div className="icon"><FaXmark/></div>
                 </button>
               )
             )}
             { !filterTerm.createdDate && (
-              <div class="filter-dropdown">
-                <button class="dropbtn">
-                  Job Created <div class="icon"><FaCaretDown/></div>
+              <div className="filter-dropdown">
+                <button className="dropbtn">
+                  Job Created <div className="icon"><FaCaretDown/></div>
                 </button>
-                <div class="dropdown-content" onClick={(e) => {addFilterWord("createdDate", e.target.textContent); setSelectedItem(null);}}>
+                <div className="dropdown-content" onClick={(e) => {addFilterWord("createdDate", e.target.textContent); setSelectedItem(null);}}>
                   <span>1 week ago</span>
                   <span>2 weeks ago</span>
                   <span>1 month ago</span>
@@ -851,7 +916,7 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
               </div>
             )}
             {filterTerm.createdDate && (
-                <button class="filter-display-btn" onClick={() => {setFilterTerm({...filterTerm, createdDate: ''}); setSelectedItem(null);}}>
+                <button className="filter-display-btn" onClick={() => {setFilterTerm({...filterTerm, createdDate: ''}); setSelectedItem(null);}}>
                   {filterTerm.createdDate} <div className="icon"><FaXmark/></div>
                 </button>
             )}
@@ -1099,9 +1164,16 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
                       <h2>Qualifications:</h2>
                       <p>{selectedItem.qualifications}</p>
                     </div>
-                    {role === "recruiter" && (
+                    {role === "recruiter" && selectedItem.hiddenKeywords !== "" && (
                       <div className="dashboard-detail-section">
-                        <h2>Hidden Keywords:</h2>
+                        <h2>Hidden Keywords:
+                          <span className="tooltip-container">
+                            <span className="tooltip-icon">?</span>
+                            <span className="tooltip tooltip-modal">
+                              Hidden Keywords are used to filter out applicants who do not meet the minimum qualifications for the job. Resumes missing ANY of these keywords are waitlisted.
+                            </span>
+                          </span>
+                        </h2>
                         <p>{selectedItem.hiddenKeywords}</p>
                       </div>
                     )}
@@ -1190,7 +1262,9 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
         />
         <select
           name="type"
+          className="new-item-form"
           value={newItem.type}
+          placeholder="Job Type"
           onChange={handleInputChange}
           required
         >
@@ -1212,13 +1286,12 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
           onChange={handleInputChange}
           required
         />
-        <input
+        <textarea
           type="text"
           name="hiddenKeywords"
-          placeholder="Hidden Keywords"
+          placeholder="Hidden Keywords (optional): Resumes missing ANY of these keywords are waitlisted. Separate with commas."
           value={newItem.hiddenKeywords}
           onChange={handleInputChange}
-          required
         />
         <select
           name="coverLetterRequired"
@@ -1356,7 +1429,7 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
           <button
             type="submit"
             className="resume-submit-button"
-            disabled={resumeState !== "Attached" || ((selectedItem.coverLetterRequired == "Required") && coverLetterState !== "Attached")}
+            disabled={resumeState !== "Attached" || ((selectedItem.coverLetterRequired === "Required") && coverLetterState !== "Attached")}
           >
             {" "}
             Submit
@@ -1438,6 +1511,26 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
           </button>
         </div>
       </Modal>
+      {showCreateConfirm && (
+      <Modal 
+        show={true} 
+        onClose={() => setShowCreateConfirm(false)} 
+        title="Confirm New Job">
+        <div className="modal-section">
+          <div className="modal-section">
+            <p>Are you sure you want to create this job?</p>
+          </div>
+          <div className="modal-section">
+            <p>All applicants without <strong>ALL</strong> hidden keywords in their resume will be waitlisted</p>
+          </div>
+        </div>
+        <div className="create-modal">
+          <button className="submit-button create-confirm-submit-button" onClick={() => handleCreateJob(false)}>Submit</button>
+          <button className="submit-button create-confirm-submit-button" onClick={() => handleCreateJob(true)}>Submit and don't show again</button>
+          <button className="cancel-button create-confirm-submit-button" onClick={() => { setShowCreateConfirm(false); setShowItemForm(true); }}>Cancel</button>
+        </div>
+      </Modal>
+    )}
     </div>
   );
 };
@@ -1502,7 +1595,7 @@ const fetchJobsForRecruiter = async (userId, setItems, searchTerm, filterTerm) =
     if (searchTerm.trim()) {
       const searchWords = searchTerm.trim().toLowerCase().split(/\s+/);
       availableJobs = availableJobs.filter((job) =>
-        searchWords.some((word) =>
+        searchWords.every((word) =>
           ['title', 'company', 'location', 'type', 'description', 'qualifications', 'hiddenKeywords'].some((field) =>
             job[field] && job[field].toLowerCase().includes(word)
           )
@@ -1593,11 +1686,10 @@ const fetchJobsForApplicant = async (userId, setItems, searchTerm, filterTerm) =
 
     if (searchTerm.trim()) {
       const searchWords = searchTerm.trim().toLowerCase().split(/\s+/);
-      availableJobs = availableJobs.filter((job) =>
-        searchWords.some((word) =>
-          ['title', 'company', 'location', 'type', 'description', 'qualifications'].some((field) =>
-            job[field].toLowerCase().includes(word)
-          )
+      availableJobs = availableJobs.filter(job => 
+        searchWords.every(word => 
+          ['title', 'company', 'location', 'type', 'description', 'qualifications']
+          .some(key => job[key].toLowerCase().includes(word))
         )
       );
     }

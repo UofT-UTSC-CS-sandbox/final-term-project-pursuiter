@@ -124,6 +124,7 @@ app.post("/signup", async (req, res) => {
       positions,
       favorites: [],
       masterResume,
+      createConfirm: true,
     };
     const result = await db.collection("users").insertOne(newUser);
     res
@@ -155,6 +156,7 @@ app.post("/login", async (req, res) => {
         positions: user.positions,
         userId: user._id,
         favorites: user.favorites || [],
+        createConfirm: user.createConfirm,
       });
     } else {
       res.status(401).json({ message: "Invalid credentials" });
@@ -189,6 +191,7 @@ app.get("/user/:id", async (req, res) => {
         userId: user._id,
         favorites: user.favorites || [],
         masterResume: user.masterResume,
+        createConfirm: user.createConfirm,
       });
     } else {
       res.status(404).json({ message: "User not found" });
@@ -213,6 +216,7 @@ app.put("/updateUser", async (req, res) => {
     companyName,
     userType,
     masterResume,
+    createConfirm,
   } = req.body;
   try {
     const user = await db.collection("users").findOne({ email });
@@ -236,6 +240,7 @@ app.put("/updateUser", async (req, res) => {
       if (companyName) updatedUser.companyName = companyName;
       if (userType) updatedUser.userType = userType;
       if (masterResume) updatedUser.masterResume = masterResume;
+      if (createConfirm !== undefined) updatedUser.createConfirm = createConfirm;
       await db.collection("users").updateOne({ email }, { $set: updatedUser });
       res.json({
         message: "Update successful",
@@ -246,6 +251,7 @@ app.put("/updateUser", async (req, res) => {
         companyName: updatedUser.companyName,
         userType: updatedUser.userType,
         masterResume: updatedUser.masterResume,
+        createConfirm: updatedUser.createConfirm,
       });
     } else {
       res.status(404).json({ message: "User not found" });
