@@ -53,29 +53,32 @@ describe("Favorites Functionality", () => {
       const response = await request(app)
         .post("/favorites/add")
         .send({ userId: jobSeeker.body.userId, jobId: job.body.insertedId });
-  
+
       expect(response.status).to.equal(200);
       expect(response.body.message).to.equal("Job added to favorites");
 
-      const userResponse = await request(app).get(`/user/${jobSeeker.body.userId}`);
+      const userResponse = await request(app).get(
+        `/user/${jobSeeker.body.userId}`,
+      );
       expect(userResponse.status).to.equal(200);
       expect(userResponse.body.favorites).to.include(job.body.insertedId);
     });
-  
-    it("should remove a job from favorites", async () => {
 
+    it("should remove a job from favorites", async () => {
       await request(app)
         .post("/favorites/add")
         .send({ userId: jobSeeker.body.userId, jobId: job.body.insertedId });
-  
+
       const response = await request(app)
         .post("/favorites/remove")
         .send({ userId: jobSeeker.body.userId, jobId: job.body.insertedId });
-  
+
       expect(response.status).to.equal(200);
       expect(response.body.message).to.equal("Job removed from favorites");
 
-      const userResponse = await request(app).get(`/user/${jobSeeker.body.userId}`);
+      const userResponse = await request(app).get(
+        `/user/${jobSeeker.body.userId}`,
+      );
       expect(userResponse.status).to.equal(200);
       expect(userResponse.body.favorites).to.not.include(job.body.insertedId);
     });
@@ -84,7 +87,7 @@ describe("Favorites Functionality", () => {
   describe("Favouriting applicants", () => {
     it("should allow a recruiter to favorite an applicant", async () => {
       const addToFavoritesResponse = await request(app)
-      .post("/favorites/add")
+        .post("/favorites/add")
         .send({
           userId: recruiter.body.userId,
           itemId: jobSeeker.body.userId,
@@ -133,6 +136,5 @@ describe("Favorites Functionality", () => {
       );
       expect(updatedRecruiter.body).to.be.an("array").that.is.empty;
     });
-
   });
 });

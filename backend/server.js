@@ -240,7 +240,8 @@ app.put("/updateUser", async (req, res) => {
       if (companyName) updatedUser.companyName = companyName;
       if (userType) updatedUser.userType = userType;
       if (masterResume) updatedUser.masterResume = masterResume;
-      if (createConfirm !== undefined) updatedUser.createConfirm = createConfirm;
+      if (createConfirm !== undefined)
+        updatedUser.createConfirm = createConfirm;
       await db.collection("users").updateOne({ email }, { $set: updatedUser });
       res.json({
         message: "Update successful",
@@ -389,7 +390,7 @@ app.post("/applications/add", async (req, res) => {
     return res.status(400).json({ message: "Expected an application object" });
   }
 
-  application.status = 'Pending Review'; // default status
+  application.status = "Pending Review"; // default status
 
   try {
     const result = await db.collection("applications").insertOne(application);
@@ -414,10 +415,9 @@ app.put("/applications/:applicantID/:jobID/status", async (req, res) => {
   const { status } = req.body;
 
   try {
-    const result = await db.collection("applications").updateOne(
-      { applicantID, jobID },
-      { $set: { status } }
-    );
+    const result = await db
+      .collection("applications")
+      .updateOne({ applicantID, jobID }, { $set: { status } });
 
     if (result.modifiedCount === 1) {
       res.json({ message: "Application status updated", status });

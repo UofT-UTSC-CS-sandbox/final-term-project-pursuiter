@@ -18,7 +18,7 @@ before(async () => {
 const waitForMongoConnection = async (retries = 5, delay = 1000) => {
   for (let i = 0; i < retries; i++) {
     if (mongoose.connection.readyState === 1) return;
-    await new Promise(resolve => setTimeout(resolve, delay));
+    await new Promise((resolve) => setTimeout(resolve, delay));
   }
   throw new Error("Failed to establish MongoDB connection");
 };
