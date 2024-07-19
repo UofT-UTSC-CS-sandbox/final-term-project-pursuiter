@@ -2,9 +2,12 @@ import React, { useState, useEffect, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import { UserContext } from "../../contexts/UserContext";
 import { FaStar } from "react-icons/fa";
-import Modal from "./Modal";
+import Modal from "../modal/Modal";
+import UserController from "../../controllers/UserController";
+
 import DashboardController from "../../controllers/DashboardController";
 import "./Dashboard.css";
+import * as pdfjsLib from "pdfjs-dist/webpack";
 
 const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
   const navigate = useNavigate();
@@ -16,6 +19,7 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [itemToDelete, setItemToDelete] = useState(null);
   const [editMode, setEditMode] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [newItem, setNewItem] = useState({
     title: "",
     company: "",
@@ -29,16 +33,34 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
   });
   const [applications, setApplications] = useState([]);
   const [resumeFile, setResumeFile] = useState(null);
+  const [resumeState, setResumeState] = useState("Missing");
+  const [masterResume, setMasterResume] = useState(null);
+  const [MasterResumeRecommendation, setMasterResumeRecommendation] =
+    useState("Loading...");
+  const [qualified, setQualified] = useState(false);
   const { user, logoutUser } = useContext(UserContext);
-
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [showApplicationForm, setShowApplicationForm] = useState(false);
+  const [ResumeRecommendation, setResumeRecommendation] = useState("");
+  const [isGenerateButtonDisabled, setIsGenerateButtonDisabled] =
+    useState(true);
+  const [isGenerateButtonClicked, setIsGenerateButtonClicked] = useState(false);
+  const [submissionStatus, setSubmissionStatus] = useState("");
+  const [isQualificationsLoading, setIsQualificationsLoading] = useState(false);
 
   // Fetch jobs and favorited jobs
   useEffect(() => {
     if (user) {
       fetchFavoritedJobs(user.userId, setFavoritedItems);
       fetchJobs(user.userId, setItems);
+
+      UserController.fetchUserInformation(user.userId)
+        .then((userInfo) => {
+          setMasterResume(userInfo.masterResume || null);
+        })
+        .catch((error) => {
+          console.error("Error fetching user information:", error);
+        });
     }
   }, [user, fetchFavoritedJobs, fetchJobs]);
 
@@ -164,20 +186,6 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
     navigate(`/applicants/${item._id}`);
   };
 
-  // Handle apply for job
-  const handleApply = async () => {
-    const application = {
-      jobID: selectedItem._id,
-      userID: user._id,
-    };
-
-    try {
-      await DashboardController.applyForJob(application);
-    } catch (error) {
-      console.error("Error applying for job:", error);
-    }
-  };
-
   // Handle file change in apply to job
   const handleFileChange = (event, fileType) => {
     const file = event.target.files[0];
@@ -185,31 +193,268 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
     reader.onload = () => {
       if (fileType === "resume") {
         setResumeFile(reader.result);
+        setIsGenerateButtonDisabled(false);
+        setIsGenerateButtonClicked(false);
+        setResumeRecommendation("");
+        setResumeState("Attached");
       }
     };
     reader.readAsDataURL(file);
   };
 
-  // Handle job application submission
   const handleApplicationSubmit = async (e) => {
     e.preventDefault();
-
-    const applicationToSubmit = {
-      applicantID: user.userId,
-      jobID: selectedItem._id,
-      resumeData: resumeFile,
-    };
-
-    try {
-      const response =
-        await DashboardController.applyForJob(applicationToSubmit);
-      setApplications((prevApplications) => [response, ...prevApplications]);
-      setShowApplicationForm(false);
+    if (resumeFile === null) {
+      setResumeState("Missing");
+    } else {
+      setIsSubmitting(true);
+      setSubmissionStatus("Submitting application");
       setShowConfirmation(true);
-      window.location.reload();
-    } catch (error) {
-      console.error("Error submitting application:", error);
+      setShowApplicationForm(false);
+      try {
+        const scoreFormattedData = await formatScoreData(
+          selectedItem.qualifications,
+          selectedItem.description,
+          resumeFile,
+        );
+        const scoreResponse =
+          await DashboardController.fetchGeminiResponse(scoreFormattedData);
+        const scoreCleanedResponse = scoreResponse.response.replace(
+          /```json|```/g,
+          "",
+        );
+        const scoreResponseJson = JSON.parse(scoreCleanedResponse);
+
+        const descFormattedData = await formatDescData(
+          selectedItem.qualifications,
+          selectedItem.description,
+          resumeFile,
+        );
+        const descResponse =
+          await DashboardController.fetchGeminiResponse(descFormattedData);
+        const descCleanedResponse = descResponse.response.replace(
+          /```json|```/g,
+          "",
+        );
+        const descResponseJson = JSON.parse(descCleanedResponse);
+
+        const applicationToSubmit = {
+          applicantID: user.userId,
+          jobID: selectedItem._id,
+          resumeData: resumeFile,
+          totalScore: scoreResponseJson.totalScore,
+          qualificationsScore: {
+            score: scoreResponseJson.qualificationsScore.score,
+            description: scoreResponseJson.qualificationsScore.description,
+          },
+          jobDescriptionScore: {
+            score: scoreResponseJson.jobDescriptionScore.score,
+            description: scoreResponseJson.jobDescriptionScore.description,
+          },
+          applicantSummary: {
+            longSummary: descResponseJson.applicantSummary.longSummary,
+            shortSummary: descResponseJson.applicantSummary.shortSummary,
+          },
+        };
+        const response =
+          await DashboardController.applyForJob(applicationToSubmit);
+        setApplications((prevApplications) => [response, ...prevApplications]);
+        setShowApplicationForm(false);
+        setResumeState("Missing");
+        setSubmissionStatus("Application submitted successfully!");
+        setTimeout(() => {
+          window.location.reload();
+        }, 100);
+      } catch (error) {
+        console.error("Error submitting application:", error);
+        setSubmissionStatus("Error submitting application.");
+      } finally {
+        setIsSubmitting(false);
+      }
     }
+  };
+
+  //Turn pdf base64 string into text
+  const TurnPdfToString = async (pdf) => {
+    const base64String = pdf.split(",")[1];
+    const pdfData = atob(base64String);
+
+    const pdfArray = new Uint8Array(pdfData.length);
+    for (let i = 0; i < pdfData.length; i++) {
+      pdfArray[i] = pdfData.charCodeAt(i);
+    }
+
+    const loadingTask = pdfjsLib.getDocument({ data: pdfArray });
+    const pdfDocument = await loadingTask.promise;
+
+    let fullText = "";
+    for (let pageNum = 1; pageNum <= pdfDocument.numPages; pageNum++) {
+      const page = await pdfDocument.getPage(pageNum);
+      const textContent = await page.getTextContent();
+      const pageText = textContent.items.map((item) => item.str).join(" ");
+      fullText += pageText + " ";
+    }
+
+    return fullText.trim();
+  };
+
+  // Format the application data for the API call for the Compatibility Score
+  const formatScoreData = async (
+    qualifications,
+    jobDescription,
+    resumeFile,
+  ) => {
+    const resumeText = await TurnPdfToString(resumeFile);
+    return `
+      Instructions:
+      - Evaluate the resume based on the criteria provided below.
+      - Return a detailed score for each criterion (keep it to a couple of words) along with a total score.
+      - Format the response as follows:
+      {
+        "totalScore": <total_score>,
+        "qualificationsScore": {
+          "score": <qualifications_score>,
+          "description": "<qualifications_description>"
+        },
+        "jobDescriptionScore": {
+          "score": <job_description_score>,
+          "description": "<job_description_description>"
+        }
+      }
+
+      Criteria:
+      Qualifications Match:
+      - 5 points: Applicant meets all the listed qualifications.
+      - 3-4 points: Applicant meets most (70%-99%) of the listed qualifications.
+      - 2 points: Applicant meets some (30%-69%) of the listed qualifications.
+      - 1 point: Applicant meets few (1%-29%) of the listed qualifications.
+      - 0 points: Applicant does not meet any of the listed qualifications.
+
+      Job Description Fit:
+      - 5 points: Applicant’s experience and skills closely match the job description.
+      - 3-4 points: Applicant’s experience and skills moderately match the job description.
+      - 2 points: Applicant’s experience and skills somewhat match the job description.
+      - 1 point: Applicant’s experience and skills minimally match the job description.
+      - 0 points: Applicant’s experience and skills do not match the job description.
+
+      Job Posting:
+      Qualifications:
+      ${qualifications}
+
+      Job Description:
+      ${jobDescription}
+
+      Resume:
+      ${resumeText}
+    `;
+  };
+
+  // Format the application data for the API call for the Applicant Description
+  const formatDescData = async (qualifications, jobDescription, resumeFile) => {
+    const resumeText = await TurnPdfToString(resumeFile);
+    return `
+      Instructions:
+      - Evaluate the resume based on the job posting qualifications and job description below.
+      - For longSummary: Provide a concise description of the applicant, emphasizing the key skills and experiences that align with the 
+        job requirements. Highlight the most relevant qualifications that demonstrate the applicant's fit for the position.
+        Keep the description to a couple of sentences. Add spacing often, using a newline character. Include a
+        sentence at the bottom that summarizes how well the applicant aligns with the job posting. 
+      - For shortSummary: Provide a short summary of the applicant's qualifications and experience that align with the job posting.
+        It must be no longer than 12 words and in the following format. Use no more than three bullet points and separate each bullet
+        point with the newline character.
+        Example: '• 3 years with Python
+        • Great communication skills
+        • Contributed to open-source projects'
+      - Format the response as follows:
+      {
+        "applicantSummary": {
+          "longSummary": "<long_summary>",
+          "shortSummary": "<short_summary>"
+        }
+      }
+      
+      Job Posting:
+      Qualifications:
+      ${qualifications}
+
+      Job Description:
+      ${jobDescription}
+
+      Resume:
+      ${resumeText}
+    `;
+  };
+
+  // Format the resume analysis data for the API call for the AI resume review
+  const formatResumeData = async (
+    qualifications,
+    jobDescription,
+    resumeText,
+  ) => {
+    return `
+      Instructions:
+      - Evaluate the master resume based on how much the applicant matches the Qualifications and Job Description provided below.
+      - Return a detailed paragraph of text that provides a detailed analysis of the applicant's master resume, they need to know how well they match the posting,
+      things worth highlighting in the resume they submit crafted from the master resume, how likely are they to get an interview.
+      - use second person (words like you, your) as you are talking directly to the applicant.
+      - the response should not exceed 1500 characters.
+      - try to mention things specifically from the master resume in your response and link concepts to the job posting
+
+      Job Posting:
+      Qualifications:
+      ${qualifications}
+
+      Job Description:
+      ${jobDescription}
+
+      Master Resume:
+      ${resumeText}
+    `;
+  };
+
+  // Handle the checking for qualifications in the master resume
+  const handleQualificationsCheck = async (
+    keywords,
+    resume,
+    qualifications,
+    jobDescription,
+  ) => {
+    setIsQualificationsLoading(true);
+
+    if (masterResume === null) {
+      setQualified(false);
+      setIsQualificationsLoading(false);
+      return;
+    }
+
+    const keywordsArray = keywords
+      .toLowerCase()
+      .split(",")
+      .map((keyword) => keyword.trim());
+
+    let resumeText = await TurnPdfToString(resume);
+
+    const formattedData = await formatResumeData(
+      qualifications,
+      jobDescription,
+      resumeText,
+    );
+    const resumeResponse =
+      await DashboardController.fetchGeminiResponse(formattedData);
+    setMasterResumeRecommendation(resumeResponse.response);
+
+    resumeText = resumeText.toLowerCase();
+
+    const allKeywordsFound = keywordsArray.every((keyword) =>
+      resumeText.includes(keyword),
+    );
+
+    if (allKeywordsFound) {
+      setQualified(true);
+    } else {
+      setQualified(false);
+    }
+    setIsQualificationsLoading(false);
   };
 
   const allItems = items.filter(
@@ -257,7 +502,17 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
               <div
                 key={index}
                 className="dashboard-item"
-                onClick={() => setSelectedItem(item)}
+                onClick={() => {
+                  setSelectedItem(item);
+                  setQualified(false);
+                  setMasterResumeRecommendation("Loading...");
+                  handleQualificationsCheck(
+                    item.hiddenKeywords,
+                    masterResume,
+                    item.qualifications,
+                    item.description,
+                  );
+                }}
               >
                 <div className="dashboard-title">{item.title}</div>
                 <div className="dashboard-company">{item.company}</div>
@@ -308,12 +563,37 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
                         </button>
                       </>
                     ) : (
-                      <button
-                        className="apply-button"
-                        onClick={() => setShowApplicationForm(true)}
-                      >
-                        Apply
-                      </button>
+                      <div className="tooltip-container">
+                        <button
+                          className="resume-submit-button"
+                          disabled={
+                            qualified !== true || isQualificationsLoading
+                          }
+                          onClick={() => {
+                            if (qualified) {
+                              setShowApplicationForm(true);
+                            }
+                          }}
+                        >
+                          {isQualificationsLoading ? (
+                            <div className="loading-dots-container">
+                              <div className="loading-dots">
+                                <span></span>
+                                <span></span>
+                                <span></span>
+                              </div>
+                            </div>
+                          ) : (
+                            "Apply"
+                          )}
+                        </button>
+                        {qualified !== true && !isQualificationsLoading && (
+                          <span className="tooltip tooltip-apply">
+                            Master resume does not contain the required keywords
+                            for this posting
+                          </span>
+                        )}
+                      </div>
                     )}
                   </div>
                 </div>
@@ -331,10 +611,6 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
                     <p>{selectedItem.type}</p>
                   </div>
                   <div className="dashboard-detail-section">
-                    <h2>Hidden Keywords:</h2>{" "}
-                    <p>{selectedItem.hiddenKeywords}</p>
-                  </div>
-                  <div className="dashboard-detail-section">
                     <h2>Description:</h2>
                     <p>{selectedItem.description}</p>
                   </div>
@@ -342,6 +618,47 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
                     <h2>Qualifications:</h2>
                     <p>{selectedItem.qualifications}</p>
                   </div>
+                  {role === "recruiter" ? (
+                    <>
+                      <div className="dashboard-detail-section">
+                        <h2>Hidden Keywords:</h2>
+                        <p>{selectedItem.hiddenKeywords}</p>
+                      </div>
+                    </>
+                  ) : (
+                    <>
+                      <div className="dashboard-detail-section">
+                        <h2>AI master resume analysis:</h2>
+                        {masterResume !== null ? (
+                          <>
+                            {MasterResumeRecommendation === "Loading..." ? (
+                              <>
+                                <div class="loading-dots-container">
+                                  <div className="loading-dots">
+                                    <span></span>
+                                    <span></span>
+                                    <span></span>
+                                  </div>
+                                </div>
+                              </>
+                            ) : (
+                              <>
+                                <p>{MasterResumeRecommendation}</p>
+                              </>
+                            )}
+                          </>
+                        ) : (
+                          <>
+                            <p>
+                              Master resume has not been uploaded. Analysis will
+                              be available once you upload it from the account
+                              page.
+                            </p>
+                          </>
+                        )}
+                      </div>
+                    </>
+                  )}
                 </div>
               </>
             ) : (
@@ -431,29 +748,147 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
       </Modal>
       <Modal
         show={showApplicationForm}
-        onClose={() => setShowApplicationForm(false)}
-        title={editMode ? "Edit Application" : "New Application"}
+        onClose={() => {
+          setShowApplicationForm(false);
+          setResumeRecommendation("");
+          setIsGenerateButtonDisabled(true);
+          setIsGenerateButtonClicked(false);
+          setResumeFile(null);
+          setResumeState("Missing");
+        }}
+        title="New Application"
       >
         <form className="new-item-form" onSubmit={handleApplicationSubmit}>
-          <p>Upload Resume: </p>
+          <p>Upload resume: </p>
           <input
             type="file"
             accept=".pdf"
             onChange={(event) => handleFileChange(event, "resume")}
           />
-          <button type="submit">
-            {editMode ? "Update Application" : "Submit"}
+          <div className="ai-feedback-section">
+            <div className="ai-feedback-header">
+              <h3>
+                AI Generated Feedback
+                <span className="tooltip-container">
+                  <span className="tooltip-icon">?</span>
+                  <span className="tooltip tooltip-modal">
+                    Upload a customized resume for detailed feedback
+                  </span>
+                </span>
+              </h3>
+              <div className="tooltip-container">
+                <button
+                  type="button"
+                  className="generate-feedback-button"
+                  disabled={isGenerateButtonDisabled || isGenerateButtonClicked}
+                  onClick={async () => {
+                    setIsGenerateButtonClicked(true);
+                    setResumeRecommendation("Loading...");
+
+                    try {
+                      const resumeText = await TurnPdfToString(resumeFile);
+                      const formattedData = await formatResumeData(
+                        selectedItem.qualifications,
+                        selectedItem.description,
+                        resumeText,
+                      );
+                      const response =
+                        await DashboardController.fetchGeminiResponse(
+                          formattedData,
+                        );
+                      setResumeRecommendation(response.response);
+                    } catch (error) {
+                      console.error("Error generating feedback:", error);
+                      setResumeRecommendation("Error generating feedback.");
+                    }
+                  }}
+                >
+                  Generate Feedback
+                </button>
+                {(isGenerateButtonDisabled || isGenerateButtonClicked) && (
+                  <span className="tooltip tooltip-modal">
+                    Upload a new resume to generate corresponding feedback
+                  </span>
+                )}
+              </div>
+            </div>
+            <div className="ai-feedback-box">
+              {ResumeRecommendation === "Loading..." ? (
+                <div className="loading-dots-container">
+                  <div className="loading-dots">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                  </div>
+                </div>
+              ) : (
+                <p>{ResumeRecommendation || "No feedback generated yet."}</p>
+              )}
+            </div>
+          </div>
+          <button
+            type="submit"
+            className="resume-submit-button"
+            disabled={resumeState !== "Attached"}
+          >
+            {" "}
+            Submit
           </button>
           <button
             className="cancel-button"
-            onClick={() => setShowApplicationForm(false)}
+            onClick={() => {
+              setShowApplicationForm(false);
+              setResumeRecommendation("");
+              setIsGenerateButtonDisabled(true);
+              setIsGenerateButtonClicked(false);
+              setResumeFile(null);
+              setResumeState("Missing");
+            }}
+            disabled={isSubmitting}
           >
             Cancel
           </button>
         </form>
       </Modal>
-      <Modal show={showConfirmation} onClose={() => setShowConfirmation(false)}>
-        <p>Application submitted successfully!</p>
+      <Modal
+        show={showConfirmation}
+        onClose={() => {
+          setShowConfirmation(false);
+          setIsGenerateButtonDisabled(true);
+          setIsGenerateButtonClicked(false);
+          setResumeFile(null);
+          setResumeState("Missing");
+        }}
+      >
+        <div className="modal-header">
+          {submissionStatus === "Error submitting application." && (
+            <button
+              className="modal-close-button"
+              onClick={() => {
+                setShowConfirmation(false);
+                setIsGenerateButtonDisabled(true);
+                setIsGenerateButtonClicked(false);
+                setResumeFile(null);
+                setResumeRecommendation("");
+                setResumeState("Missing");
+              }}
+            >
+              X
+            </button>
+          )}
+        </div>
+        {submissionStatus === "Submitting application" ? (
+          <div className="loading-dots-container">
+            <p>{submissionStatus}</p>
+            <div className="loading-dots modal-loading-dots">
+              <span></span>
+              <span></span>
+              <span></span>
+            </div>
+          </div>
+        ) : (
+          <p>{submissionStatus}</p>
+        )}
       </Modal>
       <Modal
         show={showDeleteConfirm}
@@ -500,8 +935,25 @@ const fetchJobsForRecruiter = async (userId, setItems) => {
 
 const fetchJobsForApplicant = async (userId, setItems) => {
   try {
-    const response = await DashboardController.fetchJobs();
-    setItems(response);
+    const jobsResponse = await DashboardController.fetchJobs();
+    const applicationsResponse =
+      await DashboardController.fetchUserApplications(userId);
+    if (!applicationsResponse) {
+      setItems(jobsResponse);
+      return;
+    }
+    const appliedJobIds = new Set();
+    applicationsResponse.forEach((application) => {
+      if (application.jobID) {
+        appliedJobIds.add(application.jobID);
+      } else {
+        console.error("Application does not contain jobID:", application);
+      }
+    });
+    const availableJobs = jobsResponse.filter(
+      (job) => !appliedJobIds.has(job._id),
+    );
+    setItems(availableJobs);
   } catch (error) {
     console.error("Error fetching jobs:", error);
   }

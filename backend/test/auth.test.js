@@ -2,7 +2,7 @@ import request from "supertest";
 import { expect } from "chai";
 import { app } from "../server.js";
 import mongoose from "mongoose";
-import "./setup.js"; // Import the common setup
+import "./setup.js";
 
 describe("User Authentication", () => {
   let userCredentials = {

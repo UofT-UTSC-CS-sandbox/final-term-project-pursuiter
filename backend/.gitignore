@@ -3,3 +3,7 @@ data
 
 # dependencies
 node_modules
+
+# env files
+.env.development
+.env.test
