@@ -252,7 +252,7 @@
   justify-content: space-between;
   align-items: flex-start;
   margin-bottom: 20px;
-  width: 90vh; 
+  width: 90vh;
   margin-right: 10px;
 }
 
@@ -276,7 +276,7 @@
 }
 
 .dropbtn {
-  background-color: #E7E7E7;
+  background-color: #e7e7e7;
   color: #1e1e1e;
   padding: 16px;
   font-size: 16px;
@@ -295,7 +295,7 @@
   position: absolute;
   background-color: #f1f1f1;
   min-width: 130px;
-  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+  box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
   z-index: 1;
 }
 
@@ -314,7 +314,7 @@
 }
 
 .filter-dropdown:hover .dropbtn {
-  background-color: #DCDCDC; 
+  background-color: #dcdcdc;
   color: #1e1e1e;
 }
 
@@ -329,7 +329,7 @@
 
 .filter-display-btn:hover {
   background-color: #680025;
-  color: #E7E7E7;
+  color: #e7e7e7;
 }
 
 /************************************
@@ -385,7 +385,7 @@
   display: inline-flex;
   font-size: 20px;
   margin-left: 10px;
-  cursor: pointer; 
+  cursor: pointer;
 }
 
 .favorite-icon {
@@ -429,7 +429,7 @@
 
 .tab-button.selected {
   background-color: #800020;
-  color: #fff;  
+  color: #fff;
 }
 
 .tab-button:hover {
@@ -803,7 +803,7 @@
  * Textarea Styles
  *************************************/
 
- .new-item-form {
+.new-item-form {
   display: flex;
   flex-direction: column;
   max-height: 80vh;
@@ -823,5 +823,5 @@
 
 .modal-content {
   max-height: 90vh;
-  overflow-y: auto; 
+  overflow-y: auto;
 }

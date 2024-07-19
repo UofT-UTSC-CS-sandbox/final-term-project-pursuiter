@@ -14,7 +14,10 @@ const UserProvider = ({ children }) => {
     const userCookie = Cookies.get("user");
     const user = userCookie ? JSON.parse(userCookie) : null;
     if (user) {
-      return Cookies.get("selectedTab") || (user.userType === "applicant" ? "newJobs" : "applications");
+      return (
+        Cookies.get("selectedTab") ||
+        (user.userType === "applicant" ? "newJobs" : "applications")
+      );
     }
     return "newJobs";
   });
@@ -35,7 +38,9 @@ const UserProvider = ({ children }) => {
     try {
       const user = await UserController.loginUser(email, password);
       setUser(user);
-      setSelectedTab(user.userType === "applicant" ? "newJobs" : "applications");
+      setSelectedTab(
+        user.userType === "applicant" ? "newJobs" : "applications",
+      );
       return user;
     } catch (error) {
       throw error;

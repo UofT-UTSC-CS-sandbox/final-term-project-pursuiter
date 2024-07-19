@@ -163,14 +163,16 @@ const DashboardController = {
   // Update application status
   updateApplicationStatus: async (applicantID, jobID, status) => {
     try {
-      const response = await axios.put(`${API_URL}/applications/${applicantID}/${jobID}/status`, { status });
+      const response = await axios.put(
+        `${API_URL}/applications/${applicantID}/${jobID}/status`,
+        { status },
+      );
       return response.data;
     } catch (error) {
       console.error("Error updating application status:", error);
       throw error;
     }
   },
-  
 };
 
 export default DashboardController;

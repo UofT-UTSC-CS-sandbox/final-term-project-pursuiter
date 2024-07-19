@@ -12,23 +12,23 @@ Acceptance criteria: Given that the user opts to sign up or log in via OAuth, wh
 
 Priority: 3 - Low
 
-   a. [PUR-65](https://mohammadqassim000.atlassian.net/browse/PUR-65) Subtask - Integrate OAuth SDK
-   
-   Integrate the OAuth SDK (such as Google, Facebook, etc.) into the backend to enable OAuth authentication.
+a. [PUR-65](https://mohammadqassim000.atlassian.net/browse/PUR-65) Subtask - Integrate OAuth SDK
 
-   Priority: 3 - Low
+Integrate the OAuth SDK (such as Google, Facebook, etc.) into the backend to enable OAuth authentication.
 
-   b. [PUR-66](https://mohammadqassim000.atlassian.net/browse/PUR-66) Subtask - Develop OAuth Signup/Login API Endpoint
+Priority: 3 - Low
 
-   Create an API endpoint to handle OAuth signup and login requests, ensuring the user is authenticated and their session is managed appropriately.
+b. [PUR-66](https://mohammadqassim000.atlassian.net/browse/PUR-66) Subtask - Develop OAuth Signup/Login API Endpoint
 
-   Priority: 3 - Low
+Create an API endpoint to handle OAuth signup and login requests, ensuring the user is authenticated and their session is managed appropriately.
 
-   c. [PUR-67](https://mohammadqassim000.atlassian.net/browse/PUR-67) Subtask - Frontend Implementation
+Priority: 3 - Low
 
-   Add the OAuth signup/login buttons to the frontend and ensure they correctly initiate the OAuth flow and handle responses.
+c. [PUR-67](https://mohammadqassim000.atlassian.net/browse/PUR-67) Subtask - Frontend Implementation
 
-   Priority: 3 - Low
+Add the OAuth signup/login buttons to the frontend and ensure they correctly initiate the OAuth flow and handle responses.
+
+Priority: 3 - Low
 
 13. [PUR-45](https://mohammadqassim000.atlassian.net/browse/PUR-45) User Story - Organization Accounts
 
@@ -38,23 +38,23 @@ Acceptance criteria: Given that a user accesses the organization account, when t
 
 Priority: 2 - Medium
 
-   a. [PUR-68](https://mohammadqassim000.atlassian.net/browse/PUR-68) Subtask - Store Posted-By/Edited-By Information
-   
-   Implement functionality to store the information about who posted and edited each job posting in the database.
+a. [PUR-68](https://mohammadqassim000.atlassian.net/browse/PUR-68) Subtask - Store Posted-By/Edited-By Information
 
-   Priority: 2 - Medium
+Implement functionality to store the information about who posted and edited each job posting in the database.
 
-   b. [PUR-69](https://mohammadqassim000.atlassian.net/browse/PUR-69) Subtask - Display All Jobs for Company
-   
-   Implement the functionality to display all job postings associated with the company in the organization's account view.
+Priority: 2 - Medium
 
-   Priority: 2 - Medium
+b. [PUR-69](https://mohammadqassim000.atlassian.net/browse/PUR-69) Subtask - Display All Jobs for Company
 
-   c. [PUR-70](https://mohammadqassim000.atlassian.net/browse/PUR-70) Subtask - Show Posted-By/Edited-By Information
+Implement the functionality to display all job postings associated with the company in the organization's account view.
 
-   Develop the logic to display who posted and edited each job posting in the job listings for the organization's account.
+Priority: 2 - Medium
 
-   Priority: 2 - Medium
+c. [PUR-70](https://mohammadqassim000.atlassian.net/browse/PUR-70) Subtask - Show Posted-By/Edited-By Information
+
+Develop the logic to display who posted and edited each job posting in the job listings for the organization's account.
+
+Priority: 2 - Medium
 
 14. [PUR-46](https://mohammadqassim000.atlassian.net/browse/PUR-46) User Story - Dashboard pagination
 
@@ -64,17 +64,17 @@ Acceptance criteria: Given that there are many job listings, when the user views
 
 Priority: 2 - Medium
 
-   a. [PUR-71](https://mohammadqassim000.atlassian.net/browse/PUR-71) Subtask - Implement Pagination in Frontend
-   
-   Develop the pagination controls in the frontend to allow users to navigate through different pages of job listings.
+a. [PUR-71](https://mohammadqassim000.atlassian.net/browse/PUR-71) Subtask - Implement Pagination in Frontend
 
-   Priority: 2 - Medium
+Develop the pagination controls in the frontend to allow users to navigate through different pages of job listings.
 
-   b. [PUR-72](https://mohammadqassim000.atlassian.net/browse/PUR-72) Subtask - Implement Pagination Logic in Backend
+Priority: 2 - Medium
 
-   Develop the backend logic to handle pagination requests, returning the appropriate subset of job listings for each page.
+b. [PUR-72](https://mohammadqassim000.atlassian.net/browse/PUR-72) Subtask - Implement Pagination Logic in Backend
 
-   Priority: 2 - Medium
+Develop the backend logic to handle pagination requests, returning the appropriate subset of job listings for each page.
+
+Priority: 2 - Medium
 
 15. [PUR-73](https://mohammadqassim000.atlassian.net/browse/PUR-73) User Story - Applicant List pagination
 
@@ -84,17 +84,17 @@ Acceptance criteria: Given that there are many applicants, when the user views t
 
 Priority: 2 - Medium
 
-   a. [PUR-74](https://mohammadqassim000.atlassian.net/browse/PUR-74) Subtask - Implement Pagination in Frontend
-   
-   Develop the pagination controls in the frontend to allow users to navigate through different pages of applicants.
+a. [PUR-74](https://mohammadqassim000.atlassian.net/browse/PUR-74) Subtask - Implement Pagination in Frontend
 
-   Priority: 2 - Medium
+Develop the pagination controls in the frontend to allow users to navigate through different pages of applicants.
 
-   b. [PUR-75](https://mohammadqassim000.atlassian.net/browse/PUR-75) Subtask - Implement Pagination Logic in Backend
+Priority: 2 - Medium
 
-   Develop the backend logic to handle pagination requests, returning the appropriate subset of applicants for each page.
+b. [PUR-75](https://mohammadqassim000.atlassian.net/browse/PUR-75) Subtask - Implement Pagination Logic in Backend
 
-   Priority: 2 - Medium
+Develop the backend logic to handle pagination requests, returning the appropriate subset of applicants for each page.
+
+Priority: 2 - Medium
 
 16. [PUR-40](https://mohammadqassim000.atlassian.net/browse/PUR-40) Task - Reformat the personal info, login, and landing page frontend to abide by Figma
 

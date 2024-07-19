@@ -82,7 +82,10 @@ describe("Application Process", () => {
       .send({ status: "reviewed" });
 
     expect(updateRes.status).to.equal(200);
-    expect(updateRes.body).to.have.property("message", "Application status updated");
+    expect(updateRes.body).to.have.property(
+      "message",
+      "Application status updated",
+    );
     expect(updateRes.body).to.have.property("status", "reviewed");
 
     const updatedApplication = await mongoose.connection.db

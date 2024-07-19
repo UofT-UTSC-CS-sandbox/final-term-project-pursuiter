@@ -49,7 +49,7 @@ const UserController = {
           address,
           positions,
           masterResume,
-          createConfirm
+          createConfirm,
         }),
       });
       if (!response.ok) {
@@ -84,7 +84,7 @@ const UserController = {
     userType,
     userId,
     masterResume,
-    createConfirm
+    createConfirm,
   }) => {
     try {
       const response = await fetch(`${API_URL}/updateUser`, {
