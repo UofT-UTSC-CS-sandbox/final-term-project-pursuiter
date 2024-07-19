@@ -11,7 +11,12 @@ const UserProvider = ({ children }) => {
   });
 
   const [selectedTab, setSelectedTab] = useState(() => {
-    return Cookies.get("selectedTab") || "newJobs";
+    const userCookie = Cookies.get("user");
+    const user = userCookie ? JSON.parse(userCookie) : null;
+    if (user) {
+      return Cookies.get("selectedTab") || (user.userType === "applicant" ? "newJobs" : "applications");
+    }
+    return "newJobs";
   });
 
   useEffect(() => {
@@ -30,7 +35,7 @@ const UserProvider = ({ children }) => {
     try {
       const user = await UserController.loginUser(email, password);
       setUser(user);
-      setSelectedTab("newJobs");
+      setSelectedTab(user.userType === "applicant" ? "newJobs" : "applications");
       return user;
     } catch (error) {
       throw error;
@@ -59,6 +64,7 @@ const UserProvider = ({ children }) => {
         masterResume,
       );
       setUser(user);
+      setSelectedTab(userType === "applicant" ? "newJobs" : "applications");
       return user;
     } catch (error) {
       throw error;
@@ -98,6 +104,8 @@ const UserProvider = ({ children }) => {
   const logoutUser = () => {
     setUser(null);
     setSelectedTab(null);
+    Cookies.remove("user");
+    Cookies.remove("selectedTab");
   };
 
   return (

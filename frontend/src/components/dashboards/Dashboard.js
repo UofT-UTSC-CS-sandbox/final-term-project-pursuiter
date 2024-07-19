@@ -87,6 +87,7 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
     qualifications: "",
   });
   const [showWarning, setShowWarning] = useState(false);
+  const [isCooldown, setIsCooldown] = useState(false);
 
   // Fetch jobs and favorited jobs
   useEffect(() => {
@@ -202,7 +203,7 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
       } else {
         await DashboardController.addFavoriteJob(user.userId, item._id);
       }
-
+  
       setFavoritedItems((prevFavorites) => {
         if (isFav) {
           return prevFavorites.filter((fav) => fav._id !== item._id);
@@ -210,10 +211,16 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
           return [item, ...prevFavorites];
         }
       });
+  
+      if (isFav) {
+        setItems((prevItems) =>
+          prevItems.filter((prevItem) => prevItem._id !== item._id)
+        );
+      }
     } catch (error) {
       console.error("Error updating favorites:", error);
     }
-  };
+  };  
 
   // Handle input change on add/edit jobs
   const handleInputChange = (e) => {
@@ -356,6 +363,10 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
   // Handle application submission
   const handleApplicationSubmit = async (e) => {
     e.preventDefault();
+    if (isCooldown) {
+      console.warn("Cooldown period active. Please wait before making more requests.");
+      return;
+    }
     if (resumeFile === null) {
       setResumeState("Missing");
     } else if ((selectedItem?.coverLetterRequired == "Required") && coverLetterFile === null) {
@@ -413,23 +424,40 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
           },
           type: qualified ? "application" : "waitlist",
         };
-        const response =
-          await DashboardController.applyForJob(applicationToSubmit);
+        
+        const response = await DashboardController.applyForJob(applicationToSubmit);
         setApplications((prevApplications) => [response, ...prevApplications]);
         setShowApplicationForm(false);
         setResumeState("Missing");
         setSubmissionStatus("Application submitted successfully!");
+  
+        await DashboardController.removeFavoriteJob(user.userId, selectedItem._id);
+  
+        setFavoritedItems((prevFavoritedItems) =>
+          prevFavoritedItems.filter((fav) => fav._id !== selectedItem._id),
+        );
+  
+        setItems((prevItems) =>
+          prevItems.filter((item) => item._id !== selectedItem._id)
+        );
+  
         setTimeout(() => {
           window.location.reload();
         }, 100);
       } catch (error) {
         console.error("Error submitting application:", error);
-        setSubmissionStatus("Error submitting application.");
+        if (error.message.includes("Too Many Requests")) {
+          setSubmissionStatus("Error generating. Please try again.");
+          setIsCooldown(true);
+          setTimeout(() => setIsCooldown(false), 60000);
+        } else {
+          setSubmissionStatus("Error submitting application.");
+        }
       } finally {
         setIsSubmitting(false);
       }
     }
-  };
+  };  
 
   // Checks if all form fields are filled
   const checkFormValidity = () => {
@@ -640,6 +668,11 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
     qualifications,
     jobDescription
   ) => {
+    if (isCooldown) {
+      console.warn("Cooldown period active. Please wait before making more requests.");
+      return;
+    }
+  
     setIsQualificationsLoading(true);
   
     if (masterResume === null) {
@@ -671,9 +704,20 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
         jobDescription,
         resumeText
       );
-      const resumeResponse =
-        await DashboardController.fetchGeminiResponse(formattedData);
-      setMasterResumeRecommendation(resumeResponse.response);
+      try {
+        const resumeResponse =
+          await DashboardController.fetchGeminiResponse(formattedData);
+        setMasterResumeRecommendation(resumeResponse.response);
+      } catch (error) {
+        console.error("Error generating feedback:", error);
+        if (error.message.includes("Too Many Requests")) {
+          setMasterResumeRecommendation("Error generating. Please try again.");
+          setIsCooldown(true);
+          setTimeout(() => setIsCooldown(false), 60000);
+        } else {
+          setMasterResumeRecommendation("Error generating feedback.");
+        }
+      }
     } else {
       setQualified(false);
       setMissingQualifications(missingKeywords);
@@ -681,7 +725,7 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
       setShowWarning(true);
       setIsQualificationsLoading(false);
     }
-  };
+  };  
 
   const addFilterWord = (filterType, word) => {
     setFilterTerm(filterTerm => ({
@@ -838,64 +882,69 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
             </div>
             {displayedItems.map((item, index) => (
               <div
-              key={index}
-              className={`dashboard-item ${item.type === 'waitlist' ? 'waitlist-item' : ''}`}
-              onClick={() => {
-                setSelectedItem(item);
-                setQualified(false);
-                setMasterResumeRecommendation("Loading...");
-                if (selectedTab === "myApplications") {
-                  handleQualificationsCheck(
-                    item.jobDetails.hiddenKeywords,
-                    masterResume,
-                    item.jobDetails.qualifications,
-                    item.jobDetails.description
-                  );
-                } else {
-                  handleQualificationsCheck(
-                    item.hiddenKeywords,
-                    masterResume,
-                    item.qualifications,
-                    item.description
-                  );
-                }
-              }}
-            >
-              {selectedTab === "myApplications" ? (
-                <>
-                  <div className="dashboard-title">
-                    {item.jobDetails.title}
-                    {item.type === "waitlist" && (
-                      <div className="dashboard-waitlist">
-                        Waitlisted
-                      </div>
-                    )}
-                  </div>
-                  <div className="dashboard-company">{item.jobDetails.company}</div>
-                  <div className="dashboard-location">{item.jobDetails.location}</div>
-                  <div className="dashboard-type">{item.jobDetails.type}</div>
-                </>
-              ) : (
-                <>
-                  <div className="dashboard-title">{item.title}</div>
-                  <div className="dashboard-company">{item.company}</div>
-                  <div className="dashboard-location">{item.location}</div>
-                  <div className="dashboard-type">{item.type}</div>
-                  <div className="dashboard-apply-by">
-                    <strong>Apply by:</strong> {item.applyBy}
-                  </div>
-                  <div
-                    className={`favorite-icon ${isFavorited(item) ? "favorited" : ""}`}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleFavorite(item);
-                    }}
-                  >
-                    <FaStar />
-                  </div>
-                </>
-              )}
-            </div>
+                key={index}
+                className={`dashboard-item ${item.type === 'waitlist' ? 'waitlist-item' : ''}`}
+                onClick={() => {
+                  setSelectedItem(item);
+                  setQualified(false);
+                  setMasterResumeRecommendation("Loading...");
+                  if (selectedTab === "myApplications") {
+                    handleQualificationsCheck(
+                      item.jobDetails.hiddenKeywords,
+                      masterResume,
+                      item.jobDetails.qualifications,
+                      item.jobDetails.description
+                    );
+                  } else {
+                    handleQualificationsCheck(
+                      item.hiddenKeywords,
+                      masterResume,
+                      item.qualifications,
+                      item.description
+                    );
+                  }
+                }}
+              >
+                {selectedTab === "myApplications" ? (
+                  <>
+                    <div className="dashboard-title">
+                      {item.jobDetails.title}
+                      {item.type === "waitlist" && (
+                        <div className="dashboard-waitlist">
+                          {item.status === "Pending Review" ? "Waitlisted" : item.status}
+                        </div>
+                      )}
+                      {item.type === "application" && (
+                        <div className="dashboard-waitlist">
+                          {item.status}
+                        </div>
+                      )}
+                    </div>
+                    <div className="dashboard-company">{item.jobDetails.company}</div>
+                    <div className="dashboard-location">{item.jobDetails.location}</div>
+                    <div className="dashboard-type">{item.jobDetails.type}</div>
+                  </>
+                ) : (
+                  <>
+                    <div className="dashboard-title">{item.title}</div>
+                    <div className="dashboard-company">{item.company}</div>
+                    <div className="dashboard-location">{item.location}</div>
+                    <div className="dashboard-type">{item.type}</div>
+                    <div className="dashboard-apply-by">
+                      <strong>Apply by:</strong> {item.applyBy}
+                    </div>
+                    <div
+                      className={`favorite-icon ${isFavorited(item) ? "favorited" : ""}`}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleFavorite(item);
+                      }}
+                    >
+                      <FaStar />
+                    </div>
+                  </>
+                )}
+              </div>
             ))}
           </div>
           <div className="dashboard-detail">
@@ -1471,7 +1520,8 @@ const fetchJobsForApplicant = async (userId, setItems, searchTerm, filterTerm) =
   try {
     const jobsResponse = await DashboardController.fetchJobs();
     const applicationsResponse = await DashboardController.fetchUserApplications(userId);
-
+    const userInfo = await UserController.fetchUserInformation(userId);
+    
     if (!applicationsResponse) {
       setItems(jobsResponse);
       return;
@@ -1480,6 +1530,25 @@ const fetchJobsForApplicant = async (userId, setItems, searchTerm, filterTerm) =
     const appliedJobIds = new Set(applicationsResponse.map((application) => application.jobID));
 
     let availableJobs = jobsResponse.filter((job) => !appliedJobIds.has(job._id));
+
+    const positionsWanted = userInfo.positions.split(',').map(position => position.trim().toLowerCase());
+
+    const calculateJobSimilarity = (job, positionsWanted) => {
+      const jobContent = `${job.title.toLowerCase()} ${job.description.toLowerCase()} ${job.qualifications.toLowerCase()}`;
+      let score = 0;
+      positionsWanted.forEach((keyword) => {
+        if (jobContent.includes(keyword)) {
+          score += 1;
+        }
+      });
+      return score;
+    };
+
+    availableJobs.sort((a, b) => {
+      const similarityA = calculateJobSimilarity(a, positionsWanted);
+      const similarityB = calculateJobSimilarity(b, positionsWanted);
+      return similarityB - similarityA;
+    });
 
     const dateRanges = {
       "In 1 week": 7,

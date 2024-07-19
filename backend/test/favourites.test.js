@@ -2,7 +2,7 @@ import request from "supertest";
 import { expect } from "chai";
 import app from "../server.js";
 import mongoose from "mongoose";
-import "./setup.js"; // Ensure this file sets up and tears down the database correctly
+import "./setup.js";
 
 let recruiter, jobSeeker, job, application;
 
@@ -48,10 +48,43 @@ beforeEach(async () => {
 });
 
 describe("Favorites Functionality", () => {
-  describe("Recruiter Favoriting an Applicant", () => {
+  describe("Favouriting jobs ", () => {
+    it("should add a job to favorites", async () => {
+      const response = await request(app)
+        .post("/favorites/add")
+        .send({ userId: jobSeeker.body.userId, jobId: job.body.insertedId });
+  
+      expect(response.status).to.equal(200);
+      expect(response.body.message).to.equal("Job added to favorites");
+
+      const userResponse = await request(app).get(`/user/${jobSeeker.body.userId}`);
+      expect(userResponse.status).to.equal(200);
+      expect(userResponse.body.favorites).to.include(job.body.insertedId);
+    });
+  
+    it("should remove a job from favorites", async () => {
+
+      await request(app)
+        .post("/favorites/add")
+        .send({ userId: jobSeeker.body.userId, jobId: job.body.insertedId });
+  
+      const response = await request(app)
+        .post("/favorites/remove")
+        .send({ userId: jobSeeker.body.userId, jobId: job.body.insertedId });
+  
+      expect(response.status).to.equal(200);
+      expect(response.body.message).to.equal("Job removed from favorites");
+
+      const userResponse = await request(app).get(`/user/${jobSeeker.body.userId}`);
+      expect(userResponse.status).to.equal(200);
+      expect(userResponse.body.favorites).to.not.include(job.body.insertedId);
+    });
+  });
+
+  describe("Favouriting applicants", () => {
     it("should allow a recruiter to favorite an applicant", async () => {
       const addToFavoritesResponse = await request(app)
-        .post("/favorites/add")
+      .post("/favorites/add")
         .send({
           userId: recruiter.body.userId,
           itemId: jobSeeker.body.userId,
@@ -75,37 +108,7 @@ describe("Favorites Functionality", () => {
         ),
       ).to.be.true;
     });
-  });
 
-  describe("Recruiter Favoriting a Job", () => {
-    it("should allow a recruiter to favorite a job", async () => {
-      const addToFavoritesResponse = await request(app)
-        .post("/favorites/add")
-        .send({
-          userId: recruiter.body.userId,
-          itemId: job.body.insertedId,
-          type: "job",
-        });
-
-      expect(addToFavoritesResponse.status).to.equal(200);
-      expect(addToFavoritesResponse.body).to.have.property(
-        "message",
-        "Job added to favorites",
-      );
-
-      const updatedRecruiter = await request(app).get(
-        `/favorites/${recruiter.body.userId}`,
-      );
-      expect(updatedRecruiter.body).to.be.an("array").that.is.not.empty;
-      expect(
-        updatedRecruiter.body.some(
-          (fav) => fav._id.toString() === job.body.insertedId,
-        ),
-      ).to.be.true;
-    });
-  });
-
-  describe("Removing Favorites", () => {
     it("should allow a recruiter to remove an applicant from favorites", async () => {
       await request(app).post("/favorites/add").send({
         userId: recruiter.body.userId,
@@ -131,29 +134,5 @@ describe("Favorites Functionality", () => {
       expect(updatedRecruiter.body).to.be.an("array").that.is.empty;
     });
 
-    it("should allow a job seeker to remove a job from favorites", async () => {
-      await request(app).post("/favorites/add").send({
-        userId: jobSeeker.body.userId,
-        itemId: job.body.insertedId,
-        type: "job",
-      });
-
-      const res = await request(app).post("/favorites/remove").send({
-        userId: jobSeeker.body.userId,
-        itemId: job.body.insertedId,
-        type: "job",
-      });
-
-      expect(res.status).to.equal(200);
-      expect(res.body).to.have.property(
-        "message",
-        "Job removed from favorites",
-      );
-
-      const updatedJobSeeker = await request(app).get(
-        `/favorites/${jobSeeker.body.userId}`,
-      );
-      expect(updatedJobSeeker.body).to.be.an("array").that.is.empty;
-    });
   });
 });

@@ -20,7 +20,7 @@ function ApplicantList() {
   const [applicationDetails, setApplicationDetails] = useState(null);
   const [filterTerm, setFilterTerm] = useState({appliedDate: "", totalScore: ""});
   
-  const { user, logoutUser } = useContext(UserContext);
+  const { user, selectedTab, setSelectedTab } = useContext(UserContext);
   const progressBarRef = useRef(null);
   const [status, setStatus] = useState("");
   const [isStatusLoading, setIsStatusLoading] = useState(false);
@@ -31,7 +31,7 @@ function ApplicantList() {
       try {
         const response = await DashboardController.fetchApplicants(jobId);
         if (!response) return;
-        
+    
         let filteredApplicants = await Promise.all(
           response.map(async (applicant) => {
             const applicationDetails =
@@ -41,17 +41,16 @@ function ApplicantList() {
               );
             return {
               ...applicant,
-              totalScore: applicationDetails
-                ? applicationDetails.totalScore
-                : 0,
+              totalScore: applicationDetails ? applicationDetails.totalScore : 0,
               applicantSummary: applicationDetails
                 ? applicationDetails.applicantSummary
                 : {},
+              type: applicationDetails ? applicationDetails.type : "application",
             };
           }),
         );
         filteredApplicants.sort((a, b) => b.totalScore - a.totalScore);
-
+    
         const dateRanges = {
           "1 week ago": -8,
           "2 weeks ago": -15,
@@ -65,7 +64,7 @@ function ApplicantList() {
         };
     
         const filterByDate = (applicants) => {
-          const days = dateRanges[filterTerm['appliedDate']];
+          const days = dateRanges[filterTerm["appliedDate"]];
           if (!days) return applicants;
     
           const targetDate = getDateRange(days);
@@ -78,22 +77,22 @@ function ApplicantList() {
         if (filterTerm.appliedDate) {
           filteredApplicants = filterByDate(filteredApplicants);
         }
-
+    
         const filterByScore = (applicants, scoreKey) => {
           const scoreRange = filterTerm[scoreKey];
           if (!scoreRange) return applicants;
-
-          const [min, max] = scoreRange.split('-').map(Number);
+    
+          const [min, max] = scoreRange.split("-").map(Number);
           return applicants.filter((applicant) => {
             const score = applicant.totalScore;
             return score >= min && score <= max;
           });
         };
-
+    
         if (filterTerm.totalScore) {
-          filteredApplicants = filterByScore(filteredApplicants, 'totalScore');
+          filteredApplicants = filterByScore(filteredApplicants, "totalScore");
         }
-
+    
         if (searchTerm.trim()) {
           filteredApplicants = filteredApplicants.filter((applicant) => {
             const searchWords = searchTerm.trim().toLowerCase().split(/\s+/);
@@ -105,13 +104,24 @@ function ApplicantList() {
             );
           });
         }
-
+    
+        // Filter applicants based on the selected tab
+        if (selectedTab === "waitlist") {
+          filteredApplicants = filteredApplicants.filter(
+            (applicant) => applicant.type === "waitlist"
+          );
+        } else if (selectedTab === "applications") {
+          filteredApplicants = filteredApplicants.filter(
+            (applicant) => applicant.type === "application"
+          );
+        }
+    
         setApplicants(filteredApplicants);
       } catch (error) {
         console.error("Error fetching applicants:", error);
       }
-    };
-
+    };    
+  
     const fetchJobDetails = async () => {
       try {
         const response = await DashboardController.fetchJobDetails(jobId);
@@ -120,10 +130,10 @@ function ApplicantList() {
         console.error("Error fetching job details:", error);
       }
     };
-
+  
     fetchApplicants();
     fetchJobDetails();
-  }, [jobId, searchTerm, filterTerm]);
+  }, [jobId, searchTerm, filterTerm, selectedTab]);  
 
   // Handle favorite
   const handleFavorite = (applicant) => {
@@ -139,6 +149,12 @@ function ApplicantList() {
   const isFavorited = (applicant) => favoritedApplicants.includes(applicant);
 
   const filteredApplicants = applicants;
+
+  // Handle tab change
+  const handleTabChange = (tab) => {
+    setSelectedTab(tab);
+    setSelectedApplicant(null);
+  };  
 
   // Handle select applicant
   const handleSelectApplicant = async (applicant) => {
@@ -307,6 +323,22 @@ function ApplicantList() {
                 {filterTerm.totalScore} <div className="icon"><FaXmark/></div>
               </button>
             )}
+          </div>
+        </div>
+        <div className="tab-bar">
+          <div className="tab-container">
+            <button
+              className={`tab-button ${selectedTab === "applications" ? "selected" : ""}`}
+              onClick={() => handleTabChange("applications")}
+            >
+              Applications
+            </button>
+            <button
+              className={`tab-button ${selectedTab === "waitlist" ? "selected" : ""}`}
+              onClick={() => handleTabChange("waitlist")}
+            >
+              Waitlist
+            </button>
           </div>
         </div>
         <div className="dashboard-listings">
