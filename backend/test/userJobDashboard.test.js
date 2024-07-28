@@ -16,6 +16,7 @@ describe("Applications Management", () => {
       password: "password123",
       fullName: "John Applicant",
       companyName: "Applicant Corp",
+      companyAccessCode: "Code123",
     });
     user = userResponse.body;
 

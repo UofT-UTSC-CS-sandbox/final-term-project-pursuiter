@@ -437,6 +437,7 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
         address: user.address,
         positions: user.positions,
         companyName: user.companyName,
+        companyAccessCode: user.companyAccessCode,
         userType: user.userType,
         userId: user.userId,
         masterResume: user.masterResume,

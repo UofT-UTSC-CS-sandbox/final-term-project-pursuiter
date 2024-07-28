@@ -17,6 +17,7 @@ describe("Application Process", () => {
       password: "password123",
       fullName: "Jane Applicant",
       companyName: "",
+      companyAccessCode: "",
     });
     applicant = applicantRes.body.userId;
 
