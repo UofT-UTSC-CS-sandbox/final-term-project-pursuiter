@@ -46,6 +46,7 @@
   flex-direction: column;
   padding: 20px;
   min-height: 100vh;
+  height: fit-content;
   position: relative;
 }
 
@@ -57,22 +58,10 @@
 }
 
 .dashboard-list {
-  width: 30%;
+  width: 25%;
   background-color: #f2f2f2;
   overflow-y: auto;
 }
-
-/* .dashboard-count {
-  justify-content: space-between;
-  padding: 10px;
-  font-weight: bold;
-  background-color: #fff;
-  width: 100%;
-  box-sizing: border-box;
-  position: sticky;
-  top: 0;
-  z-index: 1000;
-} */
 
 .dashboard-count {
   display: flex;
