@@ -328,7 +328,7 @@
 }
 
 .filter-display-btn {
-  background-color: #680025;
+  background-color: #600021;
   color: #fffbfb;
   font-weight: normal;
   font-size: 16px;
@@ -848,9 +848,6 @@
 }
 
 .pagination button {
-  background-color: #800020;
-  color: #fff;
-  border: none;
   padding: 10px 15px;
   margin: 0 5px;
   border-radius: 5px;
@@ -858,17 +855,17 @@
 }
 
 .pagination button.active {
-  background-color: #680025;
   font-weight: bold;
+  background-color: #600021;
 }
 
 .pagination button:disabled {
-  background-color: #ccc;
   cursor: not-allowed;
 }
 
-.pagination button:hover:not(:disabled) {
-  background-color: #a00028;
+.pagination button.active:hover {
+  background-color: #680025;
+  color: #e7e7e7;  
 }
 
 .items-per-page-dropdown {
