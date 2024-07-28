@@ -4,13 +4,12 @@ import { UserContext } from "../../contexts/UserContext";
 import { FaStar } from "react-icons/fa";
 import { FaXmark } from "react-icons/fa6";
 import { FaCaretDown } from "react-icons/fa6";
-
 import Modal from "../modal/Modal";
 import UserController from "../../controllers/UserController";
-
 import DashboardController from "../../controllers/DashboardController";
 import "./Dashboard.css";
 import * as pdfjsLib from "pdfjs-dist/webpack";
+import Cookies from "js-cookie";
 
 const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
   const navigate = useNavigate();
@@ -97,33 +96,97 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
   const [showWarning, setShowWarning] = useState(false);
   const [isCooldown, setIsCooldown] = useState(false);
 
+  const [newJobsPage, setNewJobsPage] = useState(Number(Cookies.get('newJobsPage') || 1));
+  const [applicationsPage, setApplicationsPage] = useState(Number(Cookies.get('applicationsPage') || 1));
+  const [itemsPerPage, setItemsPerPage] = useState(Number(Cookies.get('itemsPerPage') || 10));
+  const [totalJobs, setTotalJobs] = useState(0);
+  const [totalPages, setTotalPages] = useState(1);
+
+  const currentPage = selectedTab === "newJobs" ? newJobsPage : applicationsPage;
+
+  const paginate = (pageNumber) => {
+    if (selectedTab === "newJobs") {
+      setNewJobsPage(pageNumber);
+      Cookies.set('newJobsPage', pageNumber);
+    } else {
+      setApplicationsPage(pageNumber);
+      Cookies.set('applicationsPage', pageNumber);
+    }
+  };
+
+  const Pagination = ({ currentPage, totalPages, onPageChange }) => {
+    const pages = [];
+    for (let i = 1; i <= totalPages; i++) {
+      pages.push(i);
+    }
+    return (
+      <div className="pagination">
+        <button
+          onClick={() => onPageChange(currentPage - 1)}
+          disabled={currentPage === 1}
+        >
+          Previous
+        </button>
+        {pages.map((page) => (
+          <button
+            key={page}
+            onClick={() => onPageChange(page)}
+            className={page === currentPage ? "active" : ""}
+          >
+            {page}
+          </button>
+        ))}
+        <button
+          onClick={() => onPageChange(currentPage + 1)}
+          disabled={currentPage === totalPages}
+        >
+          Next
+        </button>
+      </div>
+    );
+  };
+
   // Fetch jobs and favorited jobs
   useEffect(() => {
     if (user) {
-      if (selectedTab === "myApplications") {
-        fetchApplications(user.userId, searchTerm, filterTerm);
-      } else {
-        fetchFavoritedJobs(user.userId, setFavoritedItems);
-        fetchJobs(user.userId, setItems, searchTerm, filterTerm);
-
-        UserController.fetchUserInformation(user.userId)
-          .then((userInfo) => {
+      const fetchJobsAndFavorites = async () => {
+        try {
+          if (selectedTab === "myApplications") {
+            await fetchApplications(user.userId, searchTerm, filterTerm);
+          } else {
+            const userInfo = await UserController.fetchUserInformation(user.userId);
             setMasterResume(userInfo.masterResume || null);
-          })
-          .catch((error) => {
-            console.error("Error fetching user information:", error);
-            setMasterResume(null);
-          });
-      }
+
+            await fetchFavoritedJobs(user.userId, setFavoritedItems);
+
+            if (role === "recruiter") {
+              await fetchJobsForRecruiter(user.userId, setItems, searchTerm, filterTerm);
+            } else {
+              await fetchJobsForApplicant(user.userId, setItems, searchTerm, filterTerm);
+            }
+          }
+        } catch (error) {
+          console.error("Error fetching jobs or user information:", error);
+          setMasterResume(null);
+        }
+      };
+
+      fetchJobsAndFavorites();
     }
   }, [
     user,
-    fetchFavoritedJobs,
-    fetchJobs,
     selectedTab,
     searchTerm,
     filterTerm,
+    newJobsPage,
+    applicationsPage,
+    itemsPerPage,
+    role,
   ]);
+
+  useEffect(() => {
+    Cookies.set('itemsPerPage', itemsPerPage);
+  }, [itemsPerPage]);
 
   // Fetch recruiter information
   useEffect(() => {
@@ -632,8 +695,10 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
     setSelectedItem(null);
     setSelectedTab(tab);
     if (tab === "newJobs") {
+      Cookies.set("newJobsPage", 1);
       fetchJobs(user.userId, setItems, "", filterTerm);
     } else {
+      Cookies.set("applicationsPage", 1);
       fetchApplications(user.userId, "", filterTerm);
     }
   };
@@ -871,6 +936,15 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
       ? applications
       : [...favoritedItems, ...allItems];
 
+  const indexOfLastJob = currentPage * itemsPerPage;
+  const indexOfFirstJob = indexOfLastJob - itemsPerPage;
+  const currentJobs = displayedItems.slice(indexOfFirstJob, indexOfLastJob);
+
+  useEffect(() => {
+    setTotalJobs(displayedItems.length);
+    setTotalPages(Math.ceil(displayedItems.length / itemsPerPage));
+  }, [displayedItems, itemsPerPage]);
+
   return (
     <div className="dashboard-container">
       <div className="dashboard-content">
@@ -1087,9 +1161,19 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
         <div className="dashboard-listings">
           <div className="dashboard-list">
             <div className="dashboard-count">
-              Showing {displayedItems.length} Jobs
+              Showing {indexOfFirstJob + 1}-{Math.min(indexOfLastJob, totalJobs)} of {totalJobs} Jobs
+              <select
+                value={itemsPerPage}
+                onChange={(e) => setItemsPerPage(Number(e.target.value))}
+                className="items-per-page-dropdown"
+              >
+                <option value={5}>5</option>
+                <option value={10}>10</option>
+                <option value={20}>20</option>
+                <option value={50}>50</option>
+              </select>
             </div>
-            {displayedItems.map((item, index) => (
+            {currentJobs.map((item, index) => (
               <div
                 key={index}
                 className={`dashboard-item ${item.type === "waitlist" ? "waitlist-item" : ""}`}
@@ -1386,6 +1470,11 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
             )}
           </div>
         </div>
+        <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={paginate}
+        />
       </div>
       <Modal
         show={showItemForm}

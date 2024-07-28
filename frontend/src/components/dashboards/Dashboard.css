@@ -45,27 +45,36 @@
   display: flex;
   flex-direction: column;
   padding: 20px;
+  min-height: 100vh;
+  height: fit-content;
+  position: relative;
 }
 
 .dashboard-listings {
   display: flex;
   flex: 1;
   border: 1px solid #ddd;
-  overflow: hidden;
+  overflow: auto;
 }
 
 .dashboard-list {
-  width: 30%;
+  width: 25%;
   background-color: #f2f2f2;
   overflow-y: auto;
 }
 
 .dashboard-count {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1em;
+  box-sizing: border-box;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  background-color: #fff;
   padding: 10px;
   font-weight: bold;
-  background-color: #fff;
-  width: 100%;
-  box-sizing: border-box;
 }
 
 .dashboard-title {
@@ -319,7 +328,7 @@
 }
 
 .filter-display-btn {
-  background-color: #680025;
+  background-color: #600021;
   color: #fffbfb;
   font-weight: normal;
   font-size: 16px;
@@ -824,4 +833,49 @@
 .modal-content {
   max-height: 90vh;
   overflow-y: auto;
+}
+
+/************************************
+ * Pagination Styles
+ *************************************/
+ .pagination {
+  display: flex;
+  justify-content: left;
+  align-items: center;
+  padding: 10px;
+  background-color: #fff;
+  border-top: 1px solid #ddd;
+}
+
+.pagination button {
+  padding: 10px 15px;
+  margin: 0 5px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.pagination button.active {
+  font-weight: bold;
+  background-color: #600021;
+}
+
+.pagination button:disabled {
+  cursor: not-allowed;
+}
+
+.pagination button.active:hover {
+  background-color: #680025;
+  color: #e7e7e7;  
+}
+
+.items-per-page-dropdown {
+  margin-left: auto;
+  margin-right: 1em;
+  padding: 0.5em;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 1em;
+  background-color: #fff;
+  cursor: pointer;
+  outline: none;
 }
