@@ -113,6 +113,8 @@ const UserProvider = ({ children }) => {
   const logoutUser = () => {
     setUser(null);
     setSelectedTab(null);
+    Cookies.remove("currentPage");
+    Cookies.remove("itemsPerPage");
     Cookies.remove("user");
     Cookies.remove("selectedTab");
   };
