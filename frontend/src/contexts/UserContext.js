@@ -115,6 +115,8 @@ const UserProvider = ({ children }) => {
     setSelectedTab(null);
     Cookies.remove("currentPage");
     Cookies.remove("itemsPerPage");
+    Cookies.remove("newJobsPage");
+    Cookies.remove("applicationsPage");
     Cookies.remove("user");
     Cookies.remove("selectedTab");
   };

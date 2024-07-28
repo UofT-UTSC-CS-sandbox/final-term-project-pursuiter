@@ -12,7 +12,6 @@ import * as pdfjsLib from "pdfjs-dist/webpack";
 import Cookies from "js-cookie";
 
 const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
-  const paginate = (pageNumber) => setCurrentPage(pageNumber);
   const navigate = useNavigate();
   const [selectedItem, setSelectedItem] = useState(null);
   const [favoritedItems, setFavoritedItems] = useState([]);
@@ -97,24 +96,33 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
   const [showWarning, setShowWarning] = useState(false);
   const [isCooldown, setIsCooldown] = useState(false);
 
-  const [currentPage, setCurrentPage] = useState(Number(Cookies.get('currentPage') || 1));
+  const [newJobsPage, setNewJobsPage] = useState(Number(Cookies.get('newJobsPage') || 1));
+  const [applicationsPage, setApplicationsPage] = useState(Number(Cookies.get('applicationsPage') || 1));
   const [itemsPerPage, setItemsPerPage] = useState(Number(Cookies.get('itemsPerPage') || 10));
   const [totalJobs, setTotalJobs] = useState(0);
   const [totalPages, setTotalPages] = useState(1);
+
+  const currentPage = selectedTab === "newJobs" ? newJobsPage : applicationsPage;
+
+  const paginate = (pageNumber) => {
+    if (selectedTab === "newJobs") {
+      setNewJobsPage(pageNumber);
+      Cookies.set('newJobsPage', pageNumber);
+    } else {
+      setApplicationsPage(pageNumber);
+      Cookies.set('applicationsPage', pageNumber);
+    }
+  };
 
   const Pagination = ({ currentPage, totalPages, onPageChange }) => {
     const pages = [];
     for (let i = 1; i <= totalPages; i++) {
       pages.push(i);
     }
-    const handlePageChange = (page) => {
-      onPageChange(page);
-      Cookies.set('currentPage', page);
-    };
     return (
       <div className="pagination">
         <button
-          onClick={() => handlePageChange(currentPage - 1)}
+          onClick={() => onPageChange(currentPage - 1)}
           disabled={currentPage === 1}
         >
           Previous
@@ -122,14 +130,14 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
         {pages.map((page) => (
           <button
             key={page}
-            onClick={() => handlePageChange(page)}
+            onClick={() => onPageChange(page)}
             className={page === currentPage ? "active" : ""}
           >
             {page}
           </button>
         ))}
         <button
-          onClick={() => handlePageChange(currentPage + 1)}
+          onClick={() => onPageChange(currentPage + 1)}
           disabled={currentPage === totalPages}
         >
           Next
@@ -170,7 +178,8 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
     selectedTab,
     searchTerm,
     filterTerm,
-    currentPage,
+    newJobsPage,
+    applicationsPage,
     itemsPerPage,
     role,
   ]);
@@ -685,11 +694,13 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
   const handleTabChange = (tab) => {
     setSelectedItem(null);
     setSelectedTab(tab);
-    setCurrentPage(1);
-    Cookies.set("currentPage", 1);
     if (tab === "newJobs") {
+      // setNewJobsPage(1);
+      Cookies.set("newJobsPage", 1);
       fetchJobs(user.userId, setItems, "", filterTerm);
     } else {
+      // setApplicationsPage(1);
+      Cookies.set("applicationsPage", 1);
       fetchApplications(user.userId, "", filterTerm);
     }
   };
@@ -927,14 +938,14 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
       ? applications
       : [...favoritedItems, ...allItems];
 
-    const indexOfLastJob = currentPage * itemsPerPage;
-    const indexOfFirstJob = indexOfLastJob - itemsPerPage;
-    const currentJobs = displayedItems.slice(indexOfFirstJob, indexOfLastJob);
-  
-    useEffect(() => {
-      setTotalJobs(displayedItems.length);
-      setTotalPages(Math.ceil(displayedItems.length / itemsPerPage));
-    }, [displayedItems, itemsPerPage]);
+  const indexOfLastJob = currentPage * itemsPerPage;
+  const indexOfFirstJob = indexOfLastJob - itemsPerPage;
+  const currentJobs = displayedItems.slice(indexOfFirstJob, indexOfLastJob);
+
+  useEffect(() => {
+    setTotalJobs(displayedItems.length);
+    setTotalPages(Math.ceil(displayedItems.length / itemsPerPage));
+  }, [displayedItems, itemsPerPage]);
 
   return (
     <div className="dashboard-container">
