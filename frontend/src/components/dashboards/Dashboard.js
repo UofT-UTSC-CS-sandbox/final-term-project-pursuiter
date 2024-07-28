@@ -695,11 +695,9 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
     setSelectedItem(null);
     setSelectedTab(tab);
     if (tab === "newJobs") {
-      // setNewJobsPage(1);
       Cookies.set("newJobsPage", 1);
       fetchJobs(user.userId, setItems, "", filterTerm);
     } else {
-      // setApplicationsPage(1);
       Cookies.set("applicationsPage", 1);
       fetchApplications(user.userId, "", filterTerm);
     }
