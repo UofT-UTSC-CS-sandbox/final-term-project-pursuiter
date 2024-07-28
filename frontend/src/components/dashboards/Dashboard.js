@@ -687,7 +687,6 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
     setSelectedTab(tab);
     setCurrentPage(1);
     Cookies.set("currentPage", 1);
-    Cookies.set("itemsPerPage", 10);
     if (tab === "newJobs") {
       fetchJobs(user.userId, setItems, "", filterTerm);
     } else {
