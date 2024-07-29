@@ -10,6 +10,7 @@ function SignupPage({ userType }) {
   const [password, setPassword] = useState("");
   const [fullName, setFullName] = useState("");
   const [companyName, setCompanyName] = useState("");
+  const [companyAccessCode, setCompanyAccessCode] = useState("");
   const [address] = useState("");
   const [positions] = useState("");
   const navigate = useNavigate();
@@ -30,6 +31,7 @@ function SignupPage({ userType }) {
         password,
         fullName,
         companyName,
+        companyAccessCode,
         address,
         positions,
       });
@@ -83,15 +85,21 @@ function SignupPage({ userType }) {
             />
           </div>
           {userType === "recruiter" && (
-            <div className="users-form-group">
+            <><div className="users-form-group">
               <label>Company Name:</label>
               <input
                 type="text"
                 value={companyName}
                 onChange={(e) => setCompanyName(e.target.value)}
-                required
-              />
-            </div>
+                required />
+            </div><div className="users-form-group">
+                <label>Company Access Code:</label>
+                <input
+                  type="text"
+                  value={companyAccessCode}
+                  onChange={(e) => setCompanyAccessCode(e.target.value)}
+                  required />
+              </div></>            
           )}
           <button type="submit">Sign Up</button>
         </form>

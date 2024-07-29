@@ -16,6 +16,7 @@ describe("Applications Management", () => {
       password: "password123",
       fullName: "John Applicant",
       companyName: "Applicant Corp",
+      companyAccessCode: "Code123",
     });
     user = userResponse.body;
 
@@ -29,6 +30,8 @@ describe("Applications Management", () => {
       description: "Sample job description 1",
       qualifications: "Sample qualifications 1",
       recruiterID: "recruiter1",
+      postedBy: "recruiter1",
+      lastEditedBy: "recruiter1",
     });
 
     job2 = await mongoose.connection.db.collection("jobs").insertOne({
@@ -41,6 +44,8 @@ describe("Applications Management", () => {
       description: "Sample job description 2",
       qualifications: "Sample qualifications 2",
       recruiterID: "recruiter2",
+      postedBy: "recruiter2",
+      lastEditedBy: "recruiter2",
     });
 
     job3 = await mongoose.connection.db.collection("jobs").insertOne({
@@ -53,6 +58,8 @@ describe("Applications Management", () => {
       description: "Sample job description 3",
       qualifications: "Sample qualifications 3",
       recruiterID: "recruiter3",
+      postedBy: "recruiter3",
+      lastEditedBy: "recruiter3",
     });
 
     application1 = await mongoose.connection.db

@@ -17,6 +17,7 @@ beforeEach(async () => {
     password: "password123",
     fullName: "Recruiter 1",
     companyName: "Test Company",
+    companyAccessCode: "Code123",
     address: "toronto",
   });
 
@@ -27,6 +28,7 @@ beforeEach(async () => {
     password: "password123",
     fullName: "Job Seeker 1",
     companyName: "Seeker Company",
+    companyAccessCode: "Code123",
     address: "new york",
   });
 

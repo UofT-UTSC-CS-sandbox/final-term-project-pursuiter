@@ -19,6 +19,7 @@ describe("User Authentication", () => {
       password: "password123",
       fullName: "John Doe",
       companyName: "Tech Corp",
+      companyAccessCode: "Code123",
     });
   });
 
@@ -30,6 +31,7 @@ describe("User Authentication", () => {
         password: "password123",
         fullName: "Jane Doe",
         companyName: "Tech Corp",
+        companyAccessCode: "Code123",
       });
 
       expect(res.status).to.equal(201);
@@ -43,6 +45,7 @@ describe("User Authentication", () => {
         password: "password123",
         fullName: "John Doe",
         companyName: "Tech Corp",
+        companyAccessCode: "Code123",
       });
 
       expect(res.status).to.equal(409);

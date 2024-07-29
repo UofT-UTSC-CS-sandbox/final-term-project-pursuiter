@@ -104,6 +104,7 @@ app.post("/signup", async (req, res) => {
     password,
     fullName,
     companyName,
+    companyAccessCode,
     address,
     positions,
     masterResume,
@@ -113,6 +114,12 @@ app.post("/signup", async (req, res) => {
     if (existingUser) {
       return res.status(409).json({ message: "User already exists" });
     }
+    if (companyName) {
+      const companyUser = await db.collection("users").findOne({ companyName });
+      if (companyUser && companyUser.companyAccessCode !== companyAccessCode) {
+        return res.status(400).json({ message: "Invalid access code for that company" });
+      }
+    }
     const hashedPassword = await bcrypt.hash(password, 10);
     const newUser = {
       userType,
@@ -120,6 +127,7 @@ app.post("/signup", async (req, res) => {
       password: hashedPassword,
       fullName,
       companyName,
+      companyAccessCode,
       address,
       positions,
       favorites: [],
@@ -152,6 +160,7 @@ app.post("/login", async (req, res) => {
         email: user.email,
         fullName: user.fullName,
         companyName: user.companyName,
+        companyAccessCode: user.companyAccessCode,
         address: user.address,
         positions: user.positions,
         userId: user._id,
@@ -186,6 +195,7 @@ app.get("/user/:id", async (req, res) => {
         email: user.email,
         fullName: user.fullName,
         companyName: user.companyName,
+        companyAccessCode: user.companyAccessCode,
         address: user.address,
         positions: user.positions,
         userId: user._id,
@@ -214,6 +224,7 @@ app.put("/updateUser", async (req, res) => {
     address,
     positions,
     companyName,
+    companyAccessCode,
     userType,
     masterResume,
     createConfirm,
@@ -238,6 +249,7 @@ app.put("/updateUser", async (req, res) => {
       if (address) updatedUser.address = address;
       if (positions) updatedUser.positions = positions;
       if (companyName) updatedUser.companyName = companyName;
+      if (companyAccessCode) updatedUser.companyAccessCode = companyAccessCode;
       if (userType) updatedUser.userType = userType;
       if (masterResume) updatedUser.masterResume = masterResume;
       if (createConfirm !== undefined)
@@ -250,6 +262,7 @@ app.put("/updateUser", async (req, res) => {
         email: updatedUser.email,
         positions: updatedUser.positions,
         companyName: updatedUser.companyName,
+        companyAccessCode: updatedUser.companyAccessCode,
         userType: updatedUser.userType,
         masterResume: updatedUser.masterResume,
         createConfirm: updatedUser.createConfirm,
@@ -332,13 +345,14 @@ app.post("/jobs/add", async (req, res) => {
 app.put("/jobs/:id", async (req, res) => {
   const jobId = req.params.id;
   const job = req.body;
+  const lastEditedBy = job.lastEditedBy;
   if (!ObjectId.isValid(jobId)) {
     return res.status(400).json({ message: "Invalid job ID" });
   }
   try {
     const result = await db
       .collection("jobs")
-      .updateOne({ _id: new ObjectId(jobId) }, { $set: job });
+      .updateOne({ _id: new ObjectId(jobId) }, { $set: { ...job, lastEditedBy: lastEditedBy } });
     if (result.modifiedCount === 1) {
       res.json({ message: "Job updated", job });
     } else {

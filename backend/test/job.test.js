@@ -15,7 +15,6 @@ describe("Job Management", () => {
       description: "Develop and maintain software applications.",
       company: "Tech Corp",
       location: "New York, NY",
-      salary: "120000",
     });
     jobId = jobRes.body.insertedId;
   });
@@ -26,7 +25,6 @@ describe("Job Management", () => {
       description: "Develop and maintain backend services.",
       company: "Tech Solutions",
       location: "San Francisco, CA",
-      salary: "130000",
     };
 
     const res = await request(app).post("/jobs/add").send(jobData);
@@ -43,7 +41,6 @@ describe("Job Management", () => {
     expect(job).to.have.property("description", jobData.description);
     expect(job).to.have.property("company", jobData.company);
     expect(job).to.have.property("location", jobData.location);
-    expect(job).to.have.property("salary", jobData.salary);
   });
 
   it("should edit an existing job", async () => {
@@ -52,7 +49,7 @@ describe("Job Management", () => {
       description: "Develop and maintain complex software applications.",
       company: "Tech Corp",
       location: "New York, NY",
-      salary: "140000",
+      lastEditedBy: "John Doe",
     };
 
     const res = await request(app).put(`/jobs/${jobId}`).send(updatedJobData);
@@ -68,7 +65,7 @@ describe("Job Management", () => {
     expect(job).to.have.property("description", updatedJobData.description);
     expect(job).to.have.property("company", updatedJobData.company);
     expect(job).to.have.property("location", updatedJobData.location);
-    expect(job).to.have.property("salary", updatedJobData.salary);
+    expect(job).to.have.property("lastEditedBy", updatedJobData.lastEditedBy);
   });
 
   it("should delete an existing job", async () => {
