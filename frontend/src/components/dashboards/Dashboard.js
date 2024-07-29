@@ -41,6 +41,8 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
     qualifications: "",
     recruiterID: "",
     coverLetterRequired: "",
+    postedBy: "",
+    lastEditedBy: "",
   });
   const [applications, setApplications] = useState([]);
   const [resumeFile, setResumeFile] = useState(null);
@@ -77,6 +79,8 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
       qualifications: "",
       recruiterID: user.userId,
       coverLetterRequired: "",
+      postedBy: user.fullName,
+      lastEditedBy: user.fullName,
     });
     setEditMode(false);
     setShowItemForm(true);
@@ -160,7 +164,7 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
             await fetchFavoritedJobs(user.userId, setFavoritedItems);
 
             if (role === "recruiter") {
-              await fetchJobsForRecruiter(user.userId, setItems, searchTerm, filterTerm);
+              await fetchJobsForRecruiter(user.companyName,setItems, searchTerm, filterTerm);
             } else {
               await fetchJobsForApplicant(user.userId, setItems, searchTerm, filterTerm);
             }
@@ -342,6 +346,8 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
       const response = await DashboardController.postJob({
         ...newItem,
         recruiterID: user.userId,
+        postedBy: user.fullName,
+        lastEditedBy: user.fullName,
       });
 
       setItems((prevItems) => [response, ...prevItems]);
@@ -357,6 +363,8 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
         description: "",
         qualifications: "",
         recruiterID: "",
+        postedBy: "",
+        lastEditedBy: "",
         coverLetterRequired: "",
       });
 
@@ -399,7 +407,7 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
   // Handle form submission for add/edit jobs
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const itemToSubmit = { ...newItem, recruiterID: user.userId };
+    const itemToSubmit = { ...newItem, recruiterID: user.userId, lastEditedBy: user.fullName };
 
     try {
       if (editMode) {
@@ -479,6 +487,8 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
       description: item.description,
       qualifications: item.qualifications,
       recruiterID: item.recruiterID,
+      postedBy: item.postedBy,
+      lastEditedBy: item.lastEditedBy,
       coverLetterRequired: item.coverLetterRequired,
     });
     setSelectedItem(item);
@@ -663,7 +673,6 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
       location.trim() !== "" &&
       type.trim() !== "" &&
       applyBy.trim() !== "" &&
-      // hiddenKeywords.trim() !== "" &&
       description.trim() !== "" &&
       qualifications.trim() !== "" &&
       coverLetterRequired.trim() !== "";
@@ -1414,8 +1423,17 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
                               </span>
                             </h2>
                             <p>{selectedItem.hiddenKeywords}</p>
-                          </div>
+                          </div>                                             
                         )}
+                      {role === "recruiter" && (
+                        <><div className="dashboard-detail-section">
+                            <h2>Posted By:</h2>
+                            <p>{selectedItem.postedBy}</p>
+                          </div><div className="dashboard-detail-section">
+                              <h2>Last Edited By:</h2>
+                              <p>{selectedItem.lastEditedBy}</p>
+                            </div></>                         
+                      )}
                       {!qualified && missingQualifications.length > 0 ? (
                         <div className="dashboard-detail-section">
                           <h2>Missing Qualifications:</h2>
@@ -1821,7 +1839,7 @@ const fetchFavoritedJobs = async (userId, setFavoritedItems) => {
 };
 
 const fetchJobsForRecruiter = async (
-  userId,
+  companyName,
   setItems,
   searchTerm,
   filterTerm,
@@ -1829,7 +1847,7 @@ const fetchJobsForRecruiter = async (
   try {
     const response = await DashboardController.fetchJobs();
     let availableJobs = response.filter(
-      (job) => job.recruiterID.toString() === userId,
+      (job) => job.company.toString() === companyName,
     );
 
     const dateRanges = {

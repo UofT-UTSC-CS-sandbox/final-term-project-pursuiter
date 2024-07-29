@@ -345,13 +345,14 @@ app.post("/jobs/add", async (req, res) => {
 app.put("/jobs/:id", async (req, res) => {
   const jobId = req.params.id;
   const job = req.body;
+  const lastEditedBy = job.lastEditedBy;
   if (!ObjectId.isValid(jobId)) {
     return res.status(400).json({ message: "Invalid job ID" });
   }
   try {
     const result = await db
       .collection("jobs")
-      .updateOne({ _id: new ObjectId(jobId) }, { $set: job });
+      .updateOne({ _id: new ObjectId(jobId) }, { $set: { ...job, lastEditedBy: lastEditedBy } });
     if (result.modifiedCount === 1) {
       res.json({ message: "Job updated", job });
     } else {
