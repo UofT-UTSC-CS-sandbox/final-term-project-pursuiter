@@ -4,12 +4,13 @@ import React, { useState, useContext } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { UserContext } from "../../contexts/UserContext";
 import UserController from "../../controllers/UserController";
+import { GoogleLogin } from '@react-oauth/google';
 
 function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
-  const { loginUser } = useContext(UserContext);
+  const { loginUser, googleLogin} = useContext(UserContext);
 
   // Hangle login form submission
   const handleSubmit = async (event) => {
@@ -29,6 +30,22 @@ function LoginPage() {
       alert(error.message);
     }
   };
+
+  // Handle Google login
+  const handleGoogleLogin = async (response) => {
+    try {
+      const idToken = response.credential;
+      const user = await googleLogin(idToken);
+      if (user.userType === "applicant") {
+        navigate("/applicant-dashboard");
+      } else if (user.userType === "recruiter") {
+        navigate("/recruiter-dashboard");
+      }
+    } catch (error) {
+      console.error("Google Login failed:", error);
+      alert(error.message);
+    }
+  };  
 
   return (
     <div className="users-page-container">
@@ -56,6 +73,7 @@ function LoginPage() {
           </div>
           <button type="submit">Login</button>
         </form>
+        <GoogleLogin onSuccess={handleGoogleLogin} onError={() => alert('Google Login Failed')} /> 
         <div className="inline-link">
           <p>
             Want a job seeker account?{" "}

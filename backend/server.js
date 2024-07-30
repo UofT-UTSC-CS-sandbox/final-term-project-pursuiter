@@ -5,6 +5,7 @@ import cors from "cors"; // Cross-origin resource sharing middleware
 import mongoose from "mongoose"; // Mongoose library
 import dotenv from "dotenv"; // Dotenv library
 import GeminiService from "./geminiService.js"; // Import the GeminiService
+import { OAuth2Client } from 'google-auth-library';
 
 const env = process.env.NODE_ENV || "development";
 dotenv.config({ path: `.env.${env}` });
@@ -13,6 +14,9 @@ const app = express();
 const PORT = process.env.PORT || 4000;
 const mongoURL = process.env.MONGO_URI || "mongodb://localhost:27017";
 const dbName = process.env.DB_NAME || "pursuiter";
+
+const CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
+const client = new OAuth2Client(CLIENT_ID);
 
 app.use(express.json({ limit: "50mb" }));
 app.use(express.urlencoded({ limit: "50mb", extended: true }));
@@ -62,6 +66,17 @@ async function startServer() {
 }
 
 startServer();
+
+// Verify Google ID Token
+async function verifyToken(idToken) {
+  const ticket = await client.verifyIdToken({
+    idToken,
+    audience: CLIENT_ID,
+  });
+  const payload = ticket.getPayload();
+  return payload;
+}
+
 
 /************************************
  * Gemini API Endpoints
@@ -172,6 +187,104 @@ app.post("/login", async (req, res) => {
     }
   } catch (error) {
     res.status(500).json({ message: "Error logging in" });
+  }
+});
+
+/**
+ * @route POST /auth/google-signup
+ * @description Register a new user using Google
+ * @access public
+ */
+app.post('/api/auth/google-signup', async (req, res) => {
+  try {
+    const { idToken, userType } = req.body;
+    const payload = await verifyToken(idToken);
+    // const { sub, email, name } = payload;
+
+    const googleId = payload.sub;
+    const email = payload.email;
+    const name = payload.name;
+
+    let user = await db.collection('users').findOne({ email });
+    if (user) {
+        await db.collection('users').updateOne(
+          { email },
+          { $set: { googleId, fullName: name} }
+        );
+        user = await db.collection('users').findOne({ email });
+      } else {
+      user = {
+        googleId: googleId,
+        email,
+        fullName: name,
+        userType,
+        companyName: '',
+        address: '',
+        positions: '',
+        favorites: [],
+        createConfirm: true,
+      };
+      const result = await db.collection('users').insertOne(user);
+      user._id = result.insertedId;
+    }
+    const normalizedUser = {
+      googleId: user.googleId,
+      userId: user._id,
+      email: user.email,
+      fullName: user.fullName,
+      userType: user.userType,
+      companyName: user.companyName,
+      address: user.address,
+      positions: user.positions,
+      favorites: user.favorites,
+      createConfirm: user.createConfirm,
+    };
+    res.json(normalizedUser);
+  } catch (error) {
+    console.error('Google Signup error:', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
+/**
+ * @route POST /auth/google-login
+ * @description Login a user using Google
+ * @access public
+ */
+app.post('/api/auth/google-login', async (req, res) => {
+  try {
+    const { idToken } = req.body;
+    const payload = await verifyToken(idToken);
+    const { sub: googleId, email } = payload;
+
+    let user = await db.collection('users').findOne({ $or: [{ googleId }, { email }] });
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    if (!user.googleId) {
+      await db.collection('users').updateOne(
+        { email },
+        { $set: { googleId } }
+      );
+      user = await db.collection('users').findOne({ email });
+    }
+
+    res.json({
+      message: "Login successful",
+      userType: user.userType,
+      email: user.email,
+      fullName: user.fullName,
+      companyName: user.companyName,
+      address: user.address,
+      positions: user.positions,
+      userId: user._id,
+      favorites: user.favorites || [],
+      createConfirm: user.createConfirm,
+    });
+  } catch (error) {
+    console.error('Google Login error:', error);
+    res.status(500).json({ message: 'Internal server error' });
   }
 });
 

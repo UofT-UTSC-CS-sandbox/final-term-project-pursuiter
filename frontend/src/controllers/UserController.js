@@ -65,6 +65,48 @@ const UserController = {
     }
   },
 
+  // Google Signup
+  googleSignup: async (idToken, userType) => {
+    try {
+      const response = await fetch(`${API_URL}/api/auth/google-signup`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ idToken, userType }),
+      });
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Failed to signup with Google");
+      }
+      const user = await response.json();
+      return user;
+    } catch (error) {
+      throw error;
+    }
+  },
+
+  // Google Login
+  googleLogin: async (idToken) => {
+    try {
+      const response = await fetch(`${API_URL}/api/auth/google-login`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ idToken }),
+      });
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Failed to login with Google");
+      }
+      const user = await response.json();
+      return user;
+    } catch (error) {
+      throw error;
+    }
+  },
+
   // Fetch User Information
   fetchUserInformation: async (userId) => {
     const response = await fetch(`${API_URL}/user/${userId}`);

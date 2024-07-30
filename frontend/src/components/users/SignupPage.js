@@ -4,6 +4,7 @@ import React, { useState, useContext } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { UserContext } from "../../contexts/UserContext";
 import UserController from "../../controllers/UserController";
+import { GoogleLogin } from '@react-oauth/google';
 
 function SignupPage({ userType }) {
   const [email, setEmail] = useState("");
@@ -14,7 +15,7 @@ function SignupPage({ userType }) {
   const [address] = useState("");
   const [positions] = useState("");
   const navigate = useNavigate();
-  const { loginUser } = useContext(UserContext);
+  const { loginUser, googleSignup } = useContext(UserContext);
 
   const heading =
     userType === "applicant"
@@ -47,6 +48,24 @@ function SignupPage({ userType }) {
       }
     } catch (error) {
       console.error("Signup failed:", error);
+      alert(error.message);
+    }
+  };
+
+  // Handle Google signup
+  const handleGoogleSignup = async (response) => {
+    try {
+      const idToken = response.credential;
+      const user = await googleSignup(idToken, userType);
+
+      alert("Signup successful!");
+      if (user.userType === "applicant") {
+        navigate("/applicant-dashboard");
+      } else if (user.userType === "recruiter") {
+        navigate("/recruiter-dashboard");
+      }
+    } catch (error) {
+      console.error("Google Signup failed:", error);
       alert(error.message);
     }
   };
@@ -103,6 +122,7 @@ function SignupPage({ userType }) {
           )}
           <button type="submit">Sign Up</button>
         </form>
+        <GoogleLogin onSuccess={handleGoogleSignup} onError={() => alert('Google Signup Failed')} />
         <div className="inline-link">
           <p>
             Already have an account? <Link to="/login">Login</Link>
