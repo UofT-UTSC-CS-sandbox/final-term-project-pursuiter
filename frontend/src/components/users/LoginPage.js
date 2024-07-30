@@ -71,9 +71,12 @@ function LoginPage() {
               required
             />
           </div>
+          <div className="users-form-submission">
           <button type="submit">Login</button>
+          <span>OR</span>
+          <GoogleLogin onSuccess={handleGoogleLogin} onError={() => alert('Google Login Failed')} /> 
+        </div>
         </form>
-        <GoogleLogin onSuccess={handleGoogleLogin} onError={() => alert('Google Login Failed')} /> 
         <div className="inline-link">
           <p>
             Want a job seeker account?{" "}

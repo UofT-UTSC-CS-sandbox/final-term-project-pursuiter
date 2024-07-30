@@ -120,9 +120,12 @@ function SignupPage({ userType }) {
                   required />
               </div></>            
           )}
+        <div className="users-form-submission">
           <button type="submit">Sign Up</button>
+          <span>OR</span>
+          <GoogleLogin onSuccess={handleGoogleSignup} onError={() => alert('Google Signup Failed')} />
+        </div>
         </form>
-        <GoogleLogin onSuccess={handleGoogleSignup} onError={() => alert('Google Signup Failed')} />
         <div className="inline-link">
           <p>
             Already have an account? <Link to="/login">Login</Link>
