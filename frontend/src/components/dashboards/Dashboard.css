@@ -838,19 +838,27 @@
 /************************************
  * Pagination Styles
  *************************************/
- .pagination {
+ .pagination-container {
   display: flex;
-  justify-content: left;
+  justify-content: center;
   align-items: center;
   padding: 10px;
   background-color: #fff;
   border-top: 1px solid #ddd;
 }
 
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 10px;
+}
+
 .pagination button {
   padding: 10px 15px;
   margin: 0 5px;
   border-radius: 5px;
+  min-width: 60px;
   cursor: pointer;
 }
 

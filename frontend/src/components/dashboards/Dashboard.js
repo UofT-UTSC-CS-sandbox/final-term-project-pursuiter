@@ -120,7 +120,19 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
 
   const Pagination = ({ currentPage, totalPages, onPageChange }) => {
     const pages = [];
-    for (let i = 1; i <= totalPages; i++) {
+    const maxPagesToShow = 5;
+    const halfPagesToShow = Math.floor(maxPagesToShow / 2);
+  
+    let startPage = Math.max(1, currentPage - halfPagesToShow);
+    let endPage = Math.min(totalPages, currentPage + halfPagesToShow);
+  
+    if (currentPage <= halfPagesToShow) {
+      endPage = Math.min(totalPages, maxPagesToShow);
+    } else if (currentPage + halfPagesToShow >= totalPages) {
+      startPage = Math.max(1, totalPages - maxPagesToShow + 1);
+    }
+  
+    for (let i = startPage; i <= endPage; i++) {
       pages.push(i);
     }
     return (
@@ -131,6 +143,12 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
         >
           Previous
         </button>
+        {startPage > 1 && (
+          <>
+            <button onClick={() => onPageChange(1)}>1</button>
+            {startPage > 2 && <span>...</span>}
+          </>
+        )}
         {pages.map((page) => (
           <button
             key={page}
@@ -140,6 +158,12 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
             {page}
           </button>
         ))}
+        {endPage < totalPages && (
+          <>
+            {endPage < totalPages - 1 && <span>...</span>}
+            <button onClick={() => onPageChange(totalPages)}>{totalPages}</button>
+          </>
+        )}
         <button
           onClick={() => onPageChange(currentPage + 1)}
           disabled={currentPage === totalPages}
@@ -187,6 +211,20 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
     itemsPerPage,
     role,
   ]);
+
+  useEffect(() => {
+    setApplicationsPage(1);
+    setNewJobsPage(1);
+  }, [searchTerm, filterTerm]);
+
+  useEffect(() => {
+    var dashboard_list = document.getElementsByClassName('dashboard-list')[0];
+    var dashboard_detail = document.getElementsByClassName('dashboard-detail')[0];
+    if (dashboard_list && dashboard_detail) {
+        dashboard_list.scrollTop = 0;
+        dashboard_detail.scrollTop = 0;
+    }
+  }, [applicationsPage, newJobsPage]);
 
   useEffect(() => {
     Cookies.set('itemsPerPage', itemsPerPage);
@@ -1171,13 +1209,17 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
         <div className="dashboard-listings">
           <div className="dashboard-list">
             <div className="dashboard-count">
-              Showing {indexOfFirstJob + 1}-{Math.min(indexOfLastJob, totalJobs)} of {totalJobs} Jobs
+              {totalJobs === 0 ? (
+                <>Showing {indexOfFirstJob}-{Math.min(indexOfLastJob, totalJobs)} of {totalJobs} Jobs</>
+              ) : (
+                <>Showing {indexOfFirstJob + 1}-{Math.min(indexOfLastJob, totalJobs)} of {totalJobs} Jobs</>
+              )}
+
               <select
                 value={itemsPerPage}
-                onChange={(e) => setItemsPerPage(Number(e.target.value))}
+                onChange={(e) => {setItemsPerPage(Number(e.target.value)); setApplicationsPage(1); setNewJobsPage(1)}}
                 className="items-per-page-dropdown"
               >
-                <option value={5}>5</option>
                 <option value={10}>10</option>
                 <option value={20}>20</option>
                 <option value={50}>50</option>
