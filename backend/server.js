@@ -199,7 +199,6 @@ app.post('/api/auth/google-signup', async (req, res) => {
   try {
     const { idToken, userType } = req.body;
     const payload = await verifyToken(idToken);
-    // const { sub, email, name } = payload;
 
     const googleId = payload.sub;
     const email = payload.email;
