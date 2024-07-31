@@ -1198,7 +1198,7 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
               Showing {indexOfFirstJob + 1}-{Math.min(indexOfLastJob, totalJobs)} of {totalJobs} Jobs
               <select
                 value={itemsPerPage}
-                onChange={(e) => setItemsPerPage(Number(e.target.value))}
+                onChange={(e) => {setItemsPerPage(Number(e.target.value)); setApplicationsPage(1); setNewJobsPage(1)}}
                 className="items-per-page-dropdown"
               >
                 <option value={5}>5</option>
