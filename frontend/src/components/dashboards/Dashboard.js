@@ -120,7 +120,19 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
 
   const Pagination = ({ currentPage, totalPages, onPageChange }) => {
     const pages = [];
-    for (let i = 1; i <= totalPages; i++) {
+    const maxPagesToShow = 5;
+    const halfPagesToShow = Math.floor(maxPagesToShow / 2);
+  
+    let startPage = Math.max(1, currentPage - halfPagesToShow);
+    let endPage = Math.min(totalPages, currentPage + halfPagesToShow);
+  
+    if (currentPage <= halfPagesToShow) {
+      endPage = Math.min(totalPages, maxPagesToShow);
+    } else if (currentPage + halfPagesToShow >= totalPages) {
+      startPage = Math.max(1, totalPages - maxPagesToShow + 1);
+    }
+  
+    for (let i = startPage; i <= endPage; i++) {
       pages.push(i);
     }
     return (
@@ -131,6 +143,12 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
         >
           Previous
         </button>
+        {startPage > 1 && (
+          <>
+            <button onClick={() => onPageChange(1)}>1</button>
+            {startPage > 2 && <span>...</span>}
+          </>
+        )}
         {pages.map((page) => (
           <button
             key={page}
@@ -140,6 +158,12 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
             {page}
           </button>
         ))}
+        {endPage < totalPages && (
+          <>
+            {endPage < totalPages - 1 && <span>...</span>}
+            <button onClick={() => onPageChange(totalPages)}>{totalPages}</button>
+          </>
+        )}
         <button
           onClick={() => onPageChange(currentPage + 1)}
           disabled={currentPage === totalPages}
