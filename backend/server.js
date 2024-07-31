@@ -124,6 +124,7 @@ app.post("/signup", async (req, res) => {
       positions,
       favorites: [],
       masterResume,
+      createConfirm: true,
     };
     const result = await db.collection("users").insertOne(newUser);
     res
@@ -155,6 +156,7 @@ app.post("/login", async (req, res) => {
         positions: user.positions,
         userId: user._id,
         favorites: user.favorites || [],
+        createConfirm: user.createConfirm,
       });
     } else {
       res.status(401).json({ message: "Invalid credentials" });
@@ -189,6 +191,7 @@ app.get("/user/:id", async (req, res) => {
         userId: user._id,
         favorites: user.favorites || [],
         masterResume: user.masterResume,
+        createConfirm: user.createConfirm,
       });
     } else {
       res.status(404).json({ message: "User not found" });
@@ -213,6 +216,7 @@ app.put("/updateUser", async (req, res) => {
     companyName,
     userType,
     masterResume,
+    createConfirm,
   } = req.body;
   try {
     const user = await db.collection("users").findOne({ email });
@@ -236,6 +240,8 @@ app.put("/updateUser", async (req, res) => {
       if (companyName) updatedUser.companyName = companyName;
       if (userType) updatedUser.userType = userType;
       if (masterResume) updatedUser.masterResume = masterResume;
+      if (createConfirm !== undefined)
+        updatedUser.createConfirm = createConfirm;
       await db.collection("users").updateOne({ email }, { $set: updatedUser });
       res.json({
         message: "Update successful",
@@ -246,6 +252,7 @@ app.put("/updateUser", async (req, res) => {
         companyName: updatedUser.companyName,
         userType: updatedUser.userType,
         masterResume: updatedUser.masterResume,
+        createConfirm: updatedUser.createConfirm,
       });
     } else {
       res.status(404).json({ message: "User not found" });
@@ -383,6 +390,8 @@ app.post("/applications/add", async (req, res) => {
     return res.status(400).json({ message: "Expected an application object" });
   }
 
+  application.status = "Pending Review"; // default status
+
   try {
     const result = await db.collection("applications").insertOne(application);
     res
@@ -393,6 +402,31 @@ app.post("/applications/add", async (req, res) => {
     res
       .status(500)
       .json({ message: "Error adding application", error: error.message });
+  }
+});
+
+/**
+ * @route PUT /applications/:applicantID/:jobID/status
+ * @description Update application status
+ * @access private
+ */
+app.put("/applications/:applicantID/:jobID/status", async (req, res) => {
+  const { applicantID, jobID } = req.params;
+  const { status } = req.body;
+
+  try {
+    const result = await db
+      .collection("applications")
+      .updateOne({ applicantID, jobID }, { $set: { status } });
+
+    if (result.modifiedCount === 1) {
+      res.json({ message: "Application status updated", status });
+    } else {
+      res.status(404).json({ message: "Application not found" });
+    }
+  } catch (error) {
+    console.error("Error updating application status:", error);
+    res.status(500).json({ message: "Error updating application status" });
   }
 });
 
@@ -450,6 +484,7 @@ app.get("/applications/:jobId", async (req, res) => {
         ...applicant,
         applyDate: application ? application.applyDate : null,
         resumeData: application ? application.resumeData : null,
+        coverLetterData: application ? application.coverLetterData : null,
       };
     });
     res.json(applicantsWithDetails);

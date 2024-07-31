@@ -1,2 +1,4 @@
 .DS_Store
 .vscode
+backend/.env.development
+backend/.env.test

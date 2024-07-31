@@ -10,6 +10,18 @@ const UserProvider = ({ children }) => {
     return userCookie ? JSON.parse(userCookie) : null;
   });
 
+  const [selectedTab, setSelectedTab] = useState(() => {
+    const userCookie = Cookies.get("user");
+    const user = userCookie ? JSON.parse(userCookie) : null;
+    if (user) {
+      return (
+        Cookies.get("selectedTab") ||
+        (user.userType === "applicant" ? "newJobs" : "applications")
+      );
+    }
+    return "newJobs";
+  });
+
   useEffect(() => {
     if (user) {
       Cookies.set("user", JSON.stringify(user), { expires: 1 });
@@ -18,10 +30,17 @@ const UserProvider = ({ children }) => {
     }
   }, [user]);
 
+  useEffect(() => {
+    Cookies.set("selectedTab", selectedTab, { expires: 1 });
+  }, [selectedTab]);
+
   const loginUser = async (email, password) => {
     try {
       const user = await UserController.loginUser(email, password);
       setUser(user);
+      setSelectedTab(
+        user.userType === "applicant" ? "newJobs" : "applications",
+      );
       return user;
     } catch (error) {
       throw error;
@@ -37,6 +56,7 @@ const UserProvider = ({ children }) => {
     address,
     positions,
     masterResume,
+    createConfirm,
   ) => {
     try {
       const user = await UserController.signupUser(
@@ -48,8 +68,10 @@ const UserProvider = ({ children }) => {
         address,
         positions,
         masterResume,
+        createConfirm,
       );
       setUser(user);
+      setSelectedTab(userType === "applicant" ? "newJobs" : "applications");
       return user;
     } catch (error) {
       throw error;
@@ -66,6 +88,7 @@ const UserProvider = ({ children }) => {
     userType,
     userId,
     masterResume,
+    createConfirm,
   ) => {
     try {
       const updatedUser = await UserController.updateUser(
@@ -78,6 +101,7 @@ const UserProvider = ({ children }) => {
         userType,
         userId,
         masterResume,
+        createConfirm,
       );
       setUser(updatedUser);
       return updatedUser;
@@ -88,11 +112,22 @@ const UserProvider = ({ children }) => {
 
   const logoutUser = () => {
     setUser(null);
+    setSelectedTab(null);
+    Cookies.remove("user");
+    Cookies.remove("selectedTab");
   };
 
   return (
     <UserContext.Provider
-      value={{ user, loginUser, signupUser, logoutUser, updateUser }}
+      value={{
+        user,
+        selectedTab,
+        setSelectedTab,
+        loginUser,
+        signupUser,
+        logoutUser,
+        updateUser,
+      }}
     >
       {children}
     </UserContext.Provider>
