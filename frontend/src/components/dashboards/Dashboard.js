@@ -213,6 +213,11 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
   ]);
 
   useEffect(() => {
+    setApplicationsPage(1);
+    setNewJobsPage(1);
+  }, [filterTerm]);
+
+  useEffect(() => {
     Cookies.set('itemsPerPage', itemsPerPage);
   }, [itemsPerPage]);
 
@@ -1201,7 +1206,6 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
                 onChange={(e) => {setItemsPerPage(Number(e.target.value)); setApplicationsPage(1); setNewJobsPage(1)}}
                 className="items-per-page-dropdown"
               >
-                <option value={5}>5</option>
                 <option value={10}>10</option>
                 <option value={20}>20</option>
                 <option value={50}>50</option>
