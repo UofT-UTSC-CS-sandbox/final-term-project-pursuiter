@@ -218,7 +218,6 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
   }, [searchTerm, filterTerm]);
 
   useEffect(() => {
-    // window.scrollTo(0, 0);
     var dashboard_list = document.getElementsByClassName('dashboard-list')[0];
     var dashboard_detail = document.getElementsByClassName('dashboard-detail')[0];
     if (dashboard_list && dashboard_detail) {
