@@ -5,7 +5,7 @@ import cors from "cors"; // Cross-origin resource sharing middleware
 import mongoose from "mongoose"; // Mongoose library
 import dotenv from "dotenv"; // Dotenv library
 import GeminiService from "./geminiService.js"; // Import the GeminiService
-import { OAuth2Client } from 'google-auth-library';
+import { OAuth2Client } from 'google-auth-library'; // Google OAuth2 client
 
 const env = process.env.NODE_ENV || "development";
 dotenv.config({ path: `.env.${env}` });
@@ -206,12 +206,23 @@ app.post('/api/auth/google-signup', async (req, res) => {
 
     let user = await db.collection('users').findOne({ email });
     if (user) {
+      if (user.userType !== userType) {
+        return res.status(400).json({
+          message: `This email is already associated with a different user type (${user.userType}). Please use the login page.`,
+        });
+      }
+      if (!user.googleId) {
         await db.collection('users').updateOne(
           { email },
-          { $set: { googleId, fullName: name} }
+          { $set: { googleId, fullName: name } }
         );
-        user = await db.collection('users').findOne({ email });
-      } else {
+      }
+      return res.status(200).json({
+        message: 'User already exists, please log in.',
+        userId: user._id,
+        userType: user.userType,
+      });
+    } else {
       user = {
         googleId: googleId,
         email,
@@ -225,20 +236,8 @@ app.post('/api/auth/google-signup', async (req, res) => {
       };
       const result = await db.collection('users').insertOne(user);
       user._id = result.insertedId;
+      res.status(201).json(user);
     }
-    const normalizedUser = {
-      googleId: user.googleId,
-      userId: user._id,
-      email: user.email,
-      fullName: user.fullName,
-      userType: user.userType,
-      companyName: user.companyName,
-      address: user.address,
-      positions: user.positions,
-      favorites: user.favorites,
-      createConfirm: user.createConfirm,
-    };
-    res.json(normalizedUser);
   } catch (error) {
     console.error('Google Signup error:', error);
     res.status(500).json({ message: 'Internal server error' });
@@ -254,7 +253,7 @@ app.post('/api/auth/google-login', async (req, res) => {
   try {
     const { idToken } = req.body;
     const payload = await verifyToken(idToken);
-    const { sub: googleId, email } = payload;
+    const { sub: googleId, email, name} = payload;
 
     let user = await db.collection('users').findOne({ $or: [{ googleId }, { email }] });
     if (!user) {
@@ -264,7 +263,7 @@ app.post('/api/auth/google-login', async (req, res) => {
     if (!user.googleId) {
       await db.collection('users').updateOne(
         { email },
-        { $set: { googleId } }
+        { $set: { googleId, fullName: name } }
       );
       user = await db.collection('users').findOne({ email });
     }
@@ -284,6 +283,28 @@ app.post('/api/auth/google-login', async (req, res) => {
   } catch (error) {
     console.error('Google Login error:', error);
     res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
+
+/**
+ * @route POST /verifyAccessCode
+ * @description Verify company access code
+ * @access private
+ */
+app.post("/verifyAccessCode", async (req, res) => {
+  const { companyName, companyAccessCode } = req.body;
+  try {
+      if (companyName) {
+        const companyUser = await db.collection("users").findOne({ companyName });
+        if (companyUser && companyUser.companyAccessCode !== companyAccessCode) {
+          return res.status(400).json({ message: "Invalid access code for that company" });
+        }
+      }
+      res.status(200).json({ message: "Access code verified" });
+  } catch (error) {
+    console.error("Error verifying access code:", error);
+    res.status(500).json({ message: "Error verifying access code" });
   }
 });
 
@@ -385,6 +406,27 @@ app.put("/updateUser", async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Error updating user" });
+  }
+});
+
+/**
+ * @route DELETE /user/:id
+ * @description Delete a user
+ * @access private
+ */
+app.delete("/user/:id", async (req, res) => {
+  const userId = req.params.id;
+  try {
+    const result = await db
+      .collection("users")
+      .deleteOne({ _id: new ObjectId(userId) });
+    if (result.deletedCount === 1) {
+      res.status(200).json({ message: "User deleted!" });
+    } else {
+      res.status(404).json({ message: "User not found" });
+    }
+  } catch (error) {
+    res.status(500).json({ message: "Error deleting user" });
   }
 });
 
