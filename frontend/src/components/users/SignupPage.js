@@ -101,7 +101,7 @@ const handleModalSubmit = async (event) => {
         alert("Signup successful!");
         navigate("/recruiter-dashboard");
   } catch (error) {
-    await UserController.deleteUser(googleUser.userId);
+    await UserController.deleteUser(googleUser._id);
     console.error("Company details update failed:", error);
     alert("Invalid access code. Please try again.");
   }
@@ -219,7 +219,7 @@ const handleModalSubmit = async (event) => {
             className="cancel-button"
             onClick={() => {
               setShowModal(false);
-              UserController.deleteUser(googleUser.userId)
+              UserController.deleteUser(googleUser._id)
             }}
           >
             Cancel
