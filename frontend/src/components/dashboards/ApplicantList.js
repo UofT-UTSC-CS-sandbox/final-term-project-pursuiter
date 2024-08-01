@@ -370,7 +370,6 @@ function ApplicantList() {
             <p>{jobDetails.type || "Loading..."}</p>
           </div>
         </div>
-        {/* <div className="aesthetic-bar"></div> */}
         <div className="search-and-filters">
           <div className="search">
             <div className="search-container">
