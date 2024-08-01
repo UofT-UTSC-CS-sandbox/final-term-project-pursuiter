@@ -66,7 +66,6 @@ function SignupPage({ userType }) {
 
       setGoogleUser(user);
       if (userType === "recruiter") {
-        console.log(user.message);
         if (user.message === "User already exists, please log in.") {
           await googleLogin(idToken);
           navigate("/recruiter-dashboard");
