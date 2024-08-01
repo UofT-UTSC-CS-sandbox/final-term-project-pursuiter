@@ -213,6 +213,12 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
   ]);
 
   useEffect(() => {
+    if (role === "recruiter") {
+      fetchJobsForRecruiter(user.companyName, setItems, searchTerm, filterTerm);
+    }
+  }, [favoritedItems]);
+
+  useEffect(() => {
     setApplicationsPage(1);
     setNewJobsPage(1);
   }, [searchTerm, filterTerm]);
@@ -489,10 +495,7 @@ const Dashboard = ({ role, fetchJobs, fetchFavoritedJobs }) => {
         masterResume: user.masterResume,
         createConfirm,
       };
-      console.log(updatedUser);
-      console.log(createConfirm);
       const response = await UserController.updateUser(updatedUser);
-      console.log(response);
       return response;
     } catch (error) {
       console.error("Error updating createConfirm:", error);
