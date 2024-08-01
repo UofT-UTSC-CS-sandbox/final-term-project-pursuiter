@@ -6,6 +6,7 @@ import "./Dashboard.css";
 import { FaStar } from "react-icons/fa";
 import { FaXmark } from "react-icons/fa6";
 import { FaCaretDown } from "react-icons/fa6";
+import Cookies from "js-cookie";
 
 function ApplicantList() {
   const { jobId } = useParams();
@@ -27,6 +28,68 @@ function ApplicantList() {
   const progressBarRef = useRef(null);
   const [status, setStatus] = useState("");
   const [isStatusLoading, setIsStatusLoading] = useState(false);
+
+  const [currentPage, setCurrentPage] = useState(Number(Cookies.get('applicantsPage') || 1));
+  const [itemsPerPage, setItemsPerPage] = useState(Number(Cookies.get('itemsPerPage') || 10));
+  const [totalApplicants, setTotalApplicants] = useState(0);
+  const [totalPages, setTotalPages] = useState(1);
+
+  const Pagination = ({ currentPage, totalPages, onPageChange }) => {
+    const pages = [];
+    const maxPagesToShow = 5;
+    const halfPagesToShow = Math.floor(maxPagesToShow / 2);
+  
+    let startPage = Math.max(1, currentPage - halfPagesToShow);
+    let endPage = Math.min(totalPages, currentPage + halfPagesToShow);
+  
+    if (currentPage <= halfPagesToShow) {
+      endPage = Math.min(totalPages, maxPagesToShow);
+    } else if (currentPage + halfPagesToShow >= totalPages) {
+      startPage = Math.max(1, totalPages - maxPagesToShow + 1);
+    }
+  
+    for (let i = startPage; i <= endPage; i++) {
+      pages.push(i);
+    }
+  
+    return (
+      <div className="pagination">
+        <button
+          onClick={() => onPageChange(currentPage - 1)}
+          disabled={currentPage === 1}
+        >
+          Previous
+        </button>
+        {startPage > 1 && (
+          <>
+            <button onClick={() => onPageChange(1)}>1</button>
+            {startPage > 2 && <span>...</span>}
+          </>
+        )}
+        {pages.map((page) => (
+          <button
+            key={page}
+            onClick={() => onPageChange(page)}
+            className={page === currentPage ? "active" : ""}
+          >
+            {page}
+          </button>
+        ))}
+        {endPage < totalPages && (
+          <>
+            {endPage < totalPages - 1 && <span>...</span>}
+            <button onClick={() => onPageChange(totalPages)}>{totalPages}</button>
+          </>
+        )}
+        <button
+          onClick={() => onPageChange(currentPage + 1)}
+          disabled={currentPage === totalPages}
+        >
+          Next
+        </button>
+      </div>
+    );
+  };
 
   // Fetch applicants and job details
   useEffect(() => {
@@ -147,6 +210,28 @@ function ApplicantList() {
     fetchJobDetails();
   }, [jobId, searchTerm, filterTerm, selectedTab]);
 
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm, filterTerm]);
+
+  useEffect(() => {
+    setTotalApplicants(applicants.length);
+    setTotalPages(Math.ceil(applicants.length / itemsPerPage));
+  }, [applicants, itemsPerPage]);
+
+  useEffect(() => {
+    Cookies.set('applicantsPage', currentPage);
+  }, [currentPage]);
+
+  useEffect(() => {
+    Cookies.set('itemsPerPage', itemsPerPage);
+  }, [itemsPerPage]);
+
+  const paginate = (pageNumber) => {
+    setCurrentPage(pageNumber);
+    Cookies.set('applicantsPage', pageNumber);
+  };
+
   // Handle favorite
   const handleFavorite = (applicant) => {
     setFavoritedApplicants((prevFavorites) => {
@@ -160,12 +245,17 @@ function ApplicantList() {
 
   const isFavorited = (applicant) => favoritedApplicants.includes(applicant);
 
-  const filteredApplicants = applicants;
+  const displayedApplicants = applicants.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
 
   // Handle tab change
   const handleTabChange = (tab) => {
     setSelectedTab(tab);
     setSelectedApplicant(null);
+    setCurrentPage(1);
+    Cookies.set('applicantsPage', 1);
   };
 
   // Handle select applicant
@@ -254,6 +344,8 @@ function ApplicantList() {
       ...filterTerm,
       [filterType]: word,
     }));
+    setCurrentPage(1);
+    Cookies.set('applicantsPage', 1);
   };
 
   return (
@@ -278,7 +370,7 @@ function ApplicantList() {
             <p>{jobDetails.type || "Loading..."}</p>
           </div>
         </div>
-        <div className="aesthetic-bar"></div>
+        {/* <div className="aesthetic-bar"></div> */}
         <div className="search-and-filters">
           <div className="search">
             <div className="search-container">
@@ -295,6 +387,8 @@ function ApplicantList() {
                   onClick={() => {
                     setSearchTerm("");
                     setSelectedApplicant(null);
+                    setCurrentPage(1);
+                    Cookies.set('applicantsPage', 1);
                   }}
                 >
                   <div className="icon">
@@ -333,6 +427,8 @@ function ApplicantList() {
                 onClick={() => {
                   setFilterTerm({ ...filterTerm, appliedDate: "" });
                   setSelectedApplicant(null);
+                  setCurrentPage(1);
+                  Cookies.set('applicantsPage', 1);
                 }}
               >
                 {filterTerm.appliedDate}{" "}
@@ -345,7 +441,7 @@ function ApplicantList() {
               <div className="filter-dropdown">
                 <button className="dropbtn">
                   Score{" "}
-                  <div className="icon">
+                  <div class="icon">
                     <FaCaretDown />
                   </div>
                 </button>
@@ -370,6 +466,8 @@ function ApplicantList() {
                 onClick={() => {
                   setFilterTerm({ ...filterTerm, totalScore: "" });
                   setSelectedApplicant(null);
+                  setCurrentPage(1);
+                  Cookies.set('applicantsPage', 1);
                 }}
               >
                 {filterTerm.totalScore}{" "}
@@ -399,10 +497,23 @@ function ApplicantList() {
         <div className="dashboard-listings">
           <div className="dashboard-list">
             <div className="dashboard-count">
-              Showing {filteredApplicants.length} Applicants
+              {totalApplicants === 0 ? (
+                <>Showing {0} of {totalApplicants} Applicants</>
+              ) : (
+                <>Showing {(currentPage - 1) * itemsPerPage + 1}-{Math.min(currentPage * itemsPerPage, totalApplicants)} of {totalApplicants} Applicants</>
+              )}
+              <select
+                value={itemsPerPage}
+                onChange={(e) => { setItemsPerPage(Number(e.target.value)); setCurrentPage(1); }}
+                className="items-per-page-dropdown"
+              >
+                <option value={10}>10</option>
+                <option value={20}>20</option>
+                <option value={50}>50</option>
+              </select>
             </div>
-            {filteredApplicants.length > 0 ? (
-              filteredApplicants.map((applicant, index) => (
+            {displayedApplicants.length > 0 ? (
+              displayedApplicants.map((applicant, index) => (
                 <div
                   key={index}
                   className="dashboard-item"
@@ -600,6 +711,11 @@ function ApplicantList() {
             )}
           </div>
         </div>
+        <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={paginate}
+        />
       </div>
     </div>
   );
