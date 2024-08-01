@@ -10,9 +10,11 @@ import RecruiterDashboard from "./components/dashboards/RecruiterDashboard";
 import UserInformation from "./components/users/UserInformation";
 import ApplicantList from "./components/dashboards/ApplicantList";
 import NavBar from "./components/nav-bar/NavBar";
+import { GoogleOAuthProvider } from '@react-oauth/google';
 
 function App() {
   return (
+    <GoogleOAuthProvider clientId={process.env.REACT_APP_GOOGLE_CLIENT_ID}>
     <UserProvider>
       <BrowserRouter>
         <NavBar />
@@ -28,6 +30,7 @@ function App() {
         </Routes>
       </BrowserRouter>
     </UserProvider>
+    </GoogleOAuthProvider>
   );
 }
 

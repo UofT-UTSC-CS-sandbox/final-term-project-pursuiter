@@ -80,6 +80,28 @@ const UserProvider = ({ children }) => {
     }
   };
 
+  const googleSignup = async (idToken, userType) => {
+    try {
+      const user = await UserController.googleSignup(idToken, userType);
+      setUser(user);
+      setSelectedTab(user.userType === "applicant" ? "newJobs" : "applications");
+      return user;
+    } catch (error) {
+      throw error;
+    }
+  };
+
+  const googleLogin = async (idToken) => {
+    try {
+      const user = await UserController.googleLogin(idToken);
+      setUser(user);
+      setSelectedTab(user.userType === "applicant" ? "newJobs" : "applications");
+      return user;
+    } catch (error) {
+      throw error;
+    }
+  };
+
   const updateUser = async (
     email,
     newEmail,
@@ -133,6 +155,8 @@ const UserProvider = ({ children }) => {
         setSelectedTab,
         loginUser,
         signupUser,
+        googleSignup,
+        googleLogin,
         logoutUser,
         updateUser,
       }}
