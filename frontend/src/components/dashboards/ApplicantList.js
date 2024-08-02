@@ -10,7 +10,6 @@ import Cookies from "js-cookie";
 
 function ApplicantList() {
   const { jobId } = useParams();
-  const navigate = useNavigate();
   const [applicants, setApplicants] = useState([]);
   const [selectedApplicant, setSelectedApplicant] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
