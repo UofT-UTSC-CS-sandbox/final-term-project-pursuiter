@@ -104,6 +104,7 @@ const handleModalSubmit = async (event) => {
     await UserController.deleteUser(googleUser._id);
     console.error("Company details update failed:", error);
     alert("Invalid access code. Please try again.");
+    setShowModal(false);
   }
 };
 
