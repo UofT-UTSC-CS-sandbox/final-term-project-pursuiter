@@ -17,6 +17,7 @@ describe("Application Process", () => {
       password: "password123",
       fullName: "Jane Applicant",
       companyName: "",
+      companyAccessCode: "",
     });
     applicant = applicantRes.body.userId;
 
@@ -59,7 +60,7 @@ describe("Application Process", () => {
     );
     expect(application).to.have.property(
       "coverLetterData",
-      "Base64EncodeCoverLetterData",
+      "Base64EncodedCoverLetterData",
     );
 
     // Check for default status

@@ -4,16 +4,23 @@ import React, { useState, useContext } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { UserContext } from "../../contexts/UserContext";
 import UserController from "../../controllers/UserController";
+import { GoogleLogin } from '@react-oauth/google';
+import Modal from "../modal/Modal";
+import "../modal/Modal.css";
 
 function SignupPage({ userType }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [fullName, setFullName] = useState("");
   const [companyName, setCompanyName] = useState("");
+  const [companyAccessCode, setCompanyAccessCode] = useState("");
   const [address] = useState("");
   const [positions] = useState("");
   const navigate = useNavigate();
-  const { loginUser } = useContext(UserContext);
+  const { loginUser, googleSignup, googleLogin } = useContext(UserContext);
+  const [showModal, setShowModal] = useState(false);
+  const [googleUser, setGoogleUser] = useState(null);
+  const [idToken, setIdToken] = useState(null);
 
   const heading =
     userType === "applicant"
@@ -30,6 +37,7 @@ function SignupPage({ userType }) {
         password,
         fullName,
         companyName,
+        companyAccessCode,
         address,
         positions,
       });
@@ -48,6 +56,58 @@ function SignupPage({ userType }) {
       alert(error.message);
     }
   };
+
+  // Handle Google signup
+  const handleGoogleSignup = async (response) => {
+    try {
+      const idToken = response.credential;
+      setIdToken(idToken);
+      const user = await googleSignup(idToken, userType);
+
+      setGoogleUser(user);
+      if (userType === "recruiter") {
+        if (user.message === "User already exists, please log in.") {
+          await googleLogin(idToken);
+          navigate("/recruiter-dashboard");
+        } else {
+          setShowModal(true);
+        }
+      } else {
+        await googleLogin(idToken);
+        if (user.message !== "User already exists, please log in.") {
+          alert("Signup successful!");
+        }
+        navigate("/applicant-dashboard");
+      }
+    } catch (error) {
+      console.error("Google Signup failed:", error);
+      alert(error.message);
+    }
+  };
+
+// Handle submission from the modal
+const handleModalSubmit = async (event) => {
+  event.preventDefault();
+  try {
+        await UserController.verifyAccessCode(companyName, companyAccessCode)
+
+        const user = await UserController.updateUser({
+          ...googleUser,
+          companyName,
+          companyAccessCode,
+        });
+        setGoogleUser(user);
+        await googleLogin(idToken);
+        alert("Signup successful!");
+        navigate("/recruiter-dashboard");
+  } catch (error) {
+    await UserController.deleteUser(googleUser._id);
+    console.error("Company details update failed:", error);
+    alert("Invalid access code. Please try again.");
+    setShowModal(false);
+  }
+};
+
 
   return (
     <div className="users-page-container">
@@ -83,17 +143,32 @@ function SignupPage({ userType }) {
             />
           </div>
           {userType === "recruiter" && (
-            <div className="users-form-group">
-              <label>Company Name:</label>
-              <input
-                type="text"
-                value={companyName}
-                onChange={(e) => setCompanyName(e.target.value)}
-                required
-              />
-            </div>
+            <>
+              <div className="users-form-group">
+                <label>Company Name:</label>
+                <input
+                  type="text"
+                  value={companyName}
+                  onChange={(e) => setCompanyName(e.target.value)}
+                  required
+                />
+              </div>
+              <div className="users-form-group">
+                <label>Company Access Code:</label>
+                <input
+                  type="text"
+                  value={companyAccessCode}
+                  onChange={(e) => setCompanyAccessCode(e.target.value)}
+                  required
+                />
+              </div>
+            </>
           )}
-          <button type="submit">Sign Up</button>
+          <div className="users-form-submission">
+            <button type="submit">Sign Up</button>
+            <span>OR</span>
+            <GoogleLogin onSuccess={handleGoogleSignup} onError={() => alert('Google Signup Failed')} />
+          </div>
         </form>
         <div className="inline-link">
           <p>
@@ -116,6 +191,42 @@ function SignupPage({ userType }) {
           )}
         </div>
       </div>
+      <Modal show={showModal} onClose={() => setShowModal(false)}>
+      <div className="modal-header">
+        <div>Hello&nbsp;</div> 
+        <div className='modal-name'>{googleUser?.fullName}</div>
+        <div>!</div>
+      </div>
+      <p className="modal-description">Please provide your company details.</p>
+      <form className="new-item-form">
+            <input
+              type="text"
+              name="companeName"
+              placeholder="Company Name"
+              value={companyName}
+              onChange={(e) => setCompanyName(e.target.value)}
+              required
+            />
+            <input
+              type="text"
+              name="companyAccessCode"
+              placeholder="Company Access Code"
+              value={companyAccessCode}
+              onChange={(e) => setCompanyAccessCode(e.target.value)}
+              required
+            />
+          <button type="submit" onClick={handleModalSubmit}>Submit</button>
+          <button
+            className="cancel-button"
+            onClick={() => {
+              setShowModal(false);
+              UserController.deleteUser(googleUser._id)
+            }}
+          >
+            Cancel
+          </button>
+        </form>
+      </Modal>
     </div>
   );
 }

@@ -2,6 +2,24 @@
  * Modal
  *************************************/
 
+ .modal-header {
+  display: flex;
+  flex-direction: row;
+  font-size: 30px;
+  margin-bottom: 20px;
+  text-align: center;
+  font-family: 'poppins', sans-serif;
+  justify-content: center;
+ }
+
+ .modal-name {
+  color: #800020;
+ }
+
+ .modal-description {
+  margin-bottom: 10px;
+ }
+
 .modal-overlay {
   position: fixed;
   top: 0;

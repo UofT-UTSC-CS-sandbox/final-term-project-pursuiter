@@ -5,6 +5,7 @@ import cors from "cors"; // Cross-origin resource sharing middleware
 import mongoose from "mongoose"; // Mongoose library
 import dotenv from "dotenv"; // Dotenv library
 import GeminiService from "./geminiService.js"; // Import the GeminiService
+import { OAuth2Client } from 'google-auth-library'; // Google OAuth2 client
 
 const env = process.env.NODE_ENV || "development";
 dotenv.config({ path: `.env.${env}` });
@@ -13,6 +14,9 @@ const app = express();
 const PORT = process.env.PORT || 4000;
 const mongoURL = process.env.MONGO_URI || "mongodb://localhost:27017";
 const dbName = process.env.DB_NAME || "pursuiter";
+
+const CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
+const client = new OAuth2Client(CLIENT_ID);
 
 app.use(express.json({ limit: "50mb" }));
 app.use(express.urlencoded({ limit: "50mb", extended: true }));
@@ -63,6 +67,17 @@ async function startServer() {
 
 startServer();
 
+// Verify Google ID Token
+async function verifyToken(idToken) {
+  const ticket = await client.verifyIdToken({
+    idToken,
+    audience: CLIENT_ID,
+  });
+  const payload = ticket.getPayload();
+  return payload;
+}
+
+
 /************************************
  * Gemini API Endpoints
  *************************************/
@@ -104,6 +119,7 @@ app.post("/signup", async (req, res) => {
     password,
     fullName,
     companyName,
+    companyAccessCode,
     address,
     positions,
     masterResume,
@@ -113,6 +129,12 @@ app.post("/signup", async (req, res) => {
     if (existingUser) {
       return res.status(409).json({ message: "User already exists" });
     }
+    if (companyName) {
+      const companyUser = await db.collection("users").findOne({ companyName });
+      if (companyUser && companyUser.companyAccessCode !== companyAccessCode) {
+        return res.status(400).json({ message: "Invalid access code for that company" });
+      }
+    }
     const hashedPassword = await bcrypt.hash(password, 10);
     const newUser = {
       userType,
@@ -120,6 +142,7 @@ app.post("/signup", async (req, res) => {
       password: hashedPassword,
       fullName,
       companyName,
+      companyAccessCode,
       address,
       positions,
       favorites: [],
@@ -152,6 +175,7 @@ app.post("/login", async (req, res) => {
         email: user.email,
         fullName: user.fullName,
         companyName: user.companyName,
+        companyAccessCode: user.companyAccessCode,
         address: user.address,
         positions: user.positions,
         userId: user._id,
@@ -163,6 +187,124 @@ app.post("/login", async (req, res) => {
     }
   } catch (error) {
     res.status(500).json({ message: "Error logging in" });
+  }
+});
+
+/**
+ * @route POST /auth/google-signup
+ * @description Register a new user using Google
+ * @access public
+ */
+app.post('/api/auth/google-signup', async (req, res) => {
+  try {
+    const { idToken, userType } = req.body;
+    const payload = await verifyToken(idToken);
+
+    const googleId = payload.sub;
+    const email = payload.email;
+    const name = payload.name;
+
+    let user = await db.collection('users').findOne({ email });
+    if (user) {
+      if (user.userType !== userType) {
+        return res.status(400).json({
+          message: `This email is already associated with a different user type (${user.userType}). Please use the login page.`,
+        });
+      }
+      if (!user.googleId) {
+        await db.collection('users').updateOne(
+          { email },
+          { $set: { googleId, fullName: name } }
+        );
+      }
+      return res.status(200).json({
+        message: 'User already exists, please log in.',
+        userId: user._id,
+        userType: user.userType,
+      });
+    } else {
+      user = {
+        googleId: googleId,
+        email,
+        fullName: name,
+        userType,
+        companyName: '',
+        address: '',
+        positions: '',
+        favorites: [],
+        createConfirm: true,
+      };
+      const result = await db.collection('users').insertOne(user);
+      user._id = result.insertedId;
+      res.status(201).json(user);
+    }
+  } catch (error) {
+    console.error('Google Signup error:', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
+/**
+ * @route POST /auth/google-login
+ * @description Login a user using Google
+ * @access public
+ */
+app.post('/api/auth/google-login', async (req, res) => {
+  try {
+    const { idToken } = req.body;
+    const payload = await verifyToken(idToken);
+    const { sub: googleId, email, name} = payload;
+
+    let user = await db.collection('users').findOne({ $or: [{ googleId }, { email }] });
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    if (!user.googleId) {
+      await db.collection('users').updateOne(
+        { email },
+        { $set: { googleId, fullName: name } }
+      );
+      user = await db.collection('users').findOne({ email });
+    }
+
+    res.json({
+      message: "Login successful",
+      userType: user.userType,
+      email: user.email,
+      fullName: user.fullName,
+      companyName: user.companyName,
+      address: user.address,
+      positions: user.positions,
+      userId: user._id,
+      favorites: user.favorites || [],
+      createConfirm: user.createConfirm,
+    });
+  } catch (error) {
+    console.error('Google Login error:', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
+
+/**
+ * @route POST /verifyAccessCode
+ * @description Verify company access code
+ * @access private
+ */
+app.post("/verifyAccessCode", async (req, res) => {
+  const { companyName, companyAccessCode } = req.body;
+  try {
+      if (companyName) {
+        const companyUser = await db.collection("users").findOne({ companyName });
+        if (companyUser && companyUser.companyAccessCode !== companyAccessCode) {
+          return res.status(400).json({ message: "Invalid access code for that company" });
+        }
+      }
+      res.status(200).json({ message: "Access code verified" });
+  } catch (error) {
+    console.error("Error verifying access code:", error);
+    res.status(500).json({ message: "Error verifying access code" });
   }
 });
 
@@ -186,6 +328,7 @@ app.get("/user/:id", async (req, res) => {
         email: user.email,
         fullName: user.fullName,
         companyName: user.companyName,
+        companyAccessCode: user.companyAccessCode,
         address: user.address,
         positions: user.positions,
         userId: user._id,
@@ -214,6 +357,7 @@ app.put("/updateUser", async (req, res) => {
     address,
     positions,
     companyName,
+    companyAccessCode,
     userType,
     masterResume,
     createConfirm,
@@ -238,6 +382,7 @@ app.put("/updateUser", async (req, res) => {
       if (address) updatedUser.address = address;
       if (positions) updatedUser.positions = positions;
       if (companyName) updatedUser.companyName = companyName;
+      if (companyAccessCode) updatedUser.companyAccessCode = companyAccessCode;
       if (userType) updatedUser.userType = userType;
       if (masterResume) updatedUser.masterResume = masterResume;
       if (createConfirm !== undefined)
@@ -250,6 +395,7 @@ app.put("/updateUser", async (req, res) => {
         email: updatedUser.email,
         positions: updatedUser.positions,
         companyName: updatedUser.companyName,
+        companyAccessCode: updatedUser.companyAccessCode,
         userType: updatedUser.userType,
         masterResume: updatedUser.masterResume,
         createConfirm: updatedUser.createConfirm,
@@ -260,6 +406,27 @@ app.put("/updateUser", async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Error updating user" });
+  }
+});
+
+/**
+ * @route DELETE /user/:id
+ * @description Delete a user
+ * @access private
+ */
+app.delete("/user/:id", async (req, res) => {
+  const userId = req.params.id;
+  try {
+    const result = await db
+      .collection("users")
+      .deleteOne({ _id: new ObjectId(userId) });
+    if (result.deletedCount === 1) {
+      res.status(200).json({ message: "User deleted!" });
+    } else {
+      res.status(404).json({ message: "User not found" });
+    }
+  } catch (error) {
+    res.status(500).json({ message: "Error deleting user" });
   }
 });
 
@@ -332,13 +499,14 @@ app.post("/jobs/add", async (req, res) => {
 app.put("/jobs/:id", async (req, res) => {
   const jobId = req.params.id;
   const job = req.body;
+  const lastEditedBy = job.lastEditedBy;
   if (!ObjectId.isValid(jobId)) {
     return res.status(400).json({ message: "Invalid job ID" });
   }
   try {
     const result = await db
       .collection("jobs")
-      .updateOne({ _id: new ObjectId(jobId) }, { $set: job });
+      .updateOne({ _id: new ObjectId(jobId) }, { $set: { ...job, lastEditedBy: lastEditedBy } });
     if (result.modifiedCount === 1) {
       res.json({ message: "Job updated", job });
     } else {

@@ -18,6 +18,7 @@ describe("AI Score Feature", () => {
       password: "password123",
       fullName: "John Doe",
       companyName: "",
+      companyAccessCode: "",
     });
     applicantId = applicantRes.body.userId;
 

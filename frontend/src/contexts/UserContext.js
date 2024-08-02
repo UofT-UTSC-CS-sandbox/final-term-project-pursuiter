@@ -53,6 +53,7 @@ const UserProvider = ({ children }) => {
     password,
     fullName,
     companyName,
+    companyAccessCode,
     address,
     positions,
     masterResume,
@@ -65,6 +66,7 @@ const UserProvider = ({ children }) => {
         password,
         fullName,
         companyName,
+        companyAccessCode,
         address,
         positions,
         masterResume,
@@ -78,6 +80,28 @@ const UserProvider = ({ children }) => {
     }
   };
 
+  const googleSignup = async (idToken, userType) => {
+    try {
+      const user = await UserController.googleSignup(idToken, userType);
+      setUser(user);
+      setSelectedTab(user.userType === "applicant" ? "newJobs" : "applications");
+      return user;
+    } catch (error) {
+      throw error;
+    }
+  };
+
+  const googleLogin = async (idToken) => {
+    try {
+      const user = await UserController.googleLogin(idToken);
+      setUser(user);
+      setSelectedTab(user.userType === "applicant" ? "newJobs" : "applications");
+      return user;
+    } catch (error) {
+      throw error;
+    }
+  };
+
   const updateUser = async (
     email,
     newEmail,
@@ -85,6 +109,7 @@ const UserProvider = ({ children }) => {
     address,
     positions,
     companyName,
+    companyAccessCode,
     userType,
     userId,
     masterResume,
@@ -98,6 +123,7 @@ const UserProvider = ({ children }) => {
         address,
         positions,
         companyName,
+        companyAccessCode,
         userType,
         userId,
         masterResume,
@@ -113,6 +139,10 @@ const UserProvider = ({ children }) => {
   const logoutUser = () => {
     setUser(null);
     setSelectedTab(null);
+    Cookies.remove("currentPage");
+    Cookies.remove("itemsPerPage");
+    Cookies.remove("newJobsPage");
+    Cookies.remove("applicationsPage");
     Cookies.remove("user");
     Cookies.remove("selectedTab");
   };
@@ -125,6 +155,8 @@ const UserProvider = ({ children }) => {
         setSelectedTab,
         loginUser,
         signupUser,
+        googleSignup,
+        googleLogin,
         logoutUser,
         updateUser,
       }}

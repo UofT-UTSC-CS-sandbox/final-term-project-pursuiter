@@ -3,25 +3,23 @@ import "./Users.css";
 
 import React, { useState, useContext, useEffect } from "react";
 import { UserContext } from "../../contexts/UserContext";
-import { useNavigate } from "react-router-dom";
 import Modal from "../modal/Modal";
 import UserController from "../../controllers/UserController";
 
 function UserInformation() {
-  const navigate = useNavigate();
-  const { user, logoutUser, updateUser } = useContext(UserContext);
+  const { user } = useContext(UserContext);
 
   const [fullName, setFullName] = useState("");
   const [address, setAddress] = useState("");
-  const [email, setEmail] = useState("");
   const [newEmail, setNewEmail] = useState("");
   const [positions, setPositions] = useState("");
   const [companyName, setCompanyName] = useState("");
+  const [companyAccessCode, setCompanyAccessCode] = useState("");
   const [selectedResume, setSelectedResume] = useState(null);
   const [resumeFile, setResumeFile] = useState(null);
   const [userType, setUserType] = useState("");
   const [showFileForm, setShowFileForm] = useState(false);
-  const [editMode, setEditMode] = useState(false);
+  const [editMode] = useState(false);
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [isFileSelected, setIsFileSelected] = useState(false);
 
@@ -35,6 +33,7 @@ function UserInformation() {
           setNewEmail(userInfo.email || "");
           setPositions(userInfo.positions || "");
           setCompanyName(userInfo.companyName || "");
+          setCompanyAccessCode(userInfo.companyAccessCode || "");
           setUserType(userInfo.userType || "");
           setSelectedResume(userInfo.masterResume || null);
           setIsFileSelected(true);
@@ -61,6 +60,7 @@ function UserInformation() {
       address,
       positions,
       companyName,
+      companyAccessCode,
       userType,
       userId: user.userId,
       masterResume: resumeFile,
@@ -72,6 +72,7 @@ function UserInformation() {
       setNewEmail(updatedUserInfo.email);
       setPositions(updatedUserInfo.positions);
       setCompanyName(updatedUserInfo.companyName);
+      setCompanyAccessCode(updatedUserInfo.companyAccessCode);
       setUserType(updatedUserInfo.userType);
       setSelectedResume(updatedUserInfo.masterResume);
       setShowFileForm(false);
@@ -137,7 +138,7 @@ function UserInformation() {
                   required
                 />
               </div>
-              {userType === "applicant" ? (
+              {userType === "applicant" && (
                 <div className="users-form-group users-info-form-group">
                   <label>Positions Wanted:</label>
                   <input
@@ -146,17 +147,6 @@ function UserInformation() {
                     placeholder="Separate using commas. Eg: Software Engineer, Data Analyst"
                     value={positions}
                     onChange={(e) => setPositions(e.target.value)}
-                    required
-                  />
-                </div>
-              ) : (
-                <div className="users-form-group users-info-form-group">
-                  <label>Company:</label>
-                  <input
-                    type="text"
-                    name="companyName"
-                    value={companyName}
-                    onChange={(e) => setCompanyName(e.target.value)}
                     required
                   />
                 </div>

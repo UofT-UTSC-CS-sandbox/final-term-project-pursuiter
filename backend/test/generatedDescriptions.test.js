@@ -18,6 +18,7 @@ describe("AI Generated Applicant Descriptions", () => {
       password: "password123",
       fullName: "John Doe",
       companyName: "",
+      companyAccessCode: "",
     });
     applicantId = applicantRes.body.userId;
 

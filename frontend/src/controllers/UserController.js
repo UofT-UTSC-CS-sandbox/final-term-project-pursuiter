@@ -29,6 +29,7 @@ const UserController = {
     password,
     fullName,
     companyName,
+    companyAccessCode,
     address,
     positions,
     masterResume,
@@ -46,6 +47,7 @@ const UserController = {
           password,
           fullName,
           companyName,
+          companyAccessCode,
           address,
           positions,
           masterResume,
@@ -55,6 +57,48 @@ const UserController = {
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.message || "Failed to signup");
+      }
+      const user = await response.json();
+      return user;
+    } catch (error) {
+      throw error;
+    }
+  },
+
+  // Google Signup
+  googleSignup: async (idToken, userType) => {
+    try {
+      const response = await fetch(`${API_URL}/api/auth/google-signup`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ idToken, userType }),
+      });
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Failed to signup with Google");
+      }
+      const user = await response.json();
+      return user;
+    } catch (error) {
+      throw error;
+    }
+  },
+
+  // Google Login
+  googleLogin: async (idToken) => {
+    try {
+      const response = await fetch(`${API_URL}/api/auth/google-login`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ idToken }),
+      });
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Failed to login with Google");
       }
       const user = await response.json();
       return user;
@@ -81,6 +125,7 @@ const UserController = {
     address,
     positions,
     companyName,
+    companyAccessCode,
     userType,
     userId,
     masterResume,
@@ -99,6 +144,7 @@ const UserController = {
           address,
           positions,
           companyName,
+          companyAccessCode,
           userType,
           userId,
           masterResume,
@@ -115,6 +161,41 @@ const UserController = {
       throw error;
     }
   },
+
+  deleteUser: async (userId) => {
+    try {
+      const response = await fetch(`${API_URL}/user/${userId}`, {
+        method: "DELETE",
+      });
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Failed to delete user");
+      }
+      const user = await response.json();
+      return user;
+    } catch (error) {
+      throw error;
+    }
+  },
+
+  verifyAccessCode: async (companyName, companyAccessCode) => {
+    try {
+      const response = await fetch(`${API_URL}/verifyAccessCode`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ companyName, companyAccessCode }),
+      });
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Invalid access code");
+      }
+      return await response.json();
+    } catch (error) {
+      throw new Error("Error verifying access code: " + error.message);
+    }
+  }
 };
 
 export default UserController;

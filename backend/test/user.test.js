@@ -16,6 +16,7 @@ describe("User Management", () => {
       password: "password123",
       fullName: "John Doe",
       companyName: "Tech Corp",
+      companyAccessCode: "Code123",
     });
 
     user2 = await request(app).post("/signup").send({
@@ -24,6 +25,7 @@ describe("User Management", () => {
       password: "password123",
       fullName: "Doe John",
       companyName: "Tech Corp",
+      companyAccessCode: "Code123",
     });
   });
 
