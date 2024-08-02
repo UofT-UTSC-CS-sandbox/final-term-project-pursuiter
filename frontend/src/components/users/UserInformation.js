@@ -3,17 +3,14 @@ import "./Users.css";
 
 import React, { useState, useContext, useEffect } from "react";
 import { UserContext } from "../../contexts/UserContext";
-import { useNavigate } from "react-router-dom";
 import Modal from "../modal/Modal";
 import UserController from "../../controllers/UserController";
 
 function UserInformation() {
-  const navigate = useNavigate();
-  const { user, logoutUser, updateUser } = useContext(UserContext);
+  const { user } = useContext(UserContext);
 
   const [fullName, setFullName] = useState("");
   const [address, setAddress] = useState("");
-  const [email, setEmail] = useState("");
   const [newEmail, setNewEmail] = useState("");
   const [positions, setPositions] = useState("");
   const [companyName, setCompanyName] = useState("");
@@ -21,7 +18,7 @@ function UserInformation() {
   const [resumeFile, setResumeFile] = useState(null);
   const [userType, setUserType] = useState("");
   const [showFileForm, setShowFileForm] = useState(false);
-  const [editMode, setEditMode] = useState(false);
+  const [editMode] = useState(false);
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [isFileSelected, setIsFileSelected] = useState(false);
 

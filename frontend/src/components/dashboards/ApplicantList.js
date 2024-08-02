@@ -9,7 +9,6 @@ import { FaCaretDown } from "react-icons/fa6";
 
 function ApplicantList() {
   const { jobId } = useParams();
-  const navigate = useNavigate();
   const [applicants, setApplicants] = useState([]);
   const [selectedApplicant, setSelectedApplicant] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
