@@ -1,0 +1,29 @@
+# Use the official Node.js 22 image
+FROM node:20.10.0 AS backend
+
+# # Install build tools (necessary for bcrypt)
+# RUN apt-get update && apt-get install -y python3 make g++
+
+# Create a directory for the app
+WORKDIR /app/backend
+
+# Copy package.json and package-lock.json
+COPY backend/package*.json ./
+
+# Install dependencies
+RUN npm install
+
+# # Remove existing node_modules
+# RUN rm -rf node_modules
+
+# # Rebuild bcrypt for the correct architecture
+# RUN npm rebuild bcrypt --build-from-source
+
+# Copy the rest of the application
+COPY ./backend .
+
+# Expose the port the app runs on
+EXPOSE 8000
+
+# Start the app
+CMD ["npm", "run", "dev"]

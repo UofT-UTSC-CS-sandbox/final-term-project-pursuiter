@@ -1,0 +1,27 @@
+version: '3.8'
+
+services:
+  frontend:
+    image: mohammadalqasem/frontend:latest
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+    depends_on:
+      - mongodb
+
+  backend:
+    image: mohammadalqasem/backend:latest
+    ports:
+      - "4000:4000"
+    environment:
+      - NODE_ENV=production
+      - MONGO_URI=mongodb://mongodb:27017/pursuiter
+    depends_on:
+      - mongodb
+
+    
+  mongodb:
+    image: mongo:latest
+    ports:
+     - "27017:27017"
