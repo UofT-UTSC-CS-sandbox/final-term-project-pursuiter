@@ -4,6 +4,8 @@
 
 Pursuiter was pushed to GitLab and the CI/CD pipeline was set up to automate the deployment process. 
 
+- Link to Pursuiter on Azure: [Click here](pursuiter2-d6b9f0abe8ctb0cb.eastus-01.azurewebsites.net)
+
 ## Project Structure
 
 .
@@ -21,7 +23,7 @@ Pursuiter was pushed to GitLab and the CI/CD pipeline was set up to automate the
 ├── docker-compose.yml
 └── README.md
 
-## Setup and Installation
+## Setup and Installation Locally
 
 ### Prerequisites
 
