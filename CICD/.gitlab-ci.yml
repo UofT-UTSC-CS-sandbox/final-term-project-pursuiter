@@ -1,0 +1,97 @@
+stages:
+  - build
+  - test
+  - push
+
+services:
+  - docker:20.10.16-dind
+  - name: mongo:latest
+    alias: mongo
+
+variables:
+  DOCKER_DRIVER: overlay2
+  IMAGE_TAG: $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG
+  API_KEY: $API_KEY
+  MONGO_URI: "mongodb://mongo:27017/pursuiter_test"
+  DB_NAME: "pursuiter_test"
+  DOCKER_HOST: tcp://docker:2375
+  DOCKER_TLS_CERTDIR: ""
+
+build_backend:
+  stage: build
+  image: docker:20.10.16
+  before_script:
+    - docker info
+    - echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" --password-stdin $CI_REGISTRY
+    - echo "$DOCKER_HUB_PASSWORD" | docker login -u "$DOCKER_HUB_USERNAME" --password-stdin
+  script:
+    - docker build -t $IMAGE_TAG-backend -f Dockerfile_backend .
+    - docker push $IMAGE_TAG-backend
+  only:
+    - main
+
+test_backend:
+  stage: test
+  image: debian:latest
+  before_script:
+    - apt-get update && apt-get install -y curl gnupg2 software-properties-common
+    - curl -fsSL https://download.docker.com/linux/debian/gpg | apt-key add -
+    - add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/debian $(lsb_release -cs) stable"
+    - apt-get update && apt-get install -y docker.io
+    - curl -fsSL https://deb.nodesource.com/setup_20.x | bash -
+    - apt-get install -y nodejs
+    - npm install -g npm@latest
+  script:
+    - echo "Running backend tests..."
+    - cd backend
+    - npm install
+    - npm test
+  variables:
+    MONGO_URI: mongodb://mongo:27017/pursuiter_test
+    DB_NAME: pursuiter_test
+    GEMINI_API_KEY: $GEMINI_API_KEY
+    GOOGLE_CLIENT_ID: $GOOGLE_CLIENT_ID
+    GOOGLE_CLIENT_SECRET: $GOOGLE_CLIENT_SECRET
+  only:
+    - main
+
+push_backend:
+  stage: push
+  image: docker:20.10.16
+  before_script:
+    - docker info
+    - echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" --password-stdin $CI_REGISTRY
+    - echo "$DOCKER_HUB_PASSWORD" | docker login -u "$DOCKER_HUB_USERNAME" --password-stdin
+  script:
+    - docker pull $IMAGE_TAG-backend
+    - docker tag $IMAGE_TAG-backend mohammadalqasem/pursuiter-backend:latest
+    - docker push mohammadalqasem/pursuiter-backend:latest
+  only:
+    - main
+
+build_frontend:
+  stage: build
+  image: docker:20.10.16
+  before_script:
+    - docker info
+    - echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" --password-stdin $CI_REGISTRY
+    - echo "$DOCKER_HUB_PASSWORD" | docker login -u "$DOCKER_HUB_USERNAME" --password-stdin
+  script:
+    - docker build -t $IMAGE_TAG-frontend -f Dockerfile_frontend .
+    - docker push $IMAGE_TAG-frontend
+  only:
+    - main
+
+push_frontend:
+  stage: push
+  image: docker:20.10.16
+  before_script:
+    - docker info
+    - echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" --password-stdin $CI_REGISTRY
+    - echo "$DOCKER_HUB_PASSWORD" | docker login -u "$DOCKER_HUB_USERNAME" --password-stdin
+  script:
+    - docker pull $IMAGE_TAG-frontend
+    - docker tag $IMAGE_TAG-frontend mohammadalqasem/pursuiter-frontend:latest
+    - docker push mohammadalqasem/pursuiter-frontend:latest
+  only:
+    - main

@@ -12,7 +12,7 @@ dotenv.config({ path: `.env.${env}` });
 
 const app = express();
 const PORT = process.env.PORT || 4000;
-const mongoURL = process.env.MONGO_URI || "mongodb://localhost:27017";
+const mongoURL ="mongodb+srv://mohammadqassim000:xVTcVQ2a7IA3HL0C@cluster0.s77zm.mongodb.net/";
 const dbName = process.env.DB_NAME || "pursuiter";
 
 const CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
